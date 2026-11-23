@@ -1,0 +1,50 @@
+{
+  "stations": [
+    {
+      "title": "Kwabena",
+      "say": "Why did the clock stop at 44:59?",
+      "note": "Poolside desk. BL-31."
+    },
+    {
+      "title": "Session timer",
+      "text": "Runs every second, all session long.",
+      "note": "Nobody blew the whistle."
+    },
+    {
+      "title": "Your fix",
+      "file": "Gate.jsx",
+      "mine": true,
+      "gap": "Each tick reads an old draw",
+      "tasks": [
+        "Mend the clock",
+        "Family ticket counts",
+        "Steady when busy"
+      ]
+    },
+    {
+      "title": "Poolside screen",
+      "rows": [
+        [
+          "Session ends in"
+        ],
+        [
+          "In the water"
+        ]
+      ],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "The clock",
+    "wrong": "stuck at 44:59",
+    "why": "Old draw",
+    "right": "counts down"
+  },
+  "captions": [
+    "At Brimwell Lido, Kwabena asks why the session clock sat at 44:59 all morning.",
+    "The timer runs every second, and every second the clock shows the same number.",
+    "You mend the clock, find the same cause at the gate, and keep it steady, in three tasks.",
+    "The ten o'clock session counts down to the whistle, a second at a time.",
+    "Same timer, same buttons. The clock and the count now read the newest state."
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "imelda",
+        "label": "Imelda",
+        "kind": "story"
+      },
+      {
+        "id": "search",
+        "label": "MemberSearch",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "system",
+        "label": "Membership system",
+        "kind": "story"
+      },
+      {
+        "id": "results",
+        "label": "Results",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "visits",
+        "label": "Visits",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "screen",
+        "label": "Search screen",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "imelda",
+        "to": "search",
+        "label": "types, picks"
+      },
+      {
+        "from": "search",
+        "to": "system",
+        "label": "searches"
+      },
+      {
+        "from": "system",
+        "to": "results",
+        "label": "answers"
+      },
+      {
+        "from": "system",
+        "to": "visits",
+        "label": "visits"
+      },
+      {
+        "from": "results",
+        "to": "screen",
+        "label": "list"
+      },
+      {
+        "from": "visits",
+        "to": "screen",
+        "label": "card"
+      }
+    ],
+    "note": "Every letter typed and every member picked sends a request, and the answers come back in whatever order the system manages."
+  },
+  "tasks": {
+    "search": {
+      "steps": [
+        {
+          "active": [
+            "imelda",
+            "imelda->search",
+            "search"
+          ],
+          "note": "Imelda types m, a, r, a letter at a time."
+        },
+        {
+          "active": [
+            "search",
+            "search->system",
+            "system"
+          ],
+          "note": "Each letter sends a search, and all three are on their way at once."
+        },
+        {
+          "active": [
+            "system",
+            "system->results",
+            "results"
+          ],
+          "note": "The answers come back in any order; only the answer for the text typed last is still wanted."
+        },
+        {
+          "active": [
+            "results",
+            "results->screen",
+            "screen"
+          ],
+          "note": "The list shows the results for \"mar\", whatever arrived after it."
+        }
+      ]
+    },
+    "visits": {
+      "steps": [
+        {
+          "active": [
+            "imelda",
+            "imelda->search",
+            "search"
+          ],
+          "note": "Imelda picks Mateo, then quickly Delphine."
+        },
+        {
+          "active": [
+            "search",
+            "search->system",
+            "system"
+          ],
+          "note": "Each pick asks for that member's visits."
+        },
+        {
+          "active": [
+            "system",
+            "system->visits",
+            "visits",
+            "visits->screen",
+            "screen"
+          ],
+          "note": "Mateo's visits come last, and the card still shows Delphine's, under her name."
+        }
+      ]
+    },
+    "first-answer": {
+      "steps": [
+        {
+          "active": [
+            "imelda",
+            "imelda->search",
+            "search->system",
+            "system"
+          ],
+          "note": "Imelda types at her own speed, and each letter asks at once."
+        },
+        {
+          "active": [
+            "system",
+            "system->results",
+            "results",
+            "results->screen",
+            "screen"
+          ],
+          "note": "The answer for the text typed last shows the moment it comes, even with older ones still out."
+        },
+        {
+          "active": [
+            "imelda",
+            "search",
+            "system",
+            "visits",
+            "screen"
+          ],
+          "note": "A member picked shows their visits as soon as they come."
+        }
+      ]
+    }
+  }
+}

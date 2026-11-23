@@ -1,0 +1,78 @@
+{
+  "id": "old-search-results",
+  "title": "The search shows what I typed before",
+  "files": ["src/MemberSearch.jsx", "src/App.jsx", "src/members.js"],
+  "terminal": {
+    "description": "The member search runs in the Browser panel and reloads every time you save. This shell opens in your workspace in case you want to look around."
+  },
+  "preview": "index.html",
+  "tasks": [
+    {
+      "id": "search",
+      "title": "Show the results of the search typed last",
+      "file": "src/MemberSearch.jsx",
+      "description": "Whatever order the answers of `searchMembers` arrive in, the list shows the results of the text typed last. An answer to a search nobody wants any more changes nothing, and when the box is emptied the list stays empty.\n\nThe check gives the screen a membership system of its own that answers only when the check says so. It types searches one letter at a time, answers them in the wrong order and in the right one, empties the box while searches are out, and reads the list after each.",
+      "nextSteps": [
+        "Type \"mar\" quickly in the Browser panel and watch the list.",
+        "Read \"Answers that arrive out of order\" in the lesson.",
+        "In the search effect, keep a flag that says whether this search is still wanted, and turn it off in the effect's cleanup.",
+        "Only set the results while the search is still wanted."
+      ],
+      "hints": [
+        "Each letter starts a search, and a short search takes longer to answer. Look at what happens when the answer for \"m\" comes after the answer for \"mar\".",
+        "When the text changes, React runs the cleanup of the effect from the last text before it runs the new one. A variable declared inside the effect belongs to that run only, so the cleanup can mark that run's search as no longer wanted. Cancelling it with an `AbortController` works too.",
+        "`let ignore = false` at the start of the effect, `if (!ignore) setResults(found)` in `then`, and `return () => { ignore = true }` at its end."
+      ],
+      "docs": [
+        { "title": "Fetching data in an effect", "url": "https://react.dev/learn/synchronizing-with-effects#fetching-data" },
+        { "title": "AbortController", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortController" }
+      ],
+      "videos": [{ "title": "Answers out of order in an effect", "url": "https://www.youtube.com/watch?v=iXGOVcAe_xo" }],
+      "points": 10
+    },
+    {
+      "id": "visits",
+      "title": "Show the visits of the member picked last",
+      "file": "src/MemberSearch.jsx",
+      "description": "Find the same cause in another part of the screen. Picking a member asks for their visits with `loadVisits`. Whatever order those answers arrive in, the card shows the visits of the member picked last, under their name.\n\nThe check types one search and answers it, picks two members one after the other, answers their visits in the wrong order and then in the right one, and reads the card after each.",
+      "nextSteps": [
+        "Search for \"e\" in the Browser panel, pick Mateo and then quickly Delphine.",
+        "Look at the effect that loads the visits.",
+        "Mend it the way you mended the search.",
+        "Pick members quickly and watch the card."
+      ],
+      "hints": [
+        "Mateo has a long history, so his visits take longer to come than Delphine's.",
+        "It is the same race as the search, with the member picked in place of the text typed. The effect's cleanup runs when another member is picked.",
+        "The same `ignore` flag in the visits effect, checked before `setVisits`."
+      ],
+      "docs": [
+        { "title": "Lifecycle of reactive effects", "url": "https://react.dev/learn/lifecycle-of-reactive-effects" },
+        { "title": "Fetching data with effects", "url": "https://react.dev/reference/react/useEffect#fetching-data-with-effects" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "first-answer",
+      "title": "Show every answer that is still wanted, at once",
+      "file": "src/MemberSearch.jsx",
+      "description": "The fix must not slow the desk down. Each search goes out as soon as the text changes, without waiting on a timer; the search box takes every letter while a search is out; and the answer to the search typed last shows as soon as it comes, even while an older search is still out. A new search shows its first answer, and a member picked shows their visits.\n\nThe check types while searches are out, answers the newest first, starts a new search, picks a member, and reads the box, the list and the card after each. Its clock never moves on, so a search held back by a timer never goes out.",
+      "nextSteps": [
+        "Read \"When a blunt fix makes it worse\" in the lesson.",
+        "Make sure nothing in the screen waits on a timer or locks the box.",
+        "Make sure only answers nobody wants are left out, not every answer while another is out.",
+        "Type quickly and slowly in the Browser panel and watch the list."
+      ],
+      "hints": [
+        "Waiting until the typing stops, or locking the box, hides the race for a while and makes every search slower.",
+        "The newest search does not have to wait for the old ones: it decides for itself whether it is still wanted. A count of searches still out cannot tell that.",
+        "One `ignore` flag per run of the effect, set in its cleanup, is all it takes: no timer, no `disabled`, no counting."
+      ],
+      "docs": [
+        { "title": "You might not need an effect: fetching data", "url": "https://react.dev/learn/you-might-not-need-an-effect#fetching-data" },
+        { "title": "AbortSignal", "url": "https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal" }
+      ],
+      "points": 10
+    }
+  ]
+}

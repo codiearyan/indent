@@ -1,0 +1,53 @@
+{
+  "stations": [
+    {
+      "title": "Kwabena",
+      "say": "Why is Bronwen's note by Esme?",
+      "note": "Saturday lessons. BL-40."
+    },
+    {
+      "title": "Register",
+      "rows": [
+        [
+          "Arlo"
+        ],
+        [
+          "Bronwen",
+          "lost her goggles"
+        ],
+        [
+          "Esme"
+        ]
+      ],
+      "mark": 1
+    },
+    {
+      "title": "Your fix",
+      "file": "Register.jsx",
+      "mine": true,
+      "gap": "Rows matched by place",
+      "tasks": [
+        "Notes stay put",
+        "Ticks stay put",
+        "Steady when busy"
+      ]
+    },
+    {
+      "title": "Pick-up",
+      "say": "Is that note for my child?"
+    }
+  ],
+  "ticket": {
+    "label": "Goggles note",
+    "wrong": "by Esme",
+    "why": "Wrong row",
+    "right": "by Bronwen"
+  },
+  "captions": [
+    "Next, Kwabena takes Arlo off the register, and the notes move to other children.",
+    "Bronwen's note now sits beside Esme, and the waiting list's ticks move when it is sorted.",
+    "You give every row a key of its own, in the class and the waiting list, in three tasks.",
+    "Arlo leaves, and Bronwen's note stays beside Bronwen.",
+    "Same register, same notes. Each child keeps what was typed for them."
+  ]
+}

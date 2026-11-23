@@ -1,0 +1,190 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "agnieszka",
+        "label": "Agnieszka",
+        "kind": "story"
+      },
+      {
+        "id": "desk",
+        "label": "MemberDesk",
+        "kind": "function"
+      },
+      {
+        "id": "card",
+        "label": "MemberCard",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "system",
+        "label": "Membership system",
+        "kind": "story"
+      },
+      {
+        "id": "keys",
+        "label": "Keyboard",
+        "kind": "story"
+      },
+      {
+        "id": "screen",
+        "label": "Member card",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "agnieszka",
+        "to": "desk",
+        "label": "picks"
+      },
+      {
+        "from": "desk",
+        "to": "card",
+        "label": "memberId"
+      },
+      {
+        "from": "card",
+        "to": "system",
+        "label": "loadMember, logSwim"
+      },
+      {
+        "from": "system",
+        "to": "card",
+        "label": "the member"
+      },
+      {
+        "from": "keys",
+        "to": "card",
+        "label": "+"
+      },
+      {
+        "from": "card",
+        "to": "screen",
+        "label": "name, swims"
+      }
+    ],
+    "note": "The card asks the membership system for the member picked, and listens for the + key to log a swim, from two effects."
+  },
+  "tasks": {
+    "card": {
+      "steps": [
+        {
+          "active": [
+            "agnieszka",
+            "agnieszka->desk",
+            "desk",
+            "desk->card",
+            "card"
+          ],
+          "note": "Agnieszka picks Delphine in the list, and the card gets her id."
+        },
+        {
+          "active": [
+            "card",
+            "card->system",
+            "system"
+          ],
+          "note": "The card sees the member picked has changed, and asks for Delphine."
+        },
+        {
+          "active": [
+            "card",
+            "screen"
+          ],
+          "note": "While the answer is on its way, the card says it is loading."
+        },
+        {
+          "active": [
+            "system",
+            "system->card",
+            "card",
+            "card->screen",
+            "screen"
+          ],
+          "note": "The answer comes, and the card shows Delphine.",
+          "value": {
+            "kind": "map",
+            "label": "the member",
+            "entries": [
+              {
+                "key": "name",
+                "value": "full name"
+              },
+              {
+                "key": "pass",
+                "value": "the pass they hold"
+              },
+              {
+                "key": "swims",
+                "value": "swims this season"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "plus": {
+      "steps": [
+        {
+          "active": [
+            "keys",
+            "keys->card",
+            "card"
+          ],
+          "note": "A member shows their card at the desk, and Agnieszka presses + once."
+        },
+        {
+          "active": [
+            "card",
+            "card->system",
+            "system"
+          ],
+          "note": "One swim is logged for the member on the card."
+        },
+        {
+          "active": [
+            "card",
+            "card->screen",
+            "screen"
+          ],
+          "note": "The count on the card goes up by one."
+        },
+        {
+          "active": [
+            "card",
+            "keys"
+          ],
+          "note": "Once the card has left the screen, + logs nothing."
+        }
+      ]
+    },
+    "calm": {
+      "steps": [
+        {
+          "active": [
+            "agnieszka",
+            "card"
+          ],
+          "note": "Agnieszka types a note on the card, a letter at a time."
+        },
+        {
+          "active": [
+            "card",
+            "card->screen",
+            "screen"
+          ],
+          "note": "Every letter draws the card again."
+        },
+        {
+          "active": [
+            "card",
+            "system"
+          ],
+          "note": "The member picked has not changed, so the card asks the membership system for nothing."
+        }
+      ]
+    }
+  }
+}
