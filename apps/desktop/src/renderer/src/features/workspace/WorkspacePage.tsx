@@ -106,7 +106,8 @@ export function WorkspacePage(): React.JSX.Element {
       {labId && <ToolNotice labId={labId} />}
       <MissingFilesNotice />
       <CompanionBar />
-      <div className="mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
+      {/* `relative`: the expanded Browser panel covers this sheet, not the window and its top bar. */}
+      <div className="relative mx-2 mb-2 min-h-0 flex-1 overflow-hidden rounded-2xl border border-border bg-card">
         {notice && labId && chapterId ? (
           <RepoNotice labId={labId} chapterId={chapterId} />
         ) : companion ? (
