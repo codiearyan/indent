@@ -1,0 +1,129 @@
+{
+  "id": "arrays",
+  "title": "Arrays: a whole day in one variable",
+  "files": ["Crossings.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the log here, and try your methods from main.",
+    "suggestedCommand": "java Crossings.java"
+  },
+  "tasks": [
+    {
+      "id": "last-crossing",
+      "title": "Read the last crossing",
+      "file": "Crossings.java",
+      "description": "Under `// Task 1` in `Crossings.java`, write a method called `lastCrossing`. It takes an `int[]` of passengers, one per crossing, and gives back an `int`: the passengers of the last crossing. The array always has at least one crossing, and it can be of any length.\n\nCheck calls `lastCrossing` with logs of its own, of different lengths, and reads what it gives back.",
+      "nextSteps": [
+        "Write the first line: the parameter's type is `int[]`.",
+        "Work out the position of the last item of an array of 3, then of 6.",
+        "Write that position using the array's `length`, so it works for any length.",
+        "Try it from `main`, then try a typed-in position and read what happens."
+      ],
+      "hints": [
+        "Positions start at 0, so the last position is not the length.",
+        "An array of length 3 has positions 0, 1 and 2. `passengers.length` gives the length of any array.",
+        "The method gives back `passengers[passengers.length - 1]`."
+      ],
+      "docs": [
+        {
+          "title": "Arrays",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html"
+        },
+        {
+          "title": "ArrayIndexOutOfBoundsException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ArrayIndexOutOfBoundsException.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Making and reading arrays",
+          "url": "https://www.youtube.com/watch?v=B10TjOAyBnw"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Add up the day",
+      "file": "Crossings.java",
+      "description": "Under `// Task 2`, write a method called `total`. It takes an `int[]` of passengers and gives back an `int`: all of them added up. A day with no crossings, an empty array, has a total of 0.\n\nCheck calls `total` with logs of its own, an empty one included, and reads what it gives back.",
+      "nextSteps": [
+        "Make a running total before the loop, as in the loops issue.",
+        "Loop over every position of the array, from the first to the last.",
+        "Add the item at each position to the total, and give the total back after the loop.",
+        "Try it from `main` with today's log."
+      ],
+      "hints": [
+        "The positions of an array run from 0 to one less than its `length`.",
+        "With `i <= passengers.length` the loop asks for one position too many, and the program stops with an `ArrayIndexOutOfBoundsException`.",
+        "The loop is `for (int i = 0; i < passengers.length; i++) { sum = sum + passengers[i]; }`, with `sum` made at 0 before it."
+      ],
+      "docs": [
+        {
+          "title": "Arrays",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html"
+        },
+        {
+          "title": "The for statement",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "busiest",
+      "title": "Find the busiest crossing",
+      "file": "Crossings.java",
+      "description": "Under `// Task 3`, write a method called `busiest`. It takes an `int[]` of passengers, with at least one crossing, and gives back an `int`: the position of the crossing that carried the most. If two carried the same most, give back the earlier one.\n\nCheck calls `busiest` with logs of its own, one with two busiest crossings, and reads what it gives back.",
+      "nextSteps": [
+        "Keep the position of the best crossing so far, starting with the first.",
+        "Loop over the other positions.",
+        "When a crossing carried more than the best so far, keep its position instead.",
+        "Give the position back after the loop, and try a log with a tie."
+      ],
+      "hints": [
+        "The task asks for a position, not a number of passengers. The passengers at the best position are `passengers[best]`.",
+        "Only replace the best when a crossing carried more, not the same: then a tie keeps the earlier one.",
+        "Start with `int best = 0;`, loop `i` from 1, and inside write `if (passengers[i] > passengers[best]) { best = i; }`."
+      ],
+      "docs": [
+        {
+          "title": "Arrays",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html"
+        },
+        {
+          "title": "Equality and relational operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "departures",
+      "title": "Make the departures",
+      "file": "Crossings.java",
+      "description": "Under `// Task 4`, write a method called `departures`. It takes two `int`s, `firstHour` and `crossings`, and gives back a new `int[]` with one hour for each crossing: `firstHour`, the hour after, and so on. For 7 and 3 that is 7, 8 and 9.\n\nCheck calls `departures` with hours and crossings of its own, none included, and reads every item of the array it gives back.",
+      "nextSteps": [
+        "Make a new array with one place for each crossing.",
+        "Loop over its positions.",
+        "Put an hour in each place, built from `firstHour` and the position.",
+        "Give the array back, and print its first and last item from `main`."
+      ],
+      "hints": [
+        "`new int[n]` makes an array of `n` places, each starting at 0. Its type, for the method's first line, is `int[]`.",
+        "Position 0 holds `firstHour`, position 1 the hour after. The position says how many hours later.",
+        "Inside the method: `int[] hours = new int[crossings];`, then a loop with `hours[i] = firstHour + i;`, then `return hours;`."
+      ],
+      "docs": [
+        {
+          "title": "Arrays: creating and filling",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html"
+        },
+        {
+          "title": "Arrays in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-10.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

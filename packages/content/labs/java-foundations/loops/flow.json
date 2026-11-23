@@ -1,0 +1,104 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "numbers", "label": "Today's numbers", "kind": "data" },
+      { "id": "file", "label": "Timetable.java", "kind": "file", "mine": true },
+      { "id": "gate", "label": "Boarding gate", "kind": "story" },
+      { "id": "board", "label": "Departures board", "kind": "story" },
+      { "id": "printer", "label": "Ticket printer", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "numbers", "to": "file", "label": "values" },
+      { "from": "file", "to": "gate", "label": "countdown" },
+      { "from": "file", "to": "board", "label": "departures" },
+      { "from": "file", "to": "printer", "label": "name end" }
+    ],
+    "note": "Timetable.java runs the same lines again and again: once a minute, once an hour, once a year, once a letter."
+  },
+  "tasks": {
+    "countdown": {
+      "steps": [
+        {
+          "active": ["numbers", "numbers->file", "file"],
+          "note": "The countdown starts from the minutes left before the boat goes."
+        },
+        {
+          "active": ["file"],
+          "note": "Each time round it says the minutes left, and something has to bring departure one minute closer."
+        },
+        {
+          "active": ["file", "file->gate", "gate"],
+          "note": "When no minutes are left, the gate says boarding has closed, once."
+        }
+      ]
+    },
+    "departures": {
+      "steps": [
+        {
+          "active": ["numbers", "numbers->file", "file"],
+          "note": "The day has a first hour and a last hour, and a boat leaves every hour between them."
+        },
+        {
+          "active": ["file"],
+          "note": "A counter walks the hours from the first to the last, both included."
+        },
+        {
+          "active": ["file", "file->board", "board"],
+          "value": { "kind": "array", "label": "board", "values": ["Departs, hour, :00", "one line per hour"] },
+          "note": "The board gets one line for each departure."
+        }
+      ]
+    },
+    "passengers": {
+      "steps": [
+        {
+          "active": ["numbers", "numbers->file", "file"],
+          "note": "Departures in the morning rush carry more people than the quiet ones."
+        },
+        {
+          "active": ["file"],
+          "note": "A total starts at nothing, and each departure adds its passengers to it."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "passengersToday", "values": ["every departure added up"] },
+          "note": "After the last departure, the total is the day's passengers."
+        }
+      ]
+    },
+    "fare-rise": {
+      "steps": [
+        {
+          "active": ["numbers", "numbers->file", "file"],
+          "note": "The fare today and the fare the council has in mind."
+        },
+        {
+          "active": ["file"],
+          "note": "Each year the fare grows by a twentieth of itself, and one more year is counted."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "years", "values": ["years until the fare gets there"] },
+          "note": "The counting stops in the year the fare reaches the target."
+        }
+      ]
+    },
+    "name-end": {
+      "steps": [
+        {
+          "active": ["numbers", "numbers->file", "file"],
+          "note": "A ticket starts with the boat's name, and a space ends it."
+        },
+        {
+          "active": ["file"],
+          "note": "The loop looks at one letter at a time, and stops at the first space it meets."
+        },
+        {
+          "active": ["file", "file->printer", "printer"],
+          "value": { "kind": "array", "label": "nameEnd", "values": ["position of the first space"] },
+          "note": "The printer learns where the name ends, even for a ticket with no space."
+        }
+      ]
+    }
+  }
+}

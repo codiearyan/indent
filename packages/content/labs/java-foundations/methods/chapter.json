@@ -1,0 +1,129 @@
+{
+  "id": "methods",
+  "title": "Methods: rules you can reuse",
+  "files": ["FareRules.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the fare rules here, and try your methods from main.",
+    "suggestedCommand": "java FareRules.java"
+  },
+  "tasks": [
+    {
+      "id": "child-fare",
+      "title": "Write childFare",
+      "file": "FareRules.java",
+      "description": "Under `// Task 1` in `FareRules.java`, below `main`, write a method called `childFare`. It takes one `int`, the single fare in pence, and gives back an `int`: half of it, in whole pence. Write all of it, from `static` to its closing brace.\n\nCheck calls `childFare` from code of its own with fares of its own, one of them odd, and reads what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson about the first line of a method.",
+        "Write the first line: `static`, the type it gives back, the name, and the parameter in round brackets.",
+        "In its braces, give back half of the parameter with `return`.",
+        "Take the `//` off the line in `main` that calls it, and run the program."
+      ],
+      "hints": [
+        "A method goes inside the class but outside `main`: below `main`'s closing brace, under the Task 1 comment.",
+        "The first line has the shape `static <type it gives back> <name>(<type> <parameter name>)`. Inside, `return` gives a value back to whoever called it.",
+        "The method is `static int childFare(int singleFarePence) { return singleFarePence / 2; }`."
+      ],
+      "docs": [
+        {
+          "title": "Defining methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html"
+        },
+        {
+          "title": "Returning a value from a method",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/returnvalue.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Method parameters and return types",
+          "url": "https://www.youtube.com/watch?v=CRX02YMsLqA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "print-ticket",
+      "title": "Write printTicket",
+      "file": "FareRules.java",
+      "description": "Under `// Task 2`, write a `void` method called `printTicket`. It takes a `String`, the destination, then an `int`, the fare in pence, and prints one line:\n\n```\nTicket to Corran, 320 pence\n```\n\nCheck calls `printTicket` with destinations and fares of its own and reads the line it prints.",
+      "nextSteps": [
+        "Write the first line: `void` in place of a type, because it gives nothing back.",
+        "Put the two parameters in the round brackets, in the order the task gives, separated by a comma.",
+        "Inside, print the line built from the two parameters.",
+        "Call it from `main` with a destination and a fare of your own."
+      ],
+      "hints": [
+        "A `void` method does its job and gives nothing back, so it has no `return` with a value.",
+        "Parameters are written as type and name, one after another with commas: `(String destination, int farePence)`.",
+        "Inside, one line: `System.out.println(\"Ticket to \" + destination + \", \" + farePence + \" pence\");`."
+      ],
+      "docs": [
+        {
+          "title": "Defining methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html"
+        },
+        {
+          "title": "Passing information to a method",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "party-fare",
+      "title": "Write partyFare",
+      "file": "FareRules.java",
+      "description": "Under `// Task 3`, write a method called `partyFare`. It takes three `int`s: the adults, the children and the single fare in pence, and gives back an `int`: what the whole party pays. Each adult pays the single fare, and each child pays the child fare. Call `childFare` from Task 1 for a child's fare.\n\nCheck calls `partyFare` with parties and fares of its own, one fare odd, reads what it gives back, and reads your lines for the call to `childFare`.",
+      "nextSteps": [
+        "Make sure Task 1 passes first: this method builds on it.",
+        "Write the first line with three parameters, in the order the task gives.",
+        "Work out the adults' part and the children's part, calling `childFare` for one child's fare.",
+        "Give back the two added together, and try it from `main`."
+      ],
+      "hints": [
+        "One method can call another, just as `main` does: write its name and the value to pass in round brackets.",
+        "`childFare(singleFarePence)` is one child's fare. Multiply it by the number of children.",
+        "The return line has the shape `return adults * singleFarePence + children * childFare(singleFarePence);`."
+      ],
+      "docs": [
+        {
+          "title": "Defining methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html"
+        },
+        {
+          "title": "Class methods and static",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/classvars.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seats-after",
+      "title": "Make seatsAfter give back the seats",
+      "file": "FareRules.java",
+      "description": "Under `// Task 4`, Ossian's `seatsAfter` should take the passengers who board off the seats left, but in `main` `seatsLeft` never changes. Make it give back, as an `int`, the seats left after `boarding` passengers board, and never less than 0.\n\nCheck calls `seatsAfter` with seats and passengers of its own, one where more want to board than there are seats, and reads what it gives back.",
+      "nextSteps": [
+        "Run the program: `main` prints 48 seats left after 5 board. Read the lesson's part about copies.",
+        "Change the type in front of the name, so the method gives back a number.",
+        "Give back the seats left, and 0 when more want to board than there are seats.",
+        "In `main`, keep what it gives back in `seatsLeft`, and run again."
+      ],
+      "hints": [
+        "A method gets copies of the values it is called with. Changing a parameter changes only the copy, never the caller's variable.",
+        "To get a value out of a method, give it back with `return`, and have the caller keep it: `seatsLeft = seatsAfter(seatsLeft, 5);`.",
+        "The method is `static int seatsAfter(int seatsLeft, int boarding)`, with `if (boarding > seatsLeft) { return 0; }` and then `return seatsLeft - boarding;`."
+      ],
+      "docs": [
+        {
+          "title": "Passing information to a method",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/arguments.html"
+        },
+        {
+          "title": "Returning a value from a method",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/returnvalue.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

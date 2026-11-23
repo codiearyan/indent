@@ -1,0 +1,129 @@
+{
+  "id": "lists",
+  "title": "Lists that grow",
+  "files": ["WaitingList.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the waiting list here, and try your methods from main.",
+    "suggestedCommand": "java WaitingList.java"
+  },
+  "tasks": [
+    {
+      "id": "waiting-list",
+      "title": "Make the waiting list",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 1` in `WaitingList.java`, write a method called `waitingList`. It takes a `String[]` of the people in the queue, in order, and an `int`, the seats on the boat. The first `seats` people in the queue board; it gives back a new `ArrayList<String>` of everyone after them, in queue order.\n\nCheck calls `waitingList` with queues and boats of its own, one where everyone gets a seat, and reads every name on the list it gives back.",
+      "nextSteps": [
+        "Write the first line: the method gives back an `ArrayList<String>`.",
+        "Make a new, empty list inside the method.",
+        "Loop over the queue from the first person without a seat to the end, adding each one.",
+        "Give the list back, and print it from `main`."
+      ],
+      "hints": [
+        "`new ArrayList<>()` makes an empty list; `add` puts a name at its end.",
+        "The first `seats` people are at positions 0 to `seats - 1`. The first one without a seat is at position `seats`.",
+        "Inside: `ArrayList<String> waiting = new ArrayList<>();`, then `for (int i = seats; i < queue.length; i++) { waiting.add(queue[i]); }`, then `return waiting;`."
+      ],
+      "docs": [
+        {
+          "title": "ArrayList",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+        },
+        {
+          "title": "The List interface",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/interfaces/list.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Adding, reading and removing in an ArrayList",
+          "url": "https://www.youtube.com/watch?v=hJobOCPNnsc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "last-on-list",
+      "title": "Find the last name on the list",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 2`, write a method called `lastOnList`. It takes an `ArrayList<String>` and gives back a `String`: the last name on it, or `Nobody` when the list is empty.\n\nCheck calls `lastOnList` with lists of its own, an empty one included, and reads what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson about reading a list: it has no square brackets and no `length`.",
+        "Handle the empty list first.",
+        "Work out the position of the last name from the list's size.",
+        "Try it from `main` with the waiting list, then with an empty list."
+      ],
+      "hints": [
+        "A list tells you how many names it holds with `size()`, and gives the name at a position with `get`.",
+        "Positions start at 0, so the last is one less than the size. An empty list has no last position at all.",
+        "The shape is `if (waiting.size() == 0) { return \"Nobody\"; }` then `return waiting.get(waiting.size() - 1);`."
+      ],
+      "docs": [
+        {
+          "title": "ArrayList: get and size",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+        },
+        {
+          "title": "IndexOutOfBoundsException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IndexOutOfBoundsException.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sailed-loads",
+      "title": "Keep the loads of the crossings that sailed",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 3`, write a method called `sailedLoads`. It takes an `int[]` of passengers, one per crossing, and gives back a new `ArrayList<Integer>` of the counts above 0, in order. Walk the array with a for-each loop.\n\nCheck calls `sailedLoads` with arrays of its own, an empty one included, reads every number on the list it gives back, and reads your lines for the for-each loop.",
+      "nextSteps": [
+        "Read the part of the lesson about lists of numbers and the word `Integer`.",
+        "Write the first line and make an empty list of whole numbers.",
+        "Walk the array with a for-each loop, and add each count above 0.",
+        "Give the list back, and print it from `main`."
+      ],
+      "hints": [
+        "A list holds objects, so a list of whole numbers is written `ArrayList<Integer>`, never `ArrayList<int>`. Adding an `int` to it just works.",
+        "The for-each loop over an array reads `for (int count : passengers)`: each time round, `count` is the next value.",
+        "Inside the loop: `if (count > 0) { loads.add(count); }`, with `ArrayList<Integer> loads = new ArrayList<>();` before it."
+      ],
+      "docs": [
+        {
+          "title": "Autoboxing: int and Integer",
+          "url": "https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html"
+        },
+        {
+          "title": "The for statement, for-each included",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "cancel",
+      "title": "Cancel every booking under a name",
+      "file": "WaitingList.java",
+      "description": "Under `// Task 4`, write a `void` method called `cancel`. It takes an `ArrayList<String>` of bookings and a `String`, a name, and removes every booking under that name from the list it was given. The other bookings stay, in their order.\n\nCheck makes lists of its own, one with two bookings under the name side by side, calls `cancel` on each, and then reads the list it passed in.",
+      "nextSteps": [
+        "Read the part of the lesson about removing from a list while you walk it.",
+        "Decide which way to walk the list so that removing does not make you step over a name.",
+        "Compare each booking with the name using `equals`, and remove it when they match.",
+        "Try it from `main`: the bookings list there has the same name twice."
+      ],
+      "hints": [
+        "`remove(i)` takes out the item at position `i`, and every item after it moves one place forward.",
+        "Walking from the end to the start, the items that move have already been looked at. A for-each loop cannot remove at all.",
+        "Loop `for (int i = bookings.size() - 1; i >= 0; i--)`, and inside write `if (bookings.get(i).equals(name)) { bookings.remove(i); }`."
+      ],
+      "docs": [
+        {
+          "title": "ArrayList: remove",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+        },
+        {
+          "title": "ConcurrentModificationException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ConcurrentModificationException.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

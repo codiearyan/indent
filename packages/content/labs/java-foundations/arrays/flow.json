@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ossian", "label": "Ossian", "kind": "story" },
+      { "id": "log", "label": "Day's log", "kind": "data" },
+      { "id": "file", "label": "Crossings.java", "kind": "file", "mine": true },
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "boat", "label": "Tomorrow's sheet", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ossian", "to": "log", "label": "a count a crossing" },
+      { "from": "log", "to": "file", "label": "int[]" },
+      { "from": "file", "to": "bridie", "label": "answers" },
+      { "from": "file", "to": "boat", "label": "hours" }
+    ],
+    "note": "A whole day of crossings travels as one array, and each method reads it from the first place to the last."
+  },
+  "tasks": {
+    "last-crossing": {
+      "steps": [
+        {
+          "active": ["ossian", "ossian->log", "log"],
+          "value": { "kind": "array", "label": "passengers", "values": ["first", "...", "last"] },
+          "note": "The log has one count for each crossing, as many as the day had."
+        },
+        {
+          "active": ["log", "log->file", "file"],
+          "note": "The last place is found from the length, whatever the day was like."
+        },
+        {
+          "active": ["file", "file->bridie", "bridie"],
+          "note": "Bridie gets the count of the last crossing when the boat ties up."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": ["log", "log->file", "file"],
+          "note": "The day's log comes in, perhaps with no crossings at all."
+        },
+        {
+          "active": ["file"],
+          "note": "Each place from the first to the last is added to a running total."
+        },
+        {
+          "active": ["file", "file->bridie", "bridie"],
+          "value": { "kind": "array", "label": "total", "values": ["the whole day added up"] },
+          "note": "One number goes to the council."
+        }
+      ]
+    },
+    "busiest": {
+      "steps": [
+        {
+          "active": ["log", "log->file", "file"],
+          "note": "The log comes in, and the first crossing is the best so far."
+        },
+        {
+          "active": ["file"],
+          "note": "Each later crossing takes the lead only if it carried more, so a tie keeps the earlier one."
+        },
+        {
+          "active": ["file", "file->bridie", "bridie"],
+          "value": { "kind": "array", "label": "busiest", "values": ["position in the log"] },
+          "note": "Bridie learns which crossing it was, by its place in the log."
+        }
+      ]
+    },
+    "departures": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "Tomorrow starts at a first hour, with a number of crossings."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "hours", "values": ["first hour", "an hour later", "..."] },
+          "note": "A new array gets one place per crossing, and each place gets its hour."
+        },
+        {
+          "active": ["file", "file->boat", "boat"],
+          "note": "The hours go on the sheet pinned to the boat."
+        }
+      ]
+    }
+  }
+}

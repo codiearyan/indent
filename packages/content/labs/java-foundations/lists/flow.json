@@ -1,0 +1,82 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "queue", "label": "Queue on the quay", "kind": "data" },
+      { "id": "file", "label": "WaitingList.java", "kind": "file", "mine": true },
+      { "id": "waiting", "label": "Waiting list", "kind": "data" },
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "ossian", "label": "Ossian", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "queue", "to": "file", "label": "names, seats" },
+      { "from": "file", "to": "waiting", "label": "grows, shrinks" },
+      { "from": "waiting", "to": "bridie", "label": "names" },
+      { "from": "file", "to": "ossian", "label": "loads" }
+    ],
+    "note": "The waiting list grows as people join and shrinks as they leave, which an array cannot do."
+  },
+  "tasks": {
+    "waiting-list": {
+      "steps": [
+        {
+          "active": ["queue", "queue->file", "file"],
+          "note": "The queue comes in, in order, with the seats on the boat."
+        },
+        {
+          "active": ["file"],
+          "note": "The first ones take the seats. Everyone after them is added to a new list, one by one."
+        },
+        {
+          "active": ["file", "file->waiting", "waiting"],
+          "value": { "kind": "array", "label": "waiting list", "values": ["first without a seat", "...", "end of the queue"] },
+          "note": "The waiting list holds them in queue order, and it can be empty."
+        }
+      ]
+    },
+    "last-on-list": {
+      "steps": [
+        {
+          "active": ["waiting"],
+          "note": "The waiting list may be long, short or empty."
+        },
+        {
+          "active": ["waiting", "waiting->bridie", "bridie"],
+          "note": "Bridie calls the last name on it, found from the list's size, or says there is nobody."
+        }
+      ]
+    },
+    "sailed-loads": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "The day's counts come in as an array, foggy crossings at nought among them."
+        },
+        {
+          "active": ["file"],
+          "note": "Each count is looked at in turn, and only crossings that carried someone are kept."
+        },
+        {
+          "active": ["file", "file->ossian", "ossian"],
+          "value": { "kind": "array", "label": "loads", "values": ["whole numbers", "in order"] },
+          "note": "Ossian gets a list of whole numbers: the crossings that sailed."
+        }
+      ]
+    },
+    "cancel": {
+      "steps": [
+        {
+          "active": ["waiting"],
+          "note": "Someone cancels, and they may have booked more than once, even twice in a row."
+        },
+        {
+          "active": ["file", "file->waiting", "waiting"],
+          "note": "Every booking under that name leaves the list Bridie keeps. Removing one moves the others up a place."
+        },
+        {
+          "active": ["waiting", "waiting->bridie", "bridie"],
+          "note": "The other bookings stay, in the order they were made."
+        }
+      ]
+    }
+  }
+}

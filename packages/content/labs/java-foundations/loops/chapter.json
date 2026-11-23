@@ -1,0 +1,157 @@
+{
+  "id": "loops",
+  "title": "Doing it again: loops",
+  "files": ["Timetable.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the timetable here. Press Ctrl+C to stop a program that does not end.",
+    "suggestedCommand": "java Timetable.java"
+  },
+  "tasks": [
+    {
+      "id": "countdown",
+      "title": "Stop the countdown that never ends",
+      "file": "Timetable.java",
+      "description": "Under `// Task 1` in `Timetable.java`, Ossian's countdown prints its first line again and again and never stops. Fix it so it prints one line for each minute, from `minutesToDeparture` down to 1, then `Boarding closed`. Keep the lines it prints as they are.\n\nCheck runs your Task 1 lines with countdowns of its own, one of 0 minutes, and reads what they print.",
+      "nextSteps": [
+        "Run `java Timetable.java` and watch the countdown run away. Press Ctrl+C to stop it.",
+        "Read the condition of the `while`. What would have to change for it to become false?",
+        "Find what changes inside the loop each time round. Today nothing does.",
+        "Make the loop move one minute closer to departure each time round, and run again."
+      ],
+      "hints": [
+        "A `while` loop runs as long as its condition is true. If nothing inside it changes the condition, it is true forever.",
+        "`minutes` should go down by one each time the loop prints a line.",
+        "Add `minutes = minutes - 1;` inside the loop, after the line that prints."
+      ],
+      "docs": [
+        {
+          "title": "The while and do-while statements",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/while.html"
+        },
+        {
+          "title": "Assignment, arithmetic and unary operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op1.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "while and for loops, step by step",
+          "url": "https://www.youtube.com/watch?v=AJ_90ZMV2U4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "departures",
+      "title": "Print the day's departures",
+      "file": "Timetable.java",
+      "description": "Under `// Task 2`, a boat leaves every hour on the hour, from `firstHour` to `lastHour`, both included. With a `for` loop, print one line for each departure:\n\n```\nDeparts 7:00\n```\n\nCheck runs your Task 2 lines with days of its own, one with a single departure, and reads every line they print.",
+      "nextSteps": [
+        "Read the part of the lesson about the three parts of a `for` loop.",
+        "Decide where the counter starts, the condition that keeps it going, and how it moves.",
+        "Print one line inside the loop, built from the counter.",
+        "Run it and check the first and the last line against `firstHour` and `lastHour`."
+      ],
+      "hints": [
+        "The counter of the loop can be the hour itself, starting at `firstHour`.",
+        "\"Both included\" means the loop must also run when the counter is exactly `lastHour`. Look at which comparison allows equal.",
+        "The shape is `for (int hour = firstHour; hour <= lastHour; hour++) { System.out.println(...); }`."
+      ],
+      "docs": [
+        {
+          "title": "The for statement",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html"
+        },
+        {
+          "title": "Controlling the flow of your code",
+          "url": "https://dev.java/learn/language-basics/controlling-flow/"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "passengers",
+      "title": "Add up the day's passengers",
+      "file": "Timetable.java",
+      "description": "Under `// Task 3`, every departure from `firstHour` to `lastHour` carries `rushPassengers` if it leaves before `rushEndsAt`, and `quietPassengers` otherwise. With a loop, make an `int` called `passengersToday`: the passengers of all the day's departures added up.\n\nCheck runs your Task 3 lines with days of its own and reads `passengersToday`.",
+      "nextSteps": [
+        "Make `passengersToday` before the loop, starting at 0.",
+        "Loop over the hours as in Task 2.",
+        "Inside the loop, decide with `if` which number this departure carries, and add it to the total.",
+        "Print `passengersToday` after the loop and work out by hand whether it is right."
+      ],
+      "hints": [
+        "A running total starts at 0 before the loop, and each time round the loop adds to it.",
+        "A variable made inside the loop's braces is made again each time round, and it is gone after the loop. The total has to live outside it.",
+        "The shape is `int passengersToday = 0;` then a `for` over the hours with `if (hour < rushEndsAt) { passengersToday = passengersToday + rushPassengers; } else { ... }` inside."
+      ],
+      "docs": [
+        {
+          "title": "The for statement",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html"
+        },
+        {
+          "title": "Compound assignment operators",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.26.2"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fare-rise",
+      "title": "Count the years to the new fare",
+      "file": "Timetable.java",
+      "description": "Under `// Task 4`, each year the fare goes up by a twentieth of itself: `farePence / 20` of that year, in whole pence. With a `while` loop, make an `int` called `years`: how many years until the fare reaches `targetPence` or more. A fare that is already there needs 0 years.\n\nCheck runs your Task 4 lines with fares of its own, one that lands exactly on the target, and reads `years`.",
+      "nextSteps": [
+        "Make `years` at 0, and a variable for the fare that you can change.",
+        "Write the condition that is true while the fare is still below the target.",
+        "Inside the loop, raise the fare by a twentieth and count one year.",
+        "Print `years` and try a few targets at the top of the file."
+      ],
+      "hints": [
+        "A `while` loop is right when you do not know in advance how many times it runs.",
+        "Both things must change inside the loop: the fare, so the condition can become false, and `years`, to count. If the fare never changes, the loop never ends.",
+        "The shape is `while (fare < targetPence) { fare = fare + fare / 20; years++; }`, with `fare` starting at `farePence`."
+      ],
+      "docs": [
+        {
+          "title": "The while and do-while statements",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/while.html"
+        },
+        {
+          "title": "Equality and relational operators",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op2.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "name-end",
+      "title": "Find where the boat's name ends",
+      "file": "Timetable.java",
+      "description": "Under `// Task 5`, the ticket starts with the boat's name, then a space. Make an `int` called `nameEnd`: the position of the first space in `ticket`, or the length of `ticket` if it has no space. Walk the ticket one position at a time with a loop, and stop it with `break` at the first space.\n\nCheck runs your Task 5 lines with tickets of its own, one without a space and one whose boat has two words, reads `nameEnd`, and reads your lines for the loop and the `break`.",
+      "nextSteps": [
+        "Make `nameEnd` with the value it should have if no space is found.",
+        "Loop over the positions of `ticket`, from the first to the last.",
+        "Inside, look at the character at each position. When it is a space, keep its position and leave the loop.",
+        "Print `nameEnd` and try a ticket without a space at the top of the file."
+      ],
+      "hints": [
+        "Positions in a `String` run from 0 to one less than its length. `charAt` gives the character at a position, as a `char`, which compares with `==`.",
+        "`break` leaves the loop at once. Without it, the loop goes on and a later space would replace the first.",
+        "Inside `for (int i = 0; i < ticket.length(); i++)`, write `if (ticket.charAt(i) == ' ') { nameEnd = i; break; }`."
+      ],
+      "docs": [
+        {
+          "title": "Branching statements: break",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html"
+        },
+        {
+          "title": "String: charAt and length",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
