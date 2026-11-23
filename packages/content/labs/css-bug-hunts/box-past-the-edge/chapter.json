@@ -11,7 +11,7 @@
       "id": "gift-box",
       "title": "Make the gift box fit its column",
       "file": "styles.css",
-      "description": "On Bartek's phone the Gift a ticket box sticks out past the right edge of the page, and the whole page can be dragged sideways. It sticks out on a wide screen too, just less.\n\nMake the gift box fit its column by fixing how its width is worked out. Its padding and border stay as they are; task 3 checks them. No `overflow: hidden` on anything around it, no negative margin, and only `styles.css` changes.\n\nThe check reads the gift box's width, box-sizing, padding, border and margins on a phone and on a wide screen, and works out whether they fit columns from a small phone's width up. It knows no layout: it judges what is declared.",
+      "description": "On Bartek's phone the Gift a ticket box sticks out past the right edge of the page, and the whole page can be dragged sideways. It sticks out on a wide screen too, just less.\n\nMake the gift box fit its column, and still fill it as Bartek meant, by fixing how its width is worked out. Its padding and border stay as they are; task 3 checks them. No `overflow: hidden` on anything around it, no negative margin, and only `styles.css` changes.\n\nThe check reads the gift box's width, box-sizing, padding, border and margins on a phone and on a wide screen, and works out whether they fit and fill columns from a small phone's width up. It knows no layout: it judges what is declared.",
       "nextSteps": [
         "Drag the Browser panel narrow and look at the right edge of the gift box. Read \"How it happens\" in the lesson.",
         "Find every rule that sets the gift box's width, padding and border.",
@@ -37,7 +37,7 @@
       "id": "email-field",
       "title": "Make the email field fit the footer",
       "file": "styles.css",
-      "description": "Bartek did not mention it, but the email field in the footer sticks out of its column too, past the Sign up button under it.\n\nMake the field fit its column while it still fills the whole width of it, padding and border included. The same limits hold: no `overflow: hidden`, no negative margin, and only `styles.css` changes.\n\nThe check reads the field's width, box-sizing, padding, border and margins on a phone and on a wide screen, and works out whether it fits and fills columns from a small phone's width up.",
+      "description": "Bartek did not mention it, but the email field in the footer sticks out of its column too: its left edge sits inside the footer, and its right edge runs to the edge of the page.\n\nMake the field fit its column while it still fills the whole width of it, padding and border included. The same limits hold: no `overflow: hidden`, no negative margin, and only `styles.css` changes.\n\nThe check reads the field's width, box-sizing, padding, border and margins on a phone and on a wide screen, and works out whether it fits and fills columns from a small phone's width up.",
       "nextSteps": [
         "Look at the footer's email field in a narrow Browser panel.",
         "Find the rule that sizes it.",

@@ -45,6 +45,12 @@ function primary(s, els, what, one = false) {
             message: `${what} ${verb('get')} the ${words} by force: an !important wins over every normal rule. The rule that was beating Kwame's is still as strong as before, and the next rule for these buttons will need force too. Take the !important out and weaken the rule at fault.`,
             output
           }
+        if (winner && hasId(winner.picked) && !winner.picked.includes('button-primary'))
+          return {
+            ok: false,
+            message: `${what} ${verb('get')} the ${words} from ${winner.picked}, the old rule itself, not from Kwame's .button-primary rule. That rule is still stronger than Kwame's and paints every link it picks. Make it weaker instead of changing its colour.`,
+            output
+          }
         if (winner && hasId(winner.picked))
           return {
             ok: false,

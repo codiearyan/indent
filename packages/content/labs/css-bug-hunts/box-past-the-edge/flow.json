@@ -32,7 +32,7 @@
         },
         {
           "active": ["css", "css->gift", "gift"],
-          "note": "When the box is sized so all of it counts against the column, it fits on any screen."
+          "note": "When the box is sized so all of it counts against the column, it fits and fills its column on any screen."
         }
       ]
     },

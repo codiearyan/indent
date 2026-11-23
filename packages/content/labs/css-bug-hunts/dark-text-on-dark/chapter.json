@@ -59,7 +59,7 @@
       "id": "other-colours",
       "title": "Keep every other colour as it was",
       "file": "styles.css",
-      "description": "Outside the two dark boxes nothing changes colour: the page's writing stays dark, the times stay grey, the notice at the top of the films stays dark orange with its bold line too, and the links and the picture caption keep their own colours.\n\nThis check runs once the late show box and the footer are right, and until then it says which task is not done yet. It reads the colour of headings, paragraphs, the times, the notice and its bold line, the late show link, the caption and the terms link.",
+      "description": "Outside the two dark boxes nothing changes colour: the page's writing stays dark, the times stay grey, the notice at the top of the films stays dark orange with its bold line too, and the links, the grey buttons and the picture caption keep their own colours.\n\nThis check runs once the late show box and the footer are right, and until then it says which task is not done yet. It reads the colour of headings, paragraphs, the times, the notice and its bold line, the late show link, the caption, the terms link and the writing on the Choose a gift and Sign up buttons.",
       "nextSteps": [
         "Look over the whole page in the Browser panel after your fix.",
         "Compare the notice's bold line with the rest of the notice.",

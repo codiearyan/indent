@@ -134,7 +134,9 @@ export const checks = {
     const own = off([
       [s.$('.late-show a'), ORANGE],
       [s.$('.hero-caption'), PAPER],
-      [s.$('.membership .small a'), ORANGE_DEEP]
+      [s.$('.membership .small a'), ORANGE_DEEP],
+      [s.$('.gift-box .button'), INK],
+      [s.$('.signup .button'), INK]
     ])
     return [
       detail(
@@ -150,10 +152,10 @@ export const checks = {
         inherited ?? 'The notice and its bold line are dark orange, as before'
       ),
       detail(
-        'Links and the caption keep their own colours',
+        'Links, buttons and the caption keep their own colours',
         !own,
-        'A link or the picture caption changed colour. They have colours of their own; only the writing of the dark boxes was meant to change.',
-        own ?? 'The late show link, the caption and the terms link, as before'
+        'A link, a button or the picture caption changed colour. They have colours of their own, and a grey button needs its dark writing even inside a dark box; only the writing of the dark boxes was meant to change.',
+        own ?? 'The late show link, the caption, the terms link and the grey buttons, as before'
       )
     ]
   }

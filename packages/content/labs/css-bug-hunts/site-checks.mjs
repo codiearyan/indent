@@ -270,10 +270,12 @@ export function cascade(s, el, property, width = 1024) {
   for (const d of s.decls) {
     if (!sets(d.property, property)) continue
     if (!d.media.every((q) => matchesMedia(q, width))) continue
-    const picked = d.selectors.filter((sel) => s.matches(el, sel))
+    // The strongest selector of a list that matches is the one that counts, and the one named.
+    const picked = d.selectors
+      .filter((sel) => s.matches(el, sel))
+      .sort((a, b) => specificity(b) - specificity(a))
     if (!picked.length) continue
-    const weight = Math.max(...picked.map(specificity))
-    hits.push({ ...d, picked: picked[0], weight: weight + (d.important ? 1e9 : 0) })
+    hits.push({ ...d, picked: picked[0], weight: specificity(picked[0]) + (d.important ? 1e9 : 0) })
   }
   return hits.sort((a, b) => a.weight - b.weight)
 }

@@ -37,7 +37,7 @@ Many sites set `box-sizing: border-box` on every element at the top of the style
 
 ## See it for yourself
 
-Drag the Browser panel narrow, about as wide as a phone, and look at the right edge of the gift box: its border runs out of the page. Then look at the email field in the footer: it runs past the Sign up button under it. Two boxes, one sum.
+Drag the Browser panel narrow, about as wide as a phone, and look at the right edge of the gift box: its border runs out of the page. Then look at the email field in the footer: its left edge sits well inside the dark footer, and its right edge runs to the edge of the page. Two boxes, one sum.
 
 The Browser panel cannot show you the numbers, so you add them up yourself from the stylesheet. A browser's own developer tools draw the same sum as a diagram of nested boxes.
 
@@ -60,7 +60,7 @@ Three quick fixes hide the box instead of fitting it. `overflow: hidden` on the 
 
 Everything happens in `styles.css`; `index.html` stays as it is.
 
-1. Make the gift box fit its column.
+1. Make the gift box fit its column, and still fill it.
 2. Make the email field in the footer fit its column, and still fill it.
 3. Keep their padding, their borders and the layout of the page as they are.
 

@@ -197,7 +197,9 @@ export const checks = {
     const caption = s.$('.hero-caption')
     const hs = s.style(header)
     const sticky = hs.position === 'sticky' && hs.top === '0px'
-    const overHero = WIDTHS.every((w) => stacking(s, header, hero, w).above)
+    // The page scrolls under the header, so the picture and every card must be painted below it.
+    const over = [hero, ...s.$$('.film-card')].find((el) => WIDTHS.some((w) => !stacking(s, header, el, w).above))
+    const overHero = !over
     const captionOk = WIDTHS.every(
       (w) => containingBlock(s, caption, w) === hero && stacking(s, caption, hero.querySelector('img'), w).above
     )
@@ -208,7 +210,7 @@ export const checks = {
         'The header stays at the top, above the page, while it scrolls',
         sticky && overHero,
         sticky
-          ? 'The header still sticks to the top, but the page now scrolls over it: something below it is painted above it.'
+          ? `The header still sticks to the top, but the page now scrolls over it: ${name(over ?? hero)} is painted above it.`
           : 'The header no longer stays at the top of the screen while the page scrolls. Its position is what kept it there, and it also gave it a stacking context; the menu needed a different fix.',
         `Header: position ${hs.position ?? 'static'}, top ${hs.top ?? 'not set'}, z-index ${hs['z-index'] ?? 'auto'}`
       ),

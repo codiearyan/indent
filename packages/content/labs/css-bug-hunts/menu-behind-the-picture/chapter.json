@@ -59,7 +59,7 @@
       "id": "still-in-place",
       "title": "Keep the header, the caption and the badges in place",
       "file": "styles.css",
-      "description": "The fix must not move anything else: the header stays at the top of the screen while the page scrolls, above the page, the caption stays on the big picture, above it, and each badge stays on the corner of its card.\n\nThis check runs once the Visit menu and the seat guide are on top, and until then it says which task is not done yet. It reads the header's position, works out whether it is painted above the picture, and which element the caption and each badge are placed against.",
+      "description": "The fix must not move anything else: the header stays at the top of the screen while the page scrolls, above the page, the caption stays on the big picture, above it, and each badge stays on the corner of its card.\n\nThis check runs once the Visit menu and the seat guide are on top, and until then it says which task is not done yet. It reads the header's position, works out whether it is painted above the picture and the film cards, and which element the caption and each badge are placed against.",
       "nextSteps": [
         "Scroll the page in the Browser panel and watch the header.",
         "Look at the caption on the big picture and the badges on the cards.",

@@ -23,7 +23,7 @@ These ideas are new in this repo, so here they are from the start.
 
 **z-index.** Where boxes overlap, `z-index` says which one is painted on top: higher on top. It works on positioned elements and on the items of a flex or grid container. On anything else it does nothing. Without it, positioned elements are painted over the ones that are not, and later elements over earlier ones.
 
-**Stacking context.** An element with a position and a z-index, or one that is `fixed` or `sticky`, makes a stacking context: a closed layer that is painted as one. A z-index inside it only orders things inside it. On the page, the whole layer takes the place of its parent's z-index.
+**Stacking context.** An element with a position and a z-index, or one that is `fixed` or `sticky`, makes a stacking context: a closed layer that is painted as one. A z-index inside it only orders things inside it. On the page, the whole layer is painted at the z-index of the element that made it.
 
 So `z-index: 20` inside a box with `z-index: 1` is like floor 20 of a building that is one storey tall next to a building that is two. Here is the same thing in a photo gallery:
 

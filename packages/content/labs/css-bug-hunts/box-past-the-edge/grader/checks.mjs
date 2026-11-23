@@ -1,4 +1,4 @@
-import { cascade, clean, detail, forced, gate, line, openSite } from '../../site-checks.mjs'
+import { cascade, clean, detail, forced, gate, line, openSite, resolve } from '../../site-checks.mjs'
 
 const VIEWPORTS = [360, 1024]
 // Widths of the column a box sits in, from a small phone's to a wide screen's. The page tool
@@ -6,57 +6,120 @@ const VIEWPORTS = [360, 1024]
 const COLUMNS = [240, 280, 320, 400, 600, 900]
 const cap = (text) => text[0].toUpperCase() + text.slice(1)
 const BORDER_WORDS = { thin: 1, medium: 3, thick: 5 }
+const zero = () => 0
 
-/** A length as { pct, px }, so it can be measured against any column; null for auto, NaN if unreadable. */
-function length(value) {
+/**
+ * A length as a function of the column's width in px, so % (of the column, for widths, padding
+ * and margins alike), em, calc(), min(), max() and clamp() all count. Null for auto, NaN when
+ * it cannot be read.
+ */
+function length(value, em) {
   const text = clean(value ?? 'auto')
   if (/^(auto|none|initial|unset|fit-content|max-content|min-content)$/.test(text)) return null
-  const body = text.replace(/^calc\((.*)\)$/, '$1')
-  let pct = 0
-  let px = 0
-  for (const m of body.matchAll(/([+-])?\s*(-?\d*\.?\d+)(px|rem|em|%|vw)?/g)) {
-    const n = Number(m[2]) * (m[1] === '-' ? -1 : 1)
-    if (m[3] === '%') pct += n / 100
-    else if (m[3] === 'vw') (pct += n / 100), (px += (32 * n) / 100)
-    else if (m[3] === 'rem' || m[3] === 'em') px += n * 16
-    else if (m[3] === 'px' || n === 0) px += n
-    else return NaN
+  const tokens = text.match(/\d*\.?\d+(?:px|rem|em|%|vw)?|[a-z]+\(|[()+\-*/,]/gi) ?? []
+  if (tokens.join('') !== text.replace(/\s+/g, '')) return NaN
+  let i = 0
+  const sum = () => {
+    let f = product()
+    while (tokens[i] === '+' || tokens[i] === '-') {
+      const [op, a, b] = [tokens[i++], f, product()]
+      f = op === '+' ? (c) => a(c) + b(c) : (c) => a(c) - b(c)
+    }
+    return f
   }
-  if (body.replace(/([+-])?\s*(-?\d*\.?\d+)(px|rem|em|%|vw)?/g, '').trim()) return NaN
-  return { pct, px }
+  const product = () => {
+    let f = unit()
+    while (tokens[i] === '*' || tokens[i] === '/') {
+      const [op, a, b] = [tokens[i++], f, unit()]
+      f = op === '*' ? (c) => a(c) * b(c) : (c) => a(c) / b(c)
+    }
+    return f
+  }
+  const unit = () => {
+    const t = tokens[i++]
+    if (t === '-') {
+      const f = unit()
+      return (c) => -f(c)
+    }
+    const fn = t?.match(/^(calc|min|max|clamp)?\($/i)
+    if (fn) {
+      const args = [sum()]
+      while (tokens[i] === ',') i++, args.push(sum())
+      if (tokens[i++] !== ')') throw new Error('unclosed')
+      const kind = fn[1]?.toLowerCase()
+      if (kind === 'min') return (c) => Math.min(...args.map((f) => f(c)))
+      if (kind === 'max') return (c) => Math.max(...args.map((f) => f(c)))
+      if (kind === 'clamp' && args.length === 3)
+        return (c) => Math.max(args[0](c), Math.min(args[1](c), args[2](c)))
+      if (args.length !== 1) throw new Error('arguments')
+      return args[0]
+    }
+    const m = t?.match(/^(\d*\.?\d+)(px|rem|em|%|vw)?$/i)
+    if (!m) throw new Error('unknown')
+    const n = Number(m[1])
+    const per = { '%': (c) => (n * c) / 100, vw: (c) => (n * (c + 32)) / 100, em: () => n * em, rem: () => n * 16 }
+    return per[m[2]?.toLowerCase()] ?? (() => n)
+  }
+  try {
+    const f = sum()
+    return i === tokens.length ? f : NaN
+  } catch {
+    return NaN
+  }
 }
-const at = (len, column) => len.pct * column + len.px
-const px = (value) => {
-  if (value in BORDER_WORDS) return BORDER_WORDS[value]
-  const len = length(value)
-  return len && !Number.isNaN(len) ? len.px : 0
+
+/** The element's font size in px, from the font-size rules on it and the elements around it. */
+function fontPx(s, el, viewport) {
+  if (!el) return 16
+  const parent = fontPx(s, el.parentElement, viewport)
+  const d = cascade(s, el, 'font-size', viewport).at(-1)
+  const value = d && resolve(s, el, d.value, viewport)
+  const size = d?.property === 'font' ? value.match(/\d*\.?\d+(px|rem|em|%)/)?.[0] : value
+  const len = size && length(size, parent)
+  if (!len || Number.isNaN(len)) return parent
+  return size.endsWith('%') ? len(parent) : len(0)
 }
 
 /** How a box is sized at a viewport width, read from the CSS that applies to it. */
 function sizing(s, el, viewport) {
   const st = s.style(el, viewport)
-  const side = (p) => px(st[`padding-${p}`]) + (/^(none|hidden)?$/.test(st[`border-${p}-style`] ?? '') ? 0 : px(st[`border-${p}-width`] ?? 'medium'))
-  return {
-    st,
-    model: st['box-sizing'] ?? 'content-box',
-    width: length(st.width),
-    min: length(st['min-width']),
-    max: length(st['max-width']),
-    edges: side('left') + side('right'),
-    margins: [st['margin-left'], st['margin-right']].map((m) => (m === 'auto' ? 0 : px(m)))
+  const em = fontPx(s, el, viewport)
+  const read = (value) => length(value, em)
+  const border = (p) => {
+    if (/^(none|hidden)?$/.test(st[`border-${p}-style`] ?? '')) return zero
+    const width = st[`border-${p}-width`] ?? 'medium'
+    return width in BORDER_WORDS ? () => BORDER_WORDS[width] : (read(width) ?? zero)
   }
+  const parts = ['left', 'right'].flatMap((p) => [read(st[`padding-${p}`]) ?? zero, border(p)])
+  const margins = ['left', 'right'].map((p) => read(st[`margin-${p}`]) ?? zero)
+  const z = {
+    st,
+    model: st['box-sizing'] === 'border-box' ? 'border-box' : 'content-box',
+    width: read(st.width),
+    min: read(st['min-width']),
+    max: read(st['max-width']),
+    edges: (c) => parts.reduce((a, f) => a + f(c), 0),
+    margins: (c) => margins.map((f) => f(c))
+  }
+  z.unreadable = [z.width, z.min, z.max, ...parts, ...margins].some((f) => Number.isNaN(f))
+  return z
 }
 
-/** The width a box takes in a column of `column` px, padding, border and margins included. */
-function outer(z, column, fills) {
-  const sized = (len) => (len ? at(len, column) : null)
-  const margins = z.margins.reduce((a, b) => a + b, 0)
-  if (!z.width && fills) return column
-  let w = z.width ? at(z.width, column) : null
-  if (w === null) return null
-  if (z.max) w = Math.min(w, sized(z.max))
-  if (z.min) w = Math.max(w, sized(z.min))
-  return (z.model === 'border-box' ? Math.max(w, z.edges) : w + z.edges) + margins
+/**
+ * The width a box takes in a column of `column` px, padding, border and margins included. A box
+ * with no width `stretches` to fill the column when it is a block box.
+ */
+function outer(z, column, stretches) {
+  const edges = z.edges(column)
+  const margins = z.margins(column).reduce((a, b) => a + b, 0)
+  const box = (f) => (z.model === 'border-box' ? f(column) : f(column) + edges)
+  let w
+  if (z.width) w = box(z.width)
+  else if (stretches) w = column - margins
+  else return null
+  if (z.max) w = Math.min(w, box(z.max))
+  if (z.min) w = Math.max(w, box(z.min))
+  return Math.max(w, edges) + margins
 }
 
 const hidden = (s, el, viewport) => {
@@ -71,69 +134,72 @@ const hidden = (s, el, viewport) => {
 const name = (el) => `${el.tagName.toLowerCase()}${el.className ? `.${clean(el.className).replace(/ /g, '.')}` : ''}`
 
 /**
- * Whether a box fits its column at every width without a patch. `what` names it in words, and
- * `fill` says it must also take the whole width of its column, as a field must.
+ * Whether a box fits its column at every width without a patch, and still fills it. `what` names
+ * it in words; a `field` does not stretch without a width, as a block box does.
  */
-function fits(s, el, what, fill) {
+function fits(s, el, what, field) {
   for (const viewport of VIEWPORTS) {
     const z = sizing(s, el, viewport)
     const declared = cascade(s, el, 'width', viewport).at(-1)
-    const output = `${cap(what)} at ${viewport}px: width ${z.st.width ?? 'not set'}, box-sizing ${z.model}, padding and border ${z.edges}px across${
+    const output = `${cap(what)} at ${viewport}px: width ${z.st.width ?? 'not set'}, box-sizing ${z.model}, padding and border ${z.unreadable ? '?' : z.edges(COLUMNS[0])}px across${
       z.st['max-width'] ? `, max-width ${z.st['max-width']}` : ''
     }${z.st['min-width'] ? `, min-width ${z.st['min-width']}` : ''}${declared ? `\nWidth from: ${line(declared)}` : ''}`
     const cover = hidden(s, el, viewport)
     if (cover)
       return {
         ok: false,
-        message: `${name(cover.el)} has overflow: ${cover.value}. That hides whatever sticks out of it, on this page and the next: ${what} is cut off instead of fitting, and its edge and padding go with it. Take it out and fix how ${what} is sized.`,
+        message: `the element around ${what}, ${name(cover.el)}, has overflow: ${cover.value}. That hides whatever sticks out of it, on this page and the next: ${what} is cut off instead of fitting, and its edge and padding go with it. Take it out and fix how ${what} is sized.`,
         output: `${name(cover.el)}: overflow ${cover.value}`
       }
-    if (z.margins.some((m) => m < 0))
+    if (z.unreadable)
+      return {
+        ok: false,
+        message: `The check cannot read the width, padding or margins of ${what} in this form. Write them as lengths or percentages, or calc(), min() or max() with those.`,
+        output
+      }
+    if (z.margins(COLUMNS[0]).some((m) => m < 0))
       return {
         ok: false,
         message: `${what} has a negative margin. It pulls the box outward to make up for the extra width, and the box is still as wide as before. Fix how its width is worked out instead.`,
         output
       }
-    if ([z.width, z.min, z.max].some((len) => Number.isNaN(len)))
-      return {
-        ok: false,
-        message: `The check cannot read the width of ${what} in this form. Write it as a length, a percentage, or calc() with those.`,
-        output
-      }
-    if (fill && !z.width)
+    if (field && !z.width)
       return {
         ok: false,
         message: `${what} has no width, so it is only as wide as its own default size, and no longer fills the form as Bartek designed it. Keep a width that fills the column, and size it so its padding and border fit inside.`,
         output
       }
-    const over = COLUMNS.find((c) => outer(z, c, !fill) > c + 0.5)
+    const over = COLUMNS.find((c) => outer(z, c, !field) > c + 0.5)
     if (over !== undefined) {
-      const fixed = z.width && z.width.pct === 0
+      const fixed = z.width && z.width(COLUMNS[0]) === z.width(COLUMNS.at(-1))
+      const tooMin = z.min && (z.model === 'border-box' ? z.min(over) : z.min(over) + z.edges(over)) > over
       return {
         ok: false,
-        message: fixed
-          ? `${what} has a fixed width, so it cannot shrink when its column is narrower than that, as it is on a small phone.`
-          : z.model === 'content-box' && z.edges
-            ? `${what} is wider than its column at ${viewport}px wide. With box-sizing content-box, its width covers only what is inside, and its padding and border are added on top of it.`
-            : `${what} is wider than its column at ${viewport}px wide: its width and its margins together are more than the column.`,
+        message: tooMin
+          ? `${what} has a min-width, ${z.st['min-width']}, that keeps it wider than a ${over}px column, as on a small phone.`
+          : fixed
+            ? `${what} has a fixed width, so it cannot shrink when its column is narrower than that, as it is on a small phone.`
+            : z.model === 'content-box' && z.edges(over)
+              ? `${what} is wider than a ${over}px column, as on a small phone. With box-sizing content-box, its width covers only what is inside, and its padding and border are added on top of it.`
+              : `${what} is wider than a ${over}px column, as on a small phone: its width and its margins together are more than the column.`,
         output
       }
     }
-    if (fill && COLUMNS.some((c) => outer(z, c, false) < c - 0.5))
+    if (COLUMNS.some((c) => outer(z, c, !field) < c - 0.5))
       return {
         ok: false,
         message: `${what} fits now, but no longer fills the width of its column. Keep it as wide as the column, padding and border included.`,
         output
       }
   }
-  const force = forced(s, el, ['width', 'box-sizing', 'max-width'])[0]
+  const force = forced(s, el, ['width', 'box-sizing', 'max-width', 'min-width'])[0]
   if (force)
     return {
       ok: false,
       message: `${what} is sized by force: an !important wins over every normal rule, and the next change to its size will need force too. Take the !important out.`,
       output: line(force)
     }
-  return { ok: true, output: `${what}: fits its column, phone and wide screen` }
+  return { ok: true, output: `${what}: fits and fills its column, phone and wide screen` }
 }
 
 const asDetail = (title, r) => detail(title, r.ok, r.message && cap(r.message), r.output)

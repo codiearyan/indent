@@ -134,6 +134,12 @@ function phoneResult(s, el, what, shape, wantsPhone, properties, right, describe
       output: line(force)
     }
   const unused = properties.flatMap((p) => dead(s, el, p))
+  if (unused.length && wantsPhone(shape(s, el, 1024)))
+    return {
+      ok: false,
+      message: `${what[0].toUpperCase()}${what.slice(1)} has the phone layout on a phone, and on a wide screen too: a rule outside the media query gives it that layout everywhere, so the phone rule never gets to apply. Put the wide layout back outside the media query and make the phone rule win on a phone.`,
+      output: `${what} at 1024px: the phone layout\n${output(s, el, properties, 1024)}`
+    }
   if (unused.length)
     return {
       ok: false,
