@@ -1,0 +1,73 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "clipboard", "label": "Evening waiting list", "kind": "data" },
+      { "id": "tidy", "label": "Tidy", "kind": "function", "mine": true },
+      { "id": "bookings", "label": "Day's bookings", "kind": "data" },
+      { "id": "seats", "label": "Seats", "kind": "function", "mine": true },
+      { "id": "groups", "label": "Groups", "kind": "function", "mine": true },
+      { "id": "office", "label": "Harbour office", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "clipboard", "to": "tidy", "label": "messy names" },
+      { "from": "bookings", "to": "seats", "label": "each booking" },
+      { "from": "bookings", "to": "groups", "label": "each booking" },
+      { "from": "seats", "to": "office", "label": "seats per boat" },
+      { "from": "groups", "to": "office", "label": "names per boat" }
+    ],
+    "note": "Ossian's lists clean themselves and his maps add up, each step a rule handed to the list or the map."
+  },
+  "tasks": {
+    "tidy": {
+      "steps": [
+        {
+          "active": ["clipboard", "clipboard->tidy", "tidy"],
+          "note": "The evening's waiting list arrives with blank lines and stray spaces."
+        },
+        {
+          "active": ["tidy"],
+          "note": "The blank lines come off, and every name loses the spaces at its ends."
+        },
+        {
+          "active": ["tidy"],
+          "note": "The names are put in alphabetical order, capitals or not, on the same list."
+        }
+      ]
+    },
+    "seats": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->seats", "seats"],
+          "value": { "kind": "array", "label": "a booking", "values": ["passenger", "boat", "seats"] },
+          "note": "Each booking of the day is read once."
+        },
+        {
+          "active": ["seats"],
+          "value": { "kind": "map", "label": "seats per boat", "entries": [{ "key": "boat", "value": "seats so far" }] },
+          "note": "A boat seen for the first time starts with its booking's seats; after that, each booking adds to them."
+        },
+        {
+          "active": ["seats", "seats->office", "office"],
+          "note": "The harbour office gets the seats booked on each boat."
+        }
+      ]
+    },
+    "groups": {
+      "steps": [
+        {
+          "active": ["bookings", "bookings->groups", "groups"],
+          "note": "Each booking of the day is read once, in the order it was made."
+        },
+        {
+          "active": ["groups"],
+          "value": { "kind": "map", "label": "names per boat", "entries": [{ "key": "boat", "value": "its passengers" }] },
+          "note": "A boat seen for the first time gets a list of its own; each passenger goes on their boat's list."
+        },
+        {
+          "active": ["groups", "groups->office", "office"],
+          "note": "The harbour office gets each boat with its passengers, in the order they booked."
+        }
+      ]
+    }
+  }
+}

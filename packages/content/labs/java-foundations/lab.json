@@ -78,7 +78,8 @@
       "title": "Rules you can hand over",
       "chapters": [
         "lambdas",
-        "functional-interfaces"
+        "functional-interfaces",
+        "collection-functions"
       ]
     }
   ]

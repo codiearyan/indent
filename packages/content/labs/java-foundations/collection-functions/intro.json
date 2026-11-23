@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "Who is on the Gannet tonight?",
+      "note": "For the harbour office."
+    },
+    {
+      "title": "Evening lists",
+      "text": "Blank lines, stray spaces, names all apart"
+    },
+    {
+      "title": "Your code",
+      "file": "QuayLists.java",
+      "mine": true,
+      "gap": "Nothing cleans or gathers them",
+      "tasks": [
+        "Tidy the list",
+        "Seats per boat",
+        "Names per boat"
+      ]
+    },
+    {
+      "title": "Harbour office",
+      "say": "Every boat and its names. Thanks!",
+      "note": "Read in one look."
+    }
+  ],
+  "ticket": {
+    "label": "Gannet",
+    "wrong": "names scattered",
+    "why": "A mess",
+    "right": "names together"
+  },
+  "captions": [
+    "The quay in the evening. Ossian needs each boat's passengers for the harbour office.",
+    "Today the list is full of blank lines and spaces, and a boat's names are all apart.",
+    "You tidy the list where it is, add up each boat's seats, and gather each boat's names.",
+    "Now the Gannet's passengers arrive together, in the order they booked.",
+    "Clean lists and full maps, a rule at a time. Next: asking a list for answers."
+  ]
+}
