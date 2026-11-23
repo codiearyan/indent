@@ -68,4 +68,4 @@ Never take `r` away from yourself. A file that nobody may read cannot be shown i
 
 The terminal starts in the top folder. Run `ls -l` before and after each `chmod`, and read the letters each time. For the new price, unlock the list, change the line in the editor or from the terminal, and lock it again.
 
-If a file goes wrong, Reset puts back every file this issue started with, as it was. Reset cannot rewrite a locked file in a locked folder, nor on Linux a locked file at all: give them `w` back first with `chmod u+w`.
+If a file goes wrong, Reset puts back every file this issue started with, as it was. If Reset stops at a locked file, give it `w` back first with `chmod u+w` and reset again.

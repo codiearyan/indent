@@ -23,7 +23,7 @@ const LISTS = ['prices-2023.csv', 'prices-2024.csv', 'prices-2025.csv']
 const OLD_FOX = 'fox poster A3,18.00'
 const NEW_FOX = 'fox poster A3,22.00'
 const RESET =
-  'Reset puts the starter files back as they were. A locked file, or a file in a locked folder, may need its w back first, with chmod u+w.'
+  'Reset puts the starter files back as they were. If it stops at a locked file, give the file its w back first, with chmod u+w.'
 const VERB = { r: 'read', w: 'change', x: 'run' }
 
 const same = (a, b) => a.length === b.length && a.every((line, i) => line === b[i])
