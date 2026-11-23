@@ -84,7 +84,8 @@
     {
       "title": "Functions, generators and hints",
       "chapters": [
-        "functions-as-values"
+        "functions-as-values",
+        "sorting-and-choosing"
       ]
     }
   ]

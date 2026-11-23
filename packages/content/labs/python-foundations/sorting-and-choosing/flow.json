@@ -1,0 +1,62 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "callouts", "label": "Winter callouts", "kind": "data" },
+      { "id": "longest", "label": "longest_first()", "kind": "function", "mine": true },
+      { "id": "byhill", "label": "by_hill()", "kind": "function", "mine": true },
+      { "id": "pair", "label": "quickest_and_longest()", "kind": "function", "mine": true },
+      { "id": "ready", "label": "ready_to_close()", "kind": "function", "mine": true },
+      { "id": "shelve", "label": "shelve()", "kind": "function", "mine": true },
+      { "id": "rhona", "label": "Rhona", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "callouts", "to": "longest", "label": "every callout" },
+      { "from": "callouts", "to": "byhill", "label": "every callout" },
+      { "from": "callouts", "to": "pair", "label": "every callout" },
+      { "from": "callouts", "to": "ready", "label": "every callout" },
+      { "from": "longest", "to": "rhona", "label": "council list" },
+      { "from": "byhill", "to": "rhona", "label": "hill reports" },
+      { "from": "pair", "to": "rhona", "label": "two callouts" },
+      { "from": "ready", "to": "rhona", "label": "yes or no" },
+      { "from": "shelve", "to": "rhona", "label": "rope shelf" }
+    ],
+    "note": "The winter's callouts are put in the order each reader needs, and the year's last questions are answered from them."
+  },
+  "tasks": {
+    "longest": {
+      "steps": [
+        { "active": ["callouts", "callouts->longest", "longest"], "value": { "kind": "array", "label": "hours, as written down", "values": [3, 3, 11, 7, 5] }, "note": "The callouts come in the order they were written down." },
+        { "active": ["longest"], "note": "The callout with the most hours goes first, and two with the same hours keep their order." },
+        { "active": ["longest", "longest->rhona", "rhona"], "note": "Rhona sends the council the new list, and the winter's own list stays as it was." }
+      ]
+    },
+    "hill": {
+      "steps": [
+        { "active": ["callouts", "callouts->byhill", "byhill"], "value": { "kind": "map", "label": "one callout", "entries": [{ "key": "hill", "value": "first rule" }, { "key": "date", "value": "second rule" }] }, "note": "Each callout is placed by its hill first, then by its date." },
+        { "active": ["byhill"], "note": "Callouts on the same hill line up oldest first." },
+        { "active": ["byhill", "byhill->rhona", "rhona"], "note": "Each hill's report reads in the order things happened." }
+      ]
+    },
+    "shelf": {
+      "steps": [
+        { "active": ["shelve"], "value": { "kind": "array", "label": "Dougie's tags", "values": ["R12", "R3", "R101", "R7"] }, "note": "Dougie's rope tags are in the order the ropes came in." },
+        { "active": ["shelve"], "note": "Each tag is placed by the number after its R, read as a number." },
+        { "active": ["shelve", "shelve->rhona", "rhona"], "note": "The same shelf list is now in order, with no new list made." }
+      ]
+    },
+    "pair": {
+      "steps": [
+        { "active": ["callouts", "callouts->pair", "pair"], "note": "Every callout is looked at once." },
+        { "active": ["pair"], "note": "The quickest and the longest are picked, the first one of any that tie." },
+        { "active": ["pair", "pair->rhona", "rhona"], "note": "Rhona gets the two whole callouts, quickest first." }
+      ]
+    },
+    "ready": {
+      "steps": [
+        { "active": ["callouts", "callouts->ready", "ready"], "note": "Rhona asks two questions of the whole winter." },
+        { "active": ["ready"], "note": "Has every callout got its team written down, and did none run over the limit?" },
+        { "active": ["ready", "ready->rhona", "rhona"], "note": "One yes or no tells Rhona whether the year can close." }
+      ]
+    }
+  }
+}

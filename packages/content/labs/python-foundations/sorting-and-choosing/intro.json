@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "Longest first, for the council?", "note": "The end of the winter." },
+    { "title": "The callout log", "text": "In the order it was typed, rope 101 before 3" },
+    {
+      "title": "Your code",
+      "file": "callout_lists.py",
+      "mine": true,
+      "gap": "Nothing sorts or chooses",
+      "tasks": ["Longest first", "By hill, then date", "The rope shelf", "Quickest and longest", "Ready to close"]
+    },
+    { "title": "The council", "say": "Clear at a glance. Thank you.", "note": "Reads the winter's report." }
+  ],
+  "ticket": { "label": "Winter report", "wrong": "jumbled", "why": "Typed order", "right": "in order" },
+  "captions": [
+    "At the end of the winter, Rhona needs the callouts in the order the council asks for.",
+    "Today the log is in the order it was typed, and nobody can find anything in it.",
+    "You write functions that sort by what each reader needs, and pick out what Rhona asks.",
+    "Now the council's list is longest first, and the hill reports go hill by hill.",
+    "The winter's report reads at a glance, and Rhona knows whether the year can close."
+  ]
+}
