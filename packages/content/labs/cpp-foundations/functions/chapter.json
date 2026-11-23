@@ -1,0 +1,131 @@
+{
+  "id": "functions",
+  "title": "Functions",
+  "files": [
+    "src/bill.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the bill here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/bill.cpp -o bill && ./bill"
+  },
+  "tasks": [
+    {
+      "id": "labour",
+      "title": "Price the labour",
+      "file": "src/bill.cpp",
+      "description": "Ambrose charges 48 an hour, counted by the minute. Under `// Task 1` in `src/bill.cpp`, above `main`, write a function called `labourCost` that takes the minutes worked as an `int` and gives back what they cost as a `double`. 90 minutes cost 72.\n\nCheck calls `labourCost` from code of its own with other minutes, and reads what it gives back and what it prints. It gives the cost back; it prints nothing.",
+      "nextSteps": [
+        "Write the first line: what it gives back, its name, and its parameter in round brackets.",
+        "Inside its `{ }`, work out the cost from the parameter.",
+        "End with a `return` of the cost.",
+        "Call it from `main` with 90 and print what it gives back, then build and run."
+      ],
+      "hints": [
+        "A function starts with the type of what it gives back, then its name, then its parameters with their types: `double labourCost(...)`.",
+        "48 an hour is 48 for 60 minutes. Two whole numbers divided give a whole number, so write one of them as a `double`, like `60.0`, before you divide.",
+        "The shape is `double labourCost(int minutes) { return minutes * 48.0 / 60; }`."
+      ],
+      "docs": [
+        {
+          "title": "Function declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        },
+        {
+          "title": "return statement",
+          "url": "https://en.cppreference.com/w/cpp/language/return"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Functions in C++",
+          "url": "https://www.youtube.com/watch?v=V9zuox47zr0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Print a line of the bill",
+      "file": "src/bill.cpp",
+      "description": "Under `// Task 2`, write a function called `printBillLine` that takes what the line is for as a `std::string` and the amount as a `double`, prints them as one line and gives nothing back:\n\n```\nMainspring: 18.5\n```\n\nCheck calls `printBillLine` from code of its own with other lines, and reads what it prints.",
+      "nextSteps": [
+        "Write the first line with `void` in front: it gives nothing back.",
+        "Give it two parameters, separated by a comma, each with its type.",
+        "Inside, print the line from the two parameters, and end it.",
+        "Call it from `main` with a line of your own, build and run."
+      ],
+      "hints": [
+        "A function that gives nothing back has `void` where the type of the result would be, and needs no `return`.",
+        "Parameters are separated by commas, and each has its own type: `(std::string what, double amount)`. Print them with `std::cout`, the colon and the space as text between them.",
+        "The shape is `void printBillLine(std::string what, double amount) { std::cout << what << \": \" << amount << \"\\n\"; }`."
+      ],
+      "docs": [
+        {
+          "title": "Function declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        },
+        {
+          "title": "void type",
+          "url": "https://en.cppreference.com/w/cpp/language/types"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "Add up a repair",
+      "file": "src/bill.cpp",
+      "description": "Under `// Task 3`, write a function called `repairTotal` that takes the minutes worked as an `int` and the cost of the parts as a `double`, and gives back the whole price as a `double`: the labour plus the parts. Work out the labour by calling `labourCost`.\n\nCheck calls `repairTotal` with other minutes and parts, and reads what it gives back, what it prints and whether it called `labourCost`. It gives the price back; it prints nothing. Check gives it a `labourCost` of its own, so this task does not depend on Task 1.",
+      "nextSteps": [
+        "Write the first line, with its two parameters.",
+        "Inside, call `labourCost` with the minutes.",
+        "Give back the labour plus the parts.",
+        "Call it from `main`, print the result, build and run."
+      ],
+      "hints": [
+        "A function can call another function that is written above it, just as `main` can.",
+        "`labourCost(minutes)` is a value, the one it gives back, so it can stand in a sum like any number.",
+        "The shape is `double repairTotal(int minutes, double parts) { return labourCost(minutes) + parts; }`."
+      ],
+      "docs": [
+        {
+          "title": "Function call",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_other#Built-in_function_call_operator"
+        },
+        {
+          "title": "Function declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/function"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "quarter",
+      "title": "Round the minutes up to a quarter hour",
+      "file": "src/bill.cpp",
+      "description": "Ambrose bills whole quarter hours. Under `// Task 4`, write a function called `minutesToBill` that takes the minutes worked as an `int` and gives back, as an `int`, the minutes rounded up to the next quarter hour: 50 gives 60, 60 stays 60, and 61 gives 75.\n\nCheck calls `minutesToBill` with other minutes, and reads what it gives back, what it prints and its own minutes after the call: they must stay as they were. It gives the minutes back; it prints nothing.",
+      "nextSteps": [
+        "Write the first line: an `int` in, an `int` back.",
+        "Decide how to tell whether the minutes are already a whole number of quarter hours.",
+        "While they are not, move them up a minute, then give them back.",
+        "Call it from `main` with 50, 60 and 61, build and run."
+      ],
+      "hints": [
+        "`minutes % 15` is 0 exactly when the minutes are a whole number of quarter hours.",
+        "The parameter is a copy of the caller's value, so the function may change it on the way: a loop can add 1 to it until it is a whole number of quarter hours.",
+        "The shape is `while (minutes % 15 != 0) { minutes++; }`, then `return minutes;`."
+      ],
+      "docs": [
+        {
+          "title": "Function parameters",
+          "url": "https://en.cppreference.com/w/cpp/language/function#Parameter_list"
+        },
+        {
+          "title": "while loop",
+          "url": "https://en.cppreference.com/w/cpp/language/while"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
