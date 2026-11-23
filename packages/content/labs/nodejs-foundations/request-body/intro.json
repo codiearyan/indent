@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Imran", "say": "Can the phones send the readings?", "note": "The board in the shed gets wiped." },
+    { "title": "Volunteer's phone", "text": "Has the litres, and nowhere to send them." },
+    {
+      "title": "Your server",
+      "file": "server.js",
+      "mine": true,
+      "gap": "Nothing reads what is sent",
+      "tasks": ["Read the whole body", "Answer the totals", "Refuse broken JSON", "Refuse a huge body"]
+    },
+    { "title": "Imran", "say": "So that is what north has used." }
+  ],
+  "ticket": { "label": "North reading", "wrong": "wiped off", "why": "Board only", "right": "kept" },
+  "captions": [
+    "At Marrowfield, Imran wants the evening meter readings sent from the volunteers' phones.",
+    "Today they go on a board in the shed, and half of them are wiped before he copies them.",
+    "You write a server that reads JSON bodies, checks them and answers in JSON, in four tasks.",
+    "Now the north tap's reading reaches the laptop and is kept, and broken ones are refused.",
+    "Same evening round, no board. Imran asks the server for each tap's total."
+  ]
+}

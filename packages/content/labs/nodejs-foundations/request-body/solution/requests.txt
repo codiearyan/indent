@@ -1,0 +1,8 @@
+# One request on each line: the method, the address, and for a POST, the body.
+# ask.js sends a body in three pieces, as a phone on a slow line would.
+POST /readings {"tap":"north","litres":26}
+POST /readings {"tap":"south","litres":4}
+POST /readings {"tap":"north","litres":12}
+GET /readings
+POST /readings {"tap":"north","litres":
+POST /readings {"tap":"north"}

@@ -1,0 +1,90 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "volunteer", "label": "Volunteer's phone", "kind": "story" },
+      { "id": "server", "label": "server.js", "kind": "file", "mine": true },
+      { "id": "kept", "label": "Readings so far", "kind": "data" },
+      { "id": "imran", "label": "Imran", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "volunteer", "to": "server", "label": "reading as JSON" },
+      { "from": "server", "to": "kept", "label": "keeps" },
+      { "from": "server", "to": "volunteer", "label": "kept, or why not" },
+      { "from": "imran", "to": "server", "label": "asks for totals" },
+      { "from": "kept", "to": "server", "label": "litres per tap" }
+    ],
+    "note": "server.js now receives readings from the volunteers' phones, checks each one, keeps the good ones and answers in JSON."
+  },
+  "tasks": {
+    "body": {
+      "steps": [
+        {
+          "active": ["volunteer", "volunteer->server", "server"],
+          "note": "A phone at the north tap sends a reading, and its body arrives in pieces.",
+          "value": { "kind": "map", "label": "Body", "entries": [{ "key": "tap", "value": "a tap's name" }, { "key": "litres", "value": "a number" }] }
+        },
+        {
+          "active": ["server"],
+          "note": "The server waits for every piece, joins them, and reads the whole body as JSON."
+        },
+        {
+          "active": ["server", "server->kept", "kept"],
+          "note": "It keeps the tap and the litres, nothing else that was sent."
+        },
+        {
+          "active": ["server", "server->volunteer", "volunteer"],
+          "note": "It answers that the reading was created, with the reading it kept, as JSON."
+        }
+      ]
+    },
+    "totals": {
+      "steps": [
+        {
+          "active": ["imran", "imran->server", "server"],
+          "note": "Imran asks how much each tap has used."
+        },
+        {
+          "active": ["kept", "kept->server", "server"],
+          "note": "The server adds up the litres of each tap from the readings kept so far."
+        },
+        {
+          "active": ["server", "imran"],
+          "note": "It answers with one total per tap, as JSON, and an empty object before any reading.",
+          "value": { "kind": "map", "label": "Totals", "entries": [{ "key": "a tap", "value": "its litres" }, { "key": "another tap", "value": "its litres" }] }
+        }
+      ]
+    },
+    "bad-json": {
+      "steps": [
+        {
+          "active": ["volunteer", "volunteer->server", "server"],
+          "note": "A phone loses signal halfway, and only part of a reading arrives."
+        },
+        {
+          "active": ["server"],
+          "note": "Reading it as JSON fails, and the server catches the failure instead of stopping."
+        },
+        {
+          "active": ["server", "server->volunteer", "volunteer"],
+          "note": "It answers that the request was wrong, says why in JSON, and keeps nothing."
+        }
+      ]
+    },
+    "too-large": {
+      "steps": [
+        {
+          "active": ["volunteer", "volunteer->server", "server"],
+          "note": "A body keeps coming, far longer than any reading, without saying how long it is."
+        },
+        {
+          "active": ["server"],
+          "note": "The server counts the bytes as they arrive and stops reading once they pass its limit."
+        },
+        {
+          "active": ["server", "server->volunteer", "volunteer"],
+          "note": "It answers that the body is too large, keeps nothing, and goes on serving the next phone."
+        }
+      ]
+    }
+  }
+}
