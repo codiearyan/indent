@@ -4048,8 +4048,9 @@ async function toolRule(t, file, task, rule) {
     ['map', /\bstd::(map)\s*</],
     ['vector', /\bstd::(vector)\s*</]
   ]
+  const written = code.slice(def.start, def.end)
   for (const [header, pattern] of headers) {
-    const used = pattern.exec(body)
+    const used = pattern.exec(written)
     if (!used || new RegExp(`^\\s*#\\s*include\\s*<${header}>`, 'm').test(code)) continue
     return fail(
       `${file} includes <${header}>`,
