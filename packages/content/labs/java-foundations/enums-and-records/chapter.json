@@ -1,0 +1,107 @@
+{
+  "id": "enums-and-records",
+  "title": "Enums and records: kinds of ticket",
+  "files": ["TicketKinds.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the ticket kinds here, and try your types from main.",
+    "suggestedCommand": "java TicketKinds.java"
+  },
+  "tasks": [
+    {
+      "id": "kinds",
+      "title": "Write the kinds of ticket, and a price for each",
+      "file": "TicketKinds.java",
+      "description": "Under `// Task 1`, write an enum `Kind` with three values, `ADULT`, `CHILD` and `BIKE`. Then write a class `Prices` with a method `static int pence(Kind kind)` that uses a `switch` over the kind: an adult pays 320, a child 160 and a bike 100.\n\nCheck makes sure `Kind` is an enum of three values, and reads what `pence` gives back for each kind, some found by their names. Then it looks for a `switch`, and makes sure the prices never come from the order of the values or from their names as text.",
+      "nextSteps": [
+        "Read the parts of the lesson about enums and about a switch over one.",
+        "Write the enum: its name and its three values.",
+        "Write Prices and pence, with a switch that has a case for each kind.",
+        "Take the // off the first line in main and run the file."
+      ],
+      "hints": [
+        "An enum lists every value a type can have, so a kind can never be spelt wrong: Kind.ADULT is checked by the compiler.",
+        "Inside a switch over a Kind, each case names a value alone: case CHILD, not case Kind.CHILD. With colons, each case needs a return or a break, or it runs on into the next.",
+        "The shape: `switch (kind) { case ADULT: return 320; case CHILD: return 160; default: return 100; }`, or the same with arrows."
+      ],
+      "docs": [
+        {
+          "title": "Enum types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html"
+        },
+        {
+          "title": "Switch expressions",
+          "url": "https://docs.oracle.com/en/java/javase/17/language/switch-expressions.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Enums in Java",
+          "url": "https://www.youtube.com/watch?v=wq9SJb8VeyM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "routes",
+      "title": "Write the routes, each with its minutes",
+      "file": "TicketKinds.java",
+      "description": "Under `// Task 2`, write an enum `Route` with three values, each carrying how long its crossing takes: `HARBOUR` 10 minutes, `ISLAND` 35 and `HEADLAND` 20. Each keeps its minutes in a `private final int` field, set by the enum's constructor. Write `int minutes()`, and `int crossingsIn(int hours)`: how many whole crossings of that route fit in that many hours.\n\nCheck makes sure `Route` is an enum, reads what `minutes` and `crossingsIn` give back for each route and for hours of its own, and looks for the enum's constructor. The numbers must not come from the order of the values or from their names as text.",
+      "nextSteps": [
+        "Read the part of the lesson about an enum that carries a value.",
+        "Write the three values, each with its minutes in brackets, ending with a semicolon.",
+        "Write the field, the constructor and minutes.",
+        "Write crossingsIn, then take the // off the route lines in main."
+      ],
+      "hints": [
+        "Each value of an enum is an object, made once by the enum's own constructor with the numbers in its brackets.",
+        "The constructor sets the field; minutes gives it back. An hour has 60 minutes, and dividing two ints keeps only whole crossings.",
+        "The parts: `HARBOUR(10), ISLAND(35), HEADLAND(20);`, then `private final int minutes;`, `Route(int minutes) { this.minutes = minutes; }`, and crossingsIn gives back `hours * 60 / minutes`."
+      ],
+      "docs": [
+        {
+          "title": "Enum types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html"
+        },
+        {
+          "title": "Enum classes in the Java language",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.9"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ticket",
+      "title": "Write a ticket that never changes",
+      "file": "TicketKinds.java",
+      "description": "Under `// Task 3`, write a record `Ticket` with a `String passenger`, a `Kind kind` and an `int pence`, in that order, and a method `Ticket forPassenger(String other)`: a new ticket for `other`, of the same kind and at the same price.\n\nCheck runs your record beside a `Kind` of its own, with the three values Task 1 asks for, so this task is judged on its own lines. It makes tickets, reads what the record gives back, prints one, compares equal and different tickets, and calls `forPassenger`. Then it puts a method of its own inside `Ticket` that tries to change `pence`, and Java must refuse.",
+      "nextSteps": [
+        "Read the part of the lesson about records and what they write for you.",
+        "Write the record's first line, with its three parts in round brackets.",
+        "Write forPassenger in its braces: it makes a new ticket.",
+        "Take the // off the ticket lines in main and run the file."
+      ],
+      "hints": [
+        "A record writes its fields, constructor, the methods that read each part, equals, hashCode and toString for you. You write only what is extra.",
+        "Inside the record each part is a field you can read but never change, so a ticket for someone else has to be a new one.",
+        "The whole record: `record Ticket(String passenger, Kind kind, int pence) { Ticket forPassenger(String other) { return new Ticket(other, kind, pence); } }`."
+      ],
+      "docs": [
+        {
+          "title": "Record classes",
+          "url": "https://docs.oracle.com/en/java/javase/17/language/records.html"
+        },
+        {
+          "title": "java.lang.Record",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Records in Java",
+          "url": "https://www.youtube.com/watch?v=gJ9DYC-jswo"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "inheritance",
+  "title": "Inheritance: boats of a new kind",
+  "files": ["BoatKinds.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the boats here, and try your new kinds from main.",
+    "suggestedCommand": "java BoatKinds.java"
+  },
+  "tasks": [
+    {
+      "id": "bike-ferry",
+      "title": "Write BikeFerry, a boat that carries bikes",
+      "file": "BoatKinds.java",
+      "description": "Under `// Task 1`, write a class `BikeFerry` that extends `Boat`. It adds an `int bikeSpaces`, a constructor `BikeFerry(String name, int seats, int bikeSpaces)` that hands the name and the seats to `Boat`'s constructor, and a method `int getBikeSpaces()`. Use `Boat` as the starter gives it.\n\nCheck makes bike ferries of its own, two at once included, keeps one in a variable of type `Boat`, and reads what `getName`, `getSeats`, `fareFor`, `describe` and `getBikeSpaces` give back. A `BikeFerry` that is not a `Boat` does not compile there.",
+      "nextSteps": [
+        "Read the parts of the lesson about extends and about the parent's constructor.",
+        "Write the first line of the class so that a BikeFerry is a Boat.",
+        "Write the field and the constructor: Boat's part first, then the bike spaces.",
+        "Write getBikeSpaces, then take the // off the BikeFerry lines in main and run the file."
+      ],
+      "hints": [
+        "A BikeFerry already has a name and seats: it gets them from Boat. It adds only the bike spaces.",
+        "name and seats are private in Boat, so BikeFerry cannot set them. Boat's constructor sets them, and the first line of BikeFerry's constructor runs it with super(...).",
+        "The constructor's shape: `super(name, seats);` then `this.bikeSpaces = bikeSpaces;`."
+      ],
+      "docs": [
+        {
+          "title": "Inheritance",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html"
+        },
+        {
+          "title": "Using the keyword super",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/super.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Inheritance in Java",
+          "url": "https://www.youtube.com/watch?v=Zs342ePFvRI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "night-boat",
+      "title": "Write NightBoat, with a fare of its own",
+      "file": "BoatKinds.java",
+      "description": "Under `// Task 2`, write a class `NightBoat` that extends `Boat`, with a constructor `NightBoat(String name, int seats)`. It overrides `fareFor`, with `@Override` on the line above: at night under 16 travel free and everyone else pays 450.\n\nCheck makes night boats of its own, keeps them in variables of type `Boat`, and reads what `fareFor` gives back for ages on both sides of 16, and what `getName` and `describe` give back. Then it looks for `@Override` above `fareFor`.",
+      "nextSteps": [
+        "Read the part of the lesson about overriding and @Override.",
+        "Write the class and its constructor, handing both values to Boat.",
+        "Write fareFor with exactly the first line Boat's has, and @Override above it.",
+        "Take the // off the NightBoat lines in main and run the file: the boat is in a Boat variable."
+      ],
+      "hints": [
+        "Through a variable of type Boat, Java runs NightBoat's fareFor only if it takes the place of Boat's.",
+        "It takes Boat's place only when the name and the parameter types are exactly Boat's: int fareFor(int age). With @Override above it, the compiler tells you when they are not.",
+        "The method: `@Override` on its own line, then `int fareFor(int age) {`, giving back 0 when age is below 16 and 450 otherwise."
+      ],
+      "docs": [
+        {
+          "title": "Overriding and hiding methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/override.html"
+        },
+        {
+          "title": "The Override annotation",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Override.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "charter-boat",
+      "title": "Write CharterBoat, which says who hired it",
+      "file": "BoatKinds.java",
+      "description": "Under `// Task 3`, write a class `CharterBoat` that extends `Boat`. It adds a `String hiredBy` and a constructor `CharterBoat(String name, int seats, String hiredBy)`, and overrides `describe`, with `@Override` on the line above: it gives back what `Boat`'s own `describe` gives back, then `, hired by ` and the name, as in `Petrel: 6 seats, hired by Struan`. The first part comes from `Boat`'s `describe` itself, not written again.\n\nCheck runs your class beside a `Boat` of its own, with the same methods, whose `describe` words things its own way. It makes charter boats, two at once included, keeps them in variables of type `Boat`, and reads what `describe`, `getName` and `fareFor` give back. Then it looks for `@Override` above `describe`.",
+      "nextSteps": [
+        "Read the part of the lesson about calling the parent's version.",
+        "Write the class, its field and its constructor.",
+        "Write describe with @Override, asking Boat's describe for the first part.",
+        "Take the // off the CharterBoat lines in main and run the file."
+      ],
+      "hints": [
+        "Boat already knows how to describe a boat. CharterBoat only adds who hired it.",
+        "Inside CharterBoat, describe() alone means CharterBoat's own describe, which would call itself forever. super.describe() runs Boat's.",
+        "The shape: `return super.describe() + \", hired by \" + hiredBy;`."
+      ],
+      "docs": [
+        {
+          "title": "Using the keyword super",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/super.html"
+        },
+        {
+          "title": "Overriding and hiding methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/override.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

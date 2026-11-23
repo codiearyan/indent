@@ -1,0 +1,56 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ossian", "label": "Ossian", "kind": "story" },
+      { "id": "boat", "label": "Boat", "kind": "data" },
+      { "id": "bike", "label": "BikeFerry", "kind": "data", "mine": true },
+      { "id": "night", "label": "NightBoat", "kind": "data", "mine": true },
+      { "id": "charter", "label": "CharterBoat", "kind": "data", "mine": true },
+      { "id": "hut", "label": "Ticket hut", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ossian", "to": "boat", "label": "every boat" },
+      { "from": "boat", "to": "bike", "label": "extends" },
+      { "from": "boat", "to": "night", "label": "extends" },
+      { "from": "boat", "to": "charter", "label": "extends" },
+      { "from": "night", "to": "hut", "label": "night fare" },
+      { "from": "charter", "to": "hut", "label": "description" }
+    ],
+    "note": "Three new kinds of boat start from Boat, keep what it does, and add or change only their own part."
+  },
+  "tasks": {
+    "bike-ferry": {
+      "steps": [
+        { "active": ["ossian", "ossian->boat", "boat"], "note": "Every boat has a name and seats, and Boat already knows how to keep them." },
+        {
+          "active": ["boat", "boat->bike", "bike"],
+          "value": { "kind": "map", "label": "a bike ferry", "entries": [{ "key": "name, seats", "value": "kept by Boat" }, { "key": "bike spaces", "value": "its own" }] },
+          "note": "The bike ferry hands its name and seats to Boat, and keeps only its bike spaces itself."
+        },
+        { "active": ["bike"], "note": "Anything a boat can do, the bike ferry can do too: its fares and its description come from Boat." }
+      ]
+    },
+    "night-boat": {
+      "steps": [
+        { "active": ["boat", "boat->night", "night"], "note": "The night boat is a boat in every way but one: its fare." },
+        { "active": ["night", "night->hut", "hut"], "note": "The hut asks a boat for a fare without knowing which kind it is." },
+        {
+          "active": ["night", "hut"],
+          "value": { "kind": "array", "label": "the hut asks", "values": ["a boat", "an age"] },
+          "note": "The night boat's own fare answers, not the day fare, because that is what the boat really is."
+        }
+      ]
+    },
+    "charter-boat": {
+      "steps": [
+        { "active": ["boat", "boat->charter", "charter"], "note": "A charter boat is hired out whole, and knows who hired it." },
+        { "active": ["charter", "boat"], "note": "To describe itself it first asks Boat for the usual description." },
+        {
+          "active": ["charter", "charter->hut", "hut"],
+          "value": { "kind": "array", "label": "a description", "values": ["Boat's part", "who hired it"] },
+          "note": "Then it adds who hired it, so the hut sees both in one line."
+        }
+      ]
+    }
+  }
+}

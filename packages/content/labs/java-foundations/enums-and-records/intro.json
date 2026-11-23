@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why was an adult charged as a child?",
+      "note": "The kind said Adult."
+    },
+    {
+      "title": "The programs",
+      "text": "The kind of ticket kept as text"
+    },
+    {
+      "title": "Your ticket kinds",
+      "file": "TicketKinds.java",
+      "mine": true,
+      "gap": "Any text passes for a kind",
+      "tasks": ["Fixed kinds, one price", "Routes with minutes", "A ticket that stays"]
+    },
+    {
+      "title": "Ticket printer",
+      "text": "Prints what it is given."
+    }
+  ],
+  "ticket": {
+    "label": "Adult ticket",
+    "wrong": "child fare",
+    "why": "A typo",
+    "right": "adult fare"
+  },
+  "captions": [
+    "The ticket printer. Bridie wants the kinds of ticket fixed, so none can be mistyped.",
+    "Today a kind is text, and Adult with a capital A was sold at a child's fare.",
+    "You write the kinds and their prices, routes that keep their minutes, and a fixed ticket.",
+    "Now a kind is checked by the compiler, and a printed ticket never changes.",
+    "enum, switch and record. Part 4 is done: boats, tickets and kinds as families of types."
+  ]
+}

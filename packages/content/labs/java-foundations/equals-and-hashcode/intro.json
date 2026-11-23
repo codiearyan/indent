@@ -1,0 +1,38 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why is Morag still on the list?",
+      "note": "She rang to cancel."
+    },
+    {
+      "title": "Phone call",
+      "text": "Her booking, read in again as a new object"
+    },
+    {
+      "title": "Your booking",
+      "file": "WaitingList.java",
+      "mine": true,
+      "gap": "Equal bookings look different",
+      "tasks": ["When two are the same", "Matching hash codes", "Cancel from the list"]
+    },
+    {
+      "title": "Waiting list",
+      "rows": [["Morag", "nine o'clock"], ["Lachie", "nine o'clock"], ["Ishbel", "two o'clock"]],
+      "mark": 0
+    }
+  ],
+  "ticket": {
+    "label": "Morag",
+    "wrong": "still waiting",
+    "why": "Not found",
+    "right": "off the list"
+  },
+  "captions": [
+    "The Gannet's waiting list. Bridie took Morag off it, and she is still there.",
+    "The booking from Morag's call is a new object, so the list never finds hers.",
+    "You write when two bookings are the same, a hash code to match, and the cancelling.",
+    "Now the list finds the booking equal to the call, and Morag comes off.",
+    "== against equals, hashCode, instanceof and casts. Next: enums and records."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "caller", "label": "Phone call", "kind": "story" },
+      { "id": "call", "label": "Booking read in", "kind": "data" },
+      { "id": "equals", "label": "equals()", "kind": "function", "mine": true },
+      { "id": "hash", "label": "hashCode()", "kind": "function", "mine": true },
+      { "id": "list", "label": "Waiting list", "kind": "data" },
+      { "id": "cancel", "label": "cancel()", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "caller", "to": "call", "label": "name, hour" },
+      { "from": "call", "to": "cancel", "label": "cancelled" },
+      { "from": "cancel", "to": "list", "label": "take off" },
+      { "from": "list", "to": "equals", "label": "same one?" },
+      { "from": "equals", "to": "hash", "label": "same fields" }
+    ],
+    "note": "A booking read in from a phone call is a new object, and the waiting list finds the equal one by asking each booking."
+  },
+  "tasks": {
+    "equals": {
+      "steps": [
+        { "active": ["caller", "caller->call", "call"], "note": "Morag rings to cancel, and her booking is made again from what she says." },
+        { "active": ["list", "list->equals", "equals"], "value": { "kind": "map", "label": "the same booking when", "entries": [{ "key": "passenger", "value": "compared" }, { "key": "hour", "value": "compared" }, { "key": "seats", "value": "left out" }] }, "note": "Asked whether two bookings are the same, equals looks at what they hold, not where they live." },
+        { "active": ["equals"], "note": "Anything that is not a booking, or nothing at all, is never equal to one." }
+      ]
+    },
+    "hash-code": {
+      "steps": [
+        { "active": ["equals", "equals->hash", "hash"], "note": "The hash code is built from exactly the fields equals compares." },
+        { "active": ["hash"], "value": { "kind": "map", "label": "hash codes", "entries": [{ "key": "equal bookings", "value": "always the same" }, { "key": "different bookings", "value": "mostly different" }] }, "note": "So two equal bookings always share a hash code, and a quick lookup finds them." }
+      ]
+    },
+    "cancel": {
+      "steps": [
+        { "active": ["call", "call->cancel", "cancel"], "value": { "kind": "array", "label": "cancelled", "values": ["a booking read in", "..."] }, "note": "The cancellations come in as bookings read in, new objects every one." },
+        { "active": ["cancel", "cancel->list", "list", "list->equals", "equals"], "note": "For each one, the waiting list finds the booking equal to it and takes that one off." },
+        { "active": ["cancel", "list"], "note": "Only bookings really taken off are counted, and the rest of the list stays in order." }
+      ]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "bridie", "label": "Bridie", "kind": "story" },
+      { "id": "bookable", "label": "Bookable", "kind": "data", "mine": true },
+      { "id": "shed", "label": "BikeShed", "kind": "data", "mine": true },
+      { "id": "bus", "label": "TourBus", "kind": "data", "mine": true },
+      { "id": "trip", "label": "bookAll()", "kind": "function", "mine": true },
+      { "id": "board", "label": "Departures board", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "bookable", "to": "shed", "label": "implements" },
+      { "from": "bookable", "to": "bus", "label": "implements" },
+      { "from": "bridie", "to": "trip", "label": "a trip, places" },
+      { "from": "trip", "to": "bookable", "label": "room? book" },
+      { "from": "bus", "to": "board", "label": "hour" }
+    ],
+    "note": "A bike shed and a bus are not boats, but each can be booked, and a whole trip is booked through that alone."
+  },
+  "tasks": {
+    "bike-shed": {
+      "steps": [
+        { "active": ["bookable"], "value": { "kind": "array", "label": "anything bookable", "values": ["a label", "places free", "book some"] }, "note": "Bookable names what every bookable thing can do, and nothing about how." },
+        { "active": ["bookable", "bookable->shed", "shed"], "note": "The bike shed says it is bookable, and writes each of those its own way." },
+        { "active": ["shed"], "note": "Asked for more bikes than it has, the shed says no and lends none." }
+      ]
+    },
+    "tour-bus": {
+      "steps": [
+        { "active": ["bookable", "bookable->bus", "bus"], "note": "The tour bus can be booked like the shed." },
+        { "active": ["bus", "bus->board", "board"], "note": "It also leaves at a set hour, so it shows on the departures board." },
+        { "active": ["bus"], "value": { "kind": "map", "label": "the bus is", "entries": [{ "key": "bookable", "value": "yes" }, { "key": "departing", "value": "yes" }] }, "note": "One class with two abilities, each named by its own interface." }
+      ]
+    },
+    "trip": {
+      "steps": [
+        { "active": ["bridie", "bridie->trip", "trip"], "value": { "kind": "array", "label": "Peigi's trip", "values": ["a boat", "bikes", "the tour bus"] }, "note": "Bridie asks for places for Peigi's family on every part of a trip." },
+        { "active": ["trip", "trip->bookable", "bookable"], "note": "First every part is asked whether it has room, without booking anything." },
+        { "active": ["trip", "bookable"], "note": "Only when all of them do is every part booked. Otherwise none is." }
+      ]
+    }
+  }
+}
