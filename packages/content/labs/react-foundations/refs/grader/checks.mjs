@@ -30,8 +30,9 @@ const commits = (page) => page.window.commits.length
 async function drawCabs(page, lines) {
   page.window.clear()
   const { h, React, mod } = page.window
-  const cabs = lines.map((stops) => h(mod.Cab, { key: `cab-${++fresh}`, stops: [...stops] }))
-  const { errors } = await drawCountedWith(page, h(React.Fragment, null, ...cabs))
+  const keys = lines.map(() => `cab-${++fresh}`)
+  const cabsOf = () => lines.map((stops, i) => h(mod.Cab, { key: keys[i], stops: [...stops] }))
+  const { errors } = await drawCountedWith(page, h(React.Fragment, null, ...cabsOf()))
   if (errors.length) return { problem: stopped(errors[0]) }
   const sections = page.$$('#root section.cab')
   if (sections.length !== lines.length) {
@@ -50,7 +51,9 @@ async function drawCabs(page, lines) {
       return { problem: detail(`The cab has ${name}`, false, `The check could not find ${name} in the cab. Keep it, with its class, as it was.`) }
     }
   }
-  return { cabs: sections }
+  // The same cabs drawn again with new props, so each one draws while keeping its state.
+  const redraw = () => drawCountedWith(page, h(React.Fragment, null, ...cabsOf()))
+  return { cabs: sections, redraw }
 }
 
 const part = (cab, selector) => cab.querySelector(selector)
@@ -136,6 +139,8 @@ export const checks = {
     }
     let message = ''
     if (bell.log.length < 3) message = 'End of the ride did not write a line in the log each time it was pressed. It calls logRide with the number of rings of that ride.'
+    else if (![firstRide, secondRide, nextRide].every((n) => typeof n === 'number'))
+      message = "End of the ride handed logRide something that is not a number. The count lives in the ref's current field: hand logRide that, not the ref itself."
     else if (firstRide === 0 && secondRide === 0) message = 'End of the ride told the log 0 every time: the rings are not counted yet. Count each ring in a ref, and hand its current value to logRide at the end of the ride.'
     else if (firstRide === 1 && secondRide === 4)
       message = 'The first cab lost its count when it was drawn again for another reason, a name being typed. A plain variable in the component starts again on every draw, and so does a ref the component sets while drawing. Set the ref only in the functions the buttons call.'
@@ -188,6 +193,20 @@ export const checks = {
       results.push(detail(`New driver in cab ${index + 1} puts the cursor in its name box`, !message, message, output))
       if (message) return results
       names[index] = ''
+    }
+    const bell = part(cabs[0], 'button.bell')
+    bell.focus()
+    await drawn.redraw()
+    const active = page.document.activeElement
+    if (active !== bell) {
+      results.push(
+        detail(
+          'The cursor stays put when a cab draws for another reason',
+          false,
+          'When the cabs were drawn again for another reason, the cursor jumped to a name box. The cab focuses the box while it draws, so every draw takes the cursor. Focus it only in the function New driver calls.',
+          `the cursor was on Ring the bell in cab 1\nboth cabs were drawn again\nthe cursor is in: ${where(active)}`
+        )
+      )
     }
     return results
   },

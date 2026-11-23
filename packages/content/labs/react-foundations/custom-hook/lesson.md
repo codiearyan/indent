@@ -59,7 +59,7 @@ React does not know hooks by name. It knows them by order: the first hook a comp
 - Never inside an `if`, a loop, or after an early `return`.
 - Never in an event handler or a plain function. React stops with `Invalid hook call. Hooks can only be called inside of the body of a function component.`
 
-Break the order and React notices if it can. When some hooks ran before the condition, it stops with `Rendered more hooks than during the previous render.`, or `Rendered fewer hooks than expected. This may be caused by an accidental early return statement.`, and the console may also say `React has detected a change in the order of Hooks`. When a component skips every hook it has, React may say nothing at all, or only `Internal React error: Expected static flag was missing`, which does not point at your code. Its state starts again from the beginning, and the cleanup of its effects never runs. That is what is wrong with the platform sign.
+Break the order and React notices if it can. When some hooks ran before the condition, it stops with `Rendered more hooks than during the previous render.`, or `Rendered fewer hooks than expected. This may be caused by an accidental early return statement.`, and the console may also say `React has detected a change in the order of Hooks`. When a component skips every hook it has, React usually says nothing at all, and what little it may print does not point at your code. Its state starts again from the beginning, and the cleanup of its effects never runs. That is what is wrong with the platform sign.
 
 The fix is never to call a hook less often. Call it every time, and let it do nothing when there is nothing to do: an effect can return early before it starts anything.
 

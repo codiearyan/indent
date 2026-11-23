@@ -52,7 +52,9 @@ async function hookPage(t) {
         false,
         named
           ? `useTramStop.js exports ${named}, not useTramStop. A hook's name starts with use, and the screens and the check call this one useTramStop.`
-          : 'useTramStop.js has no export called useTramStop yet. Write the whole hook in that file, exported by name.',
+          : others.includes('default')
+            ? 'useTramStop.js exports its hook as the default export. Export it by name, with export function useTramStop, so the screens can import { useTramStop }.'
+            : 'useTramStop.js has no export called useTramStop yet. Write the whole hook in that file, exported by name.',
         `functions exported: ${others.join(', ') || '(none)'}`
       )
     }
@@ -99,6 +101,16 @@ async function hookWorks(page) {
   }
   if (!follows(page).length) {
     return [detail('The hook follows the tram', false, 'Nothing followed a tram when a screen used the hook. The effect that calls follow belongs inside useTramStop.', output())]
+  }
+  if (!active(page).length) {
+    return [
+      detail(
+        'The hook keeps following the tram',
+        false,
+        'The hook started following each tram and stopped at once. The effect called the function follow gives back instead of returning it: return that function itself, and React calls it later.',
+        output()
+      )
+    ]
   }
   const first = probes(page)[0]
   if (first === '(nothing)') {
@@ -306,8 +318,10 @@ export const checks = {
     let message = ''
     if (follows(hp).slice(mark).some((f) => f.number === null || f.number === undefined))
       message = 'With no tram, the hook still called follow, with null for the tram. When the number is null, the effect follows nothing.'
-    else if (steps[2].following.length) message = 'When the tram went to none, the hook kept following the last tram. The effect still returns its cleanup, so React stops the old tram; it just follows nothing new.'
-    else if (steps.some((s) => s.number === null && s.shown !== '(null)')) message = 'With no tram, the hook should return null.'
+    else if (steps[2].following.length)
+      message = 'When the tram went to none, the hook kept following the last tram, and React printed no error. The hook skipped its own hooks on that draw, so React never ran the cleanup of the effect. A hook follows the same rules as a component: call useState and useEffect every time, and let the effect follow nothing while the number is null.'
+    else if (steps.some((s) => s.number === null && s.shown !== '(null)'))
+      message = 'With no tram, the hook should return null. Set the stop back to null in the effect before it decides there is nothing to follow.'
     else if (steps.some((s) => s.stop && s.shown !== s.stop)) message = 'After a time with no tram, a tram came back and its reports did not show.'
     if (message) return [detail('useTramStop follows nothing while there is no tram', false, message, hookOutput)]
     hp.window.clear()
@@ -329,7 +343,9 @@ export const checks = {
       { number: null, what: 'no tram again' }
     ]) {
       const before = page.window.commits.length
+      const callsBefore = hookCalls(page).length
       const errors = await drawScreen(page, 'PlatformSign', { number: step.number }, signKey)
+      const handed = hookCalls(page).slice(callsBefore)
       draws += page.window.commits.length - before
       if (errors.length) {
         const rules = RULES.test(errors[0])
@@ -350,6 +366,17 @@ export const checks = {
       step.text = textOf(page, '.sign')
       step.following = active(page).map((f) => f.number)
       if (thrown(page, signErrorsBefore)) return [...results, stopped(thrown(page, signErrorsBefore))]
+      if (step.number === null && handed.some((n) => n !== null)) {
+        return [
+          ...results,
+          detail(
+            'PlatformSign hands the hook no tram when none is due',
+            false,
+            `With no tram due, PlatformSign called useTramStop with ${JSON.stringify(handed.find((n) => n !== null))}, so a tram of that number was followed. Hand the hook the number prop as it is: null already means no tram.`,
+            signLog.join('\n')
+          )
+        ]
+      }
       if (step.number === null && step.following.length) {
         return [
           ...results,
@@ -369,7 +396,7 @@ export const checks = {
       }
     }
     const calls = hookCalls(page).length
-    const orderWarning = page.logs.slice(logsBefore).some((line) => /change in the order of Hooks|Expected static flag/.test(line))
+    const orderWarning = page.logs.slice(logsBefore).some((line) => /change in the order of Hooks/.test(line))
     results.push(
       detail(
         'PlatformSign calls the hook on every draw',

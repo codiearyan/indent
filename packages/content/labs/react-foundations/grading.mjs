@@ -86,6 +86,10 @@ const KNOWN = [
     "The code used an element through a ref whose current is null. A ref holds its element only once React has put it on the page, so not while the component draws, and only when the ref attribute was handed the ref object itself."
   ],
   [
+    /destroy is not a function/,
+    'An effect returned something that is not a function, and React tried to call it to clean up. Return the cleanup function itself, or return nothing.'
+  ],
+  [
     /Cannot read properties of (undefined|null)/,
     'The code read a field of something that is not there. Look at the names you use for props and data.'
   ],

@@ -34,7 +34,7 @@
       "id": "driver",
       "title": "Put the cursor in the name box for a new driver",
       "file": "src/Cab.jsx",
-      "description": "New driver empties the name, as it does now, and puts the cursor in the name box of the same cab, so the next child can type straight away. Reach the box through a ref on the `input`.\n\nThe check puts two cabs side by side, types a name in each, and presses New driver in one cab and then in the other. After each press it looks at where the cursor is and at both names.",
+      "description": "New driver empties the name, as it does now, and puts the cursor in the name box of the same cab, so the next child can type straight away. Reach the box through a ref on the `input`.\n\nThe check puts two cabs side by side, types a name in each, and presses New driver in one cab and then in the other. After each press it looks at where the cursor is and at both names. Then it puts the cursor on another button and draws both cabs again, to see that the cursor stays there.",
       "nextSteps": [
         "Read \"A ref to an element\" in the lesson.",
         "Make a ref that starts at `null`, and hand it to the `ref` attribute of the name box.",

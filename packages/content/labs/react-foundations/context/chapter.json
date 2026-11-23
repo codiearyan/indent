@@ -59,7 +59,7 @@
       "id": "provide",
       "title": "Provide the discount from ShopPage",
       "file": "src/Shop.jsx",
-      "description": "`ShopPage` puts its shelves inside a provider of `DiscountContext`, with the member discount as its value while Member is ticked and `0` while it is not. `Shelf` and `ShopItem` no longer need a `discount` prop: take it out, so a new shelf can never forget it. Everything else they need, the shelf and its items, stays in their props.\n\nThe check draws `ShopPage` with shelves and a member discount of its own, ticks and unticks Member, and reads every price. Then it draws `Shelf` alone with a shelf of its own under a provider of its own, with no `discount` prop.",
+      "description": "`ShopPage` puts its shelves inside a provider of `DiscountContext`, with the member discount as its value while Member is ticked and `0` while it is not. `Shelf` and `ShopItem` no longer need a `discount` prop: take it out, so a new shelf can never forget it. Everything else they need, the shelf and its items, stays in their props.\n\nThe check draws `ShopPage` with shelves and a member discount of its own, ticks and unticks Member, reads every price, and looks at the props each part was drawn with. Then it draws `Shelf` alone with a shelf of its own under a provider of its own, with no `discount` prop.",
       "nextSteps": [
         "Read \"What React says, and what it does not\" in the lesson.",
         "In `ShopPage`, wrap the shelves in `DiscountContext` with a `value`.",

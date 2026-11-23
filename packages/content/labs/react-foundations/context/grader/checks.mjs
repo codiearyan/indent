@@ -5,6 +5,7 @@ import {
   drawCountedWith,
   explain,
   exportType,
+  isDrawnBy,
   openComponent,
   warningsOf
 } from '../../grading.mjs'
@@ -16,6 +17,23 @@ const item = (id, name, pricePence) => ({ id, name, pricePence })
 const LAMPS = { id: 'lamps', name: 'Lamps and lanterns', items: [item('l-1', 'Signal lamp', 2450), item('l-2', 'Tin lantern', 1180)] }
 const MAPS = { id: 'maps', name: 'Old maps', items: [item('m-1', 'Map of the line, 1931', 760), item('m-2', 'Depot plan', 395)] }
 const TOKENS = { id: 'tokens', name: 'Gift tokens', fullPrice: true, items: [item('t-1', 'Gift token, £20', 2000), item('t-2', 'Gift token, £15', 1500)] }
+
+/**
+ * The props the component `name` was drawn with, read from React's record on the element it drew.
+ * Undefined when that record cannot be read or another component drew it, so nothing is judged.
+ */
+function componentProps(element, name) {
+  try {
+    const key = element && Object.keys(element).find((k) => k.startsWith('__reactFiber$'))
+    if (!key || !isDrawnBy(element, name)) return undefined
+    for (let fiber = element[key].return; fiber; fiber = fiber.return) {
+      if (typeof fiber.type === 'function') return fiber.memoizedProps ?? undefined
+    }
+  } catch {
+    // React's own detail changed: judge nothing.
+  }
+  return undefined
+}
 
 const stopped = (error) => detail('The shop runs without errors', false, explain(error), error)
 const isContext = (page, value) =>
@@ -32,10 +50,13 @@ async function discountPage(t) {
 function contextProblem(page, exports, context, firstTask) {
   if (context === undefined) {
     const others = Object.keys(exports ?? {})
+    const near = others.find((name) => name.toLowerCase() === 'discountcontext')
     return detail(
       'discount.js exports DiscountContext',
       false,
-      firstTask
+      firstTask && near
+        ? `discount.js exports ${near}, not DiscountContext. The screens and the check import it as DiscountContext, with the capitals as written.`
+        : firstTask
         ? 'discount.js has no export called DiscountContext yet. Make it with createContext and export it by name.'
         : 'discount.js has no DiscountContext yet. That is the first task of this issue: do it first.',
       `exports found: ${others.join(', ') || '(none)'}`
@@ -118,8 +139,13 @@ async function priceReads(page, context) {
   const wrong = PRICE_CASES.find((c) => c.shown !== pence(off(c.pence, c.percent)))
   if (!wrong) return [detail('Price takes the discount from the nearest provider', true, '', output)]
   let message = 'Price shows its price with the discount of the nearest provider above it taken off, and the full price when there is none.'
-  if (PRICE_CASES.some((c) => /nan|undefined/i.test(c.shown)))
-    message = 'Price showed no proper price. It still takes the discount from a prop, and the check gave it none: only a provider above it. Read the discount from DiscountContext with useContext.'
+  if (PRICE_CASES.some((c) => /nan|undefined/i.test(c.shown))) {
+    const error = await drawUnder(page, context, [], h(mod.Price, { pence: 1000, discount: 50 }))
+    const fromProp = !error && clean(page.$('#root .price')?.textContent) === pence(500)
+    message = fromProp
+      ? 'Price showed no proper price. It still takes the discount from a prop, and the check gave it none: only a provider above it. Read the discount from DiscountContext with useContext.'
+      : 'Price showed no proper price: the discount it worked with is not a number. useContext(DiscountContext) gives the value of the nearest provider itself, here a number of percent, to hand to discounted as it is.'
+  }
   else if (PRICE_CASES.every((c) => c.shown === pence(c.pence)))
     message = 'Price showed the full price under every provider. It does not read DiscountContext yet: useContext gives a component the value of the nearest provider above it.'
   else if (wrong.values.length > 1) message = 'Under two providers, one inside the other, Price did not use the inner one. The nearest provider above a component is the one that counts.'
@@ -215,11 +241,26 @@ export const checks = {
       message = 'React says in the console that the provider needs a value prop. A provider with no value gives every price below it undefined: hand it the discount as value.'
     else if (!same(before.prices, full)) message = 'Before Member is ticked, every price should be the full price.'
     else if (same(ticked.prices, full))
-      message = 'Ticking Member changed no price. Price reads DiscountContext, and nothing above it provides one, so it always gets the default. Put the shelves inside a provider of DiscountContext in ShopPage, with the discount as its value.'
+      message = 'Ticking Member changed no price. Price reads the nearest provider of DiscountContext above it, and with none it gets the default, no discount. Put the shelves inside a provider of DiscountContext in ShopPage, with the discount as its value.'
     else if (!same(ticked.prices, member)) message = 'With Member ticked, the prices did not have the member discount taken off. ShopPage gets that discount in its memberDiscount prop, and the check hands it one of its own.'
     else if (!same(after.prices, full)) message = 'With Member unticked again, every price should go back to the full price.'
     const results = [detail('Member changes every price on the page', !message, message, output)]
     if (message) return results
+
+    const handedOn = [
+      ['section.shelf', 'Shelf', 'ShopPage still hands each Shelf a discount prop, which nothing reads now. Take it out where ShopPage draws Shelf and where Shelf takes it, so a new shelf has nothing to forget.'],
+      ['section.shelf li', 'ShopItem', 'Shelf still hands each ShopItem a discount prop, which nothing reads now. Take it out where Shelf draws ShopItem and where ShopItem takes it.'],
+      ['section.shelf .price', 'Price', 'ShopItem still hands Price a discount prop, which Price no longer reads. Take it out where ShopItem draws Price.']
+    ].find(([selector, name]) => 'discount' in (componentProps(page.$(`#root ${selector}`), name) ?? {}))
+    results.push(
+      detail(
+        'No part hands the discount down any more',
+        !handedOn,
+        handedOn?.[2],
+        handedOn ? `${handedOn[1]} was drawn with the props: ${Object.keys(componentProps(page.$(`#root ${handedOn[0]}`), handedOn[1])).join(', ')}` : undefined
+      )
+    )
+    if (handedOn) return results
 
     const { h, mod } = page.window
     const error = await drawUnder(page, context, [25], h(mod.Shelf, { shelf: MAPS }))
@@ -254,7 +295,9 @@ export const checks = {
     const others = (s) => [...s.prices.slice(0, LAMPS.items.length), ...s.prices.slice(LAMPS.items.length + TOKENS.items.length)]
     const output = `${round.intro}; the shelf ${TOKENS.name} is marked fullPrice\n${round.output}`
     let message = ''
-    if (!same(before.prices, wantPrices(shelves, 0)) || !same(after.prices, wantPrices(shelves, 0))) message = 'When Member is not ticked, every price should be the full price.'
+    if (round.warning)
+      message = 'React says in the console that a provider needs a value prop. A provider with no value gives every price below it undefined: give the inner provider the value of no discount.'
+    else if (!same(before.prices, wantPrices(shelves, 0)) || !same(after.prices, wantPrices(shelves, 0))) message = 'When Member is not ticked, every price should be the full price.'
     else if (!same(tokenPrices(ticked), tokens))
       message = 'With Member ticked, the shelf marked fullPrice still took the member discount. Price reads the nearest provider above it, so a provider inside the outer one, around that shelf, can say there is no discount there.'
     else if (!same(others(ticked), others({ prices: wantPrices(shelves, 30) })))
