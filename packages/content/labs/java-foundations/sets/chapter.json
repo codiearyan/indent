@@ -1,0 +1,101 @@
+{
+  "id": "sets",
+  "title": "Sets: each one only once",
+  "files": ["Gangway.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the gangway's checks here, and try your classes from main.",
+    "suggestedCommand": "java Gangway.java"
+  },
+  "tasks": [
+    {
+      "id": "twice",
+      "title": "Find the tickets scanned twice",
+      "file": "Gangway.java",
+      "description": "Under `// Task 1`, write a class `Scans` with a method `static Set<String> scannedTwice(List<String> scans)`. It gives back the ticket codes scanned more than once, each code once, in the order of their second scan. `scans` stays as it is.\n\nCheck calls `scannedTwice` with scans of its own, made with `List.of`, with codes chosen so that the order of second scans differs from the order of first scans, from alphabetical order, and from the order a `HashSet` keeps: a code scanned three times, nothing scanned twice, and no scans at all. It reads the set in the order it keeps.",
+      "nextSteps": [
+        "Read the parts of the lesson about a set holding each thing once, and about three orders.",
+        "Keep the codes seen so far in a set.",
+        "For each scan, ask that set whether the code is new, and keep the ones that are not in a second set.",
+        "Make the second set one that keeps the order things went in, and give it back."
+      ],
+      "hints": [
+        "A code counts when it has been seen before. A set can say whether it already held something at the moment you add it.",
+        "Adding a code to a set answers false when it was there already. The set you give back keeps the order of the second scans, which only one kind of set promises.",
+        "Two sets: `Set<String> seen = new HashSet<>();` and `Set<String> twice = new LinkedHashSet<>();`, then in the loop `if (!seen.add(code)) { twice.add(code); }`."
+      ],
+      "docs": [
+        {
+          "title": "The Set interface",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/interfaces/set.html"
+        },
+        {
+          "title": "LinkedHashSet",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashSet.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "HashSet, TreeSet and LinkedHashSet",
+          "url": "https://www.youtube.com/watch?v=JpOScjrGBRg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "both",
+      "title": "Find who came on both days",
+      "file": "Gangway.java",
+      "description": "Under `// Task 2`, write a class `Days` with a method `static Set<String> onBoth(Set<String> first, Set<String> second)`. It gives back the names in both sets, in alphabetical order. `first` and `second` stay as they are.\n\nCheck hands `onBoth` sets of its own, a `HashSet` and a `LinkedHashSet`, with names chosen so that the order those sets keep differs from alphabetical order, and with nobody in both, and nobody on the first day. It reads the set that comes back in the order it keeps, and both sets it handed in afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about what two sets share.",
+        "Make a copy of first, of the kind of set that keeps names in alphabetical order.",
+        "Keep in the copy only the names that are also in second.",
+        "Give the copy back."
+      ],
+      "hints": [
+        "Keeping only what two sets share changes the set you do it on, and the task says first and second stay as they are.",
+        "Work on a copy, and make the copy a set that keeps its names sorted, so the order comes free.",
+        "Inside: `Set<String> both = new TreeSet<>(first);`, then `both.retainAll(second);`, then `return both;`."
+      ],
+      "docs": [
+        {
+          "title": "TreeSet",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/TreeSet.html"
+        },
+        {
+          "title": "Set.retainAll",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html#retainAll(java.util.Collection)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seats",
+      "title": "List the free seats on a boat",
+      "file": "Gangway.java",
+      "description": "Under `// Task 3`, write a record `Seat` with a `String boat` and an `int number`, in that order: a record is equal to any other with the same parts, as a set needs, with nothing more to write. Then write a class `Plan` with a method `static List<Integer> freeSeats(Set<Seat> taken, String boat, int seats)`. The boat's seats are numbered from 1 to `seats`, and `taken` holds the seats taken on every boat. It gives back the numbers of the boat's seats that are not taken, smallest first.\n\nCheck fills a `HashSet` with seats of its own, on more than one boat, then asks `freeSeats` about boats it names with text it makes separately: a boat with seats taken, a boat whose seat numbers are taken on another boat, a boat with nothing taken, fewer seats than are taken, and a boat that is full. It also checks that `Seat` is a record and reads its parts.",
+      "nextSteps": [
+        "Read the part of the lesson about a set of your own records.",
+        "Write the record: its parts go in the round brackets after its name.",
+        "In freeSeats, go through the numbers from 1 to seats, and make a Seat of this boat for each.",
+        "Ask taken whether it holds that seat, and keep the numbers it does not."
+      ],
+      "hints": [
+        "taken holds seats of every boat. A seat is taken only when both its boat and its number match.",
+        "Make the seat you are asking about, with the boat and the number, and ask the set. A record is equal to another with the same parts, so the set finds it.",
+        "The record is `record Seat(String boat, int number) { }`, and the loop is `for (int n = 1; n <= seats; n++) { if (!taken.contains(new Seat(boat, n))) { free.add(n); } }`."
+      ],
+      "docs": [
+        {
+          "title": "Record classes",
+          "url": "https://docs.oracle.com/en/java/javase/17/language/records.html"
+        },
+        {
+          "title": "HashSet",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashSet.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

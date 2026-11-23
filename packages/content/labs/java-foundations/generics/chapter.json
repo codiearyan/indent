@@ -1,0 +1,101 @@
+{
+  "id": "generics",
+  "title": "Generics: types that hold any type",
+  "files": ["HutTools.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the hut's shared tools here, and try your classes from main.",
+    "suggestedCommand": "java HutTools.java"
+  },
+  "tasks": [
+    {
+      "id": "pair",
+      "title": "Write a pair that holds two things of any types",
+      "file": "HutTools.java",
+      "description": "Under `// Task 1`, write a class `Pair<A, B>` with a constructor `Pair(A first, B second)` and three methods: `A first()` and `B second()` give back what it holds, and `Pair<B, A> swapped()` gives back a new pair with the two the other way round. The pair it is called on stays as it is.\n\nCheck makes pairs of its own with different types, two at once included, and keeps what `first()`, `second()` and `swapped()` give back in variables of the types the pair was made with, which compiles only when `Pair` hands back its own types. It also compiles a line of its own that keeps a `first()` in a variable of the wrong type, which must be refused. And it reads Task 1 for a raw `Pair` or a cast, which a class with type parameters never needs.",
+      "nextSteps": [
+        "Read the parts of the lesson about a class with a type parameter, and about raw types.",
+        "Write the class's first line with its two type parameters.",
+        "Write the two fields, the constructor, first and second, with A and B where the types go.",
+        "Write swapped: a new pair, its types the other way round."
+      ],
+      "hints": [
+        "A type parameter stands for a type chosen when each pair is made. The fields belong to each pair, so leave static off.",
+        "swapped gives back a pair whose first type is B and whose second is A, and makes it from this pair's second and first.",
+        "The first line is `class Pair<A, B> {`, and swapped is `Pair<B, A> swapped() { return new Pair<>(second, first); }`."
+      ],
+      "docs": [
+        {
+          "title": "Generic types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/generics/types.html"
+        },
+        {
+          "title": "Raw types",
+          "url": "https://docs.oracle.com/javase/tutorial/java/generics/rawTypes.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Generics in Java",
+          "url": "https://www.youtube.com/watch?v=K1iu1kXkVoA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rota",
+      "title": "Turn any rota on by a week",
+      "file": "HutTools.java",
+      "description": "Under `// Task 2`, write a class `Rotas` with a generic method `static <T> List<T> nextWeek(List<T> rota)`. It gives back a new list: the rota with its first item moved to the end. An empty rota gives back an empty list. `rota` stays as it is.\n\nCheck calls `nextWeek` with rotas of text, of numbers and of a type of its own, made with `List.of`, one of a single item and one empty, keeps what comes back in a list of the same type, and reads it in order. It reads a rota it handed in afterwards to see it has not changed, and compiles a line of its own that keeps what comes back in a list of the wrong type, which must be refused.",
+      "nextSteps": [
+        "Read the part of the lesson about a generic method.",
+        "Write the first line with the type parameter before what it gives back.",
+        "Make a new list from the rota.",
+        "When it is not empty, take its first item off and add it at the end, then give it back."
+      ],
+      "hints": [
+        "A List<Object> is not a List<String>, so a method that takes one cannot be handed the other. A type parameter of the method's own takes any list.",
+        "The rota may be a list that can never change, so work on a copy. An empty rota has no first item to move.",
+        "Inside: `List<T> next = new ArrayList<>(rota); if (!next.isEmpty()) { next.add(next.remove(0)); } return next;`."
+      ],
+      "docs": [
+        {
+          "title": "Generic methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/generics/methods.html"
+        },
+        {
+          "title": "Generics, inheritance and subtypes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/generics/inheritance.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "largest",
+      "title": "Find the largest of anything that has an order",
+      "file": "HutTools.java",
+      "description": "Under `// Task 3`, write a class `Most` with a generic method `largest` that takes a `List<T> items`, where `T` is any type with a natural order, and gives back the largest item, by that order. An empty list gives back `null`. `items` stays as it is.\n\nCheck calls `largest` with lists of numbers, of text and of a type of its own with a natural order, with the largest first, last and in the middle, a list of one and an empty list, and keeps what comes back in a variable of the list's own type. It also compiles a line of its own that hands `largest` a list of plain objects, which have no order, and that line must be refused.",
+      "nextSteps": [
+        "Read the part of the lesson about a bound.",
+        "Write the first line: the type parameter with its bound, what it gives back, and the list it takes.",
+        "Walk the list, keeping the largest item so far.",
+        "Give back the largest, or null when there was nothing."
+      ],
+      "hints": [
+        "T with nothing after it can be any type at all, and not every type has compareTo. The bound goes where the type parameter is named.",
+        "A natural order is what Comparable gives, so T must be a Comparable of T. Start with no largest at all, so an empty list gives back null.",
+        "The first line is `static <T extends Comparable<T>> T largest(List<T> items) {`, and in the loop `if (best == null || item.compareTo(best) > 0) { best = item; }`."
+      ],
+      "docs": [
+        {
+          "title": "Bounded type parameters",
+          "url": "https://docs.oracle.com/javase/tutorial/java/generics/bounded.html"
+        },
+        {
+          "title": "Comparable",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
