@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "Stop the press if check fails.", "note": "His script runs check first." },
+    { "title": "orders check", "text": "Finds the problems, then says all went well.", "note": "Messages mixed with results." },
+    {
+      "title": "Your code",
+      "file": "orders.js",
+      "mine": true,
+      "gap": "One stream, always fine",
+      "tasks": ["Two streams", "An exit code", "JSON for programs"]
+    },
+    { "title": "The print run", "say": "Not today: two broken orders." }
+  ],
+  "ticket": { "label": "Print run", "wrong": "goes ahead", "why": "Never told", "right": "held back" },
+  "captions": [
+    "Sefton's script runs orders check before every print run, and should stop on a problem.",
+    "Today check finds problems and still says all went well, so the press runs anyway.",
+    "You put results and messages on their own streams, add exit codes, then JSON.",
+    "Now a problem stops the print run, and the script reads what was wrong.",
+    "One tool, read by people and by programs, each in their own way."
+  ]
+}

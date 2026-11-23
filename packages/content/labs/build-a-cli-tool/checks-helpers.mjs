@@ -325,3 +325,14 @@ export async function expected(t, command, files, flags = {}) {
   const ok = await run(orderLines(), flags, { result: (text, value) => results.push({ text, value }), note: (text) => notes.push(text) })
   return { results, notes, ok }
 }
+
+const PAPERS = ['cotton', 'linen', 'kraft']
+const ITEMS = ['card', 'invite', 'poster', 'envelope']
+/** n made-up order lines, all of them right, the same on every run. */
+export function manyOrders(n, first = 3000) {
+  const out = []
+  for (let i = 0; i < n; i++) {
+    out.push(`${first + i},${ITEMS[i % 4]},${(i % 97) + 1},${PAPERS[i % 3]},2026-12-${String((i % 28) + 1).padStart(2, '0')}`)
+  }
+  return out.join('\n') + '\n'
+}
