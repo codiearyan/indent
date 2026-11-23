@@ -1,0 +1,104 @@
+{
+  "id": "text-methods",
+  "title": "Working with text",
+  "files": ["radio_words.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see tonight's call sign, grid reference and log entries tidied up.",
+    "suggestedCommand": "python3 radio_words.py"
+  },
+  "tasks": [
+    {
+      "id": "sign",
+      "title": "A tidy call sign",
+      "file": "radio_words.py",
+      "description": "Under `# Task 1` in `radio_words.py`, write a function called `call_sign` that takes a call sign as it was typed and gives back the same call sign without the spaces, tabs and line end at its start and end, in capital letters. For `typed_sign` it gives back `BRAVO TWO`. The spaces inside it stay. Print what it gives back for `typed_sign`.\n\nCheck calls `call_sign` with call signs of its own, typed in different ways, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on methods that give back a new text.",
+        "Take the spaces and the line end off both ends of the text.",
+        "Turn what that gives back into capital letters.",
+        "Give back the result, and print it: there should be no blank line after it."
+      ],
+      "hints": [
+        "A text method never changes the text it is called on. If the function gives back the same text it was given, look at what happens to what each method gives back.",
+        "`strip` takes spaces, tabs and line ends off both ends, and `upper` gives the text in capitals. The second method can be called on what the first gives back.",
+        "The shape is `return raw.strip().upper()`."
+      ],
+      "docs": [
+        { "title": "String methods", "url": "https://docs.python.org/3/library/stdtypes.html#string-methods" },
+        { "title": "str.strip()", "url": "https://docs.python.org/3/library/stdtypes.html#str.strip" },
+        { "title": "str.upper()", "url": "https://docs.python.org/3/library/stdtypes.html#str.upper" }
+      ],
+      "videos": [
+        { "title": "Working with text in Python", "url": "https://www.youtube.com/watch?v=k9TUPpGqYTo" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "grid",
+      "title": "A grid reference without spaces",
+      "file": "radio_words.py",
+      "description": "Under `# Task 2`, write a function called `grid_ref` that takes a grid reference as it was typed and gives back the same grid reference with every space taken out, the ones in the middle too, in capital letters. For `typed_grid` it gives back `NN166712`. Print what it gives back for `typed_grid`.\n\nCheck calls `grid_ref` with grid references of its own, some with spaces at the ends too, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on replacing text.",
+        "Replace every space with nothing.",
+        "Turn the result into capital letters, and give it back.",
+        "Try it on a grid reference with a space at its start."
+      ],
+      "hints": [
+        "`strip` only takes spaces off the two ends. The spaces between the letters and the digits need another method.",
+        "`replace` takes the text to find and the text to put in its place, and replaces every one it finds. Empty quotes are text with nothing in it.",
+        "The shape is `return raw.replace(\" \", \"\").upper()`."
+      ],
+      "docs": [
+        { "title": "str.replace()", "url": "https://docs.python.org/3/library/stdtypes.html#str.replace" },
+        { "title": "String methods", "url": "https://docs.python.org/3/library/stdtypes.html#string-methods" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "urgent",
+      "title": "Does Rhona need to see it",
+      "file": "radio_words.py",
+      "description": "Under `# Task 3`, write a function called `needs_rhona` that takes one entry of the log and gives back `True` when the entry starts with the word `urgent`, or has the word `casualty` anywhere in it, whatever its capitals. Otherwise it gives back `False`. An entry that says `urgent` somewhere other than at its start does not count. For tonight's entries it gives back `False`, `True`, `False`, `True` and `False`. Print what it gives back for each of the entries.\n\nCheck calls `needs_rhona` with entries of its own, in capitals and in small letters, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on asking questions of text.",
+        "Make a copy of the entry in small letters, so the capitals do not matter.",
+        "Ask whether that starts with urgent, and whether casualty is in it.",
+        "Give back True when either answer is True."
+      ],
+      "hints": [
+        "Comparing text counts capitals: `URGENT` does not start with `urgent`. Turn the entry into one kind of letter first.",
+        "`startswith` asks about the start of a text only, and `in` asks about anywhere in it. `or` joins the two answers.",
+        "The shape is `small = entry.lower()`, then `return small.startswith(\"urgent\") or \"casualty\" in small`."
+      ],
+      "docs": [
+        { "title": "str.startswith()", "url": "https://docs.python.org/3/library/stdtypes.html#str.startswith" },
+        { "title": "str.lower()", "url": "https://docs.python.org/3/library/stdtypes.html#str.lower" },
+        { "title": "Membership test operations", "url": "https://docs.python.org/3/reference/expressions.html#membership-test-operations" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "message",
+      "title": "The message after the colon",
+      "file": "radio_words.py",
+      "description": "Under `# Task 4`, write a function called `message_of` that takes one entry and gives back its message: the text after the first colon, without the spaces at its start and end. A colon later in the message, as in a time, stays in the message. An entry with no colon has no message: it gives back empty text, `\"\"`. For the first of tonight's entries it gives back `at the bridge, two walkers with us`. Print what it gives back for each of the entries.\n\nCheck calls `message_of` with entries of its own, some with a second colon and some with none, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on finding a position in text.",
+        "Find the position of the first colon.",
+        "When there is none, give back empty text.",
+        "Otherwise take the text after that position, strip it, and give it back."
+      ],
+      "hints": [
+        "`find` gives back the position of the first match, and `-1` when there is none. A slice from `-1 + 1` is the whole entry.",
+        "Ask whether the position is `-1` first. The message starts one position after the colon, and a slice with nothing after its colon runs to the end.",
+        "The shape is `colon = entry.find(\":\")`, then `if colon == -1:` with `return \"\"` under it, and `return entry[colon + 1:].strip()`."
+      ],
+      "docs": [
+        { "title": "str.find()", "url": "https://docs.python.org/3/library/stdtypes.html#str.find" },
+        { "title": "Text and slices", "url": "https://docs.python.org/3/tutorial/introduction.html#text" }
+      ],
+      "points": 10
+    }
+  ]
+}
