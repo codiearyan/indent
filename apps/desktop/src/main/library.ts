@@ -86,7 +86,7 @@ export async function seedContent(
     const version = shipped?.labs.find((entry) => entry.id === id)?.version
     if (version) versions[id] = version
   }
-  writeFileSync(versionsFile(root), JSON.stringify(versions))
+  writeWholeSync(versionsFile(root), JSON.stringify(versions))
   writeFileSync(marker, appVersion)
 }
 
@@ -191,7 +191,7 @@ export function staleRepos(index: PackIndex, root: string): PackEntry[] {
       entry.format <= PACK_FORMAT &&
       versionOf(entry.id) !== entry.version
   )
-  if (learned) writeFileSync(versionsFile(root), JSON.stringify(versions))
+  if (learned) writeWholeSync(versionsFile(root), JSON.stringify(versions))
   return stale
 }
 
