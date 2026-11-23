@@ -21,8 +21,9 @@
 // Task 2: Split a line into fields
 // Write a function called splitAt that takes a line as a reference to a const std::string and a
 // separator as a char, and gives back a std::vector<std::string>: the pieces of the line between
-// the separators, in order, as they are. A line with 2 separators has 3 fields, an empty field
-// counts as one, before, between or after the separators, and an empty line is one empty field.
+// the separators, in order, as they are, spaces kept. A line with 2 separators has 3 fields, an
+// empty field counts as one, before, between or after the separators, and an empty line is one
+// empty field: a field the form left empty keeps its place.
 
 // Task 3: Read a whole number, and nothing else
 // Write a function called toWhole that takes a text as a reference to a const std::string and
@@ -41,8 +42,8 @@ int main() {
     std::cout << "Dorrit's counter lines\n";
 
     // Try each task here once you have written it: read data/counter.txt line by line, as this
-    // part's first issue did, split each line at its commas, trim each field, and print the ticket that
-    // toWhole reads, or that it is not a number. Then print ticketLine(3101, "mantel clock", 18.5).
+    // part's first issue did, split each line at its commas, trim each field, and print the ticket
+    // that toWhole reads, or that it is not a number. Then print ticketLine(3101, "mantel clock", 18.5).
     // Check calls your functions with texts of its own.
 
     return 0;

@@ -64,7 +64,7 @@
         },
         {
           "active": ["report"],
-          "value": { "kind": "array", "label": "the report", "values": ["how many repairs", "all the minutes", "all the parts, in pence", "the refused lines"] },
+          "value": { "kind": "array", "label": "the report", "values": ["how many repairs", "all the minutes", "all the parts, pence and all", "the refused lines"] },
           "note": "The totals are worked out, the parts kept with their pence."
         },
         {

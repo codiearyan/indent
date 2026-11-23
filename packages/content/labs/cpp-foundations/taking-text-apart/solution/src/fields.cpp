@@ -34,8 +34,9 @@ std::string trim(const std::string& text) {
 // Task 2: Split a line into fields
 // Write a function called splitAt that takes a line as a reference to a const std::string and a
 // separator as a char, and gives back a std::vector<std::string>: the pieces of the line between
-// the separators, in order, as they are. A line with 2 separators has 3 fields, an empty field
-// counts as one, before, between or after the separators, and an empty line is one empty field.
+// the separators, in order, as they are, spaces kept. A line with 2 separators has 3 fields, an
+// empty field counts as one, before, between or after the separators, and an empty line is one
+// empty field: a field the form left empty keeps its place.
 std::vector<std::string> splitAt(const std::string& line, char separator) {
     std::vector<std::string> fields;
     std::istringstream in(line);

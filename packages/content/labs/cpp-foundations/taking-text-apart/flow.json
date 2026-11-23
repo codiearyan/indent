@@ -83,7 +83,7 @@
         },
         {
           "active": ["join"],
-          "note": "They are written into one text, with commas between them and the parts in pence."
+          "note": "They are written into one text, with commas between them and the parts to the penny."
         },
         {
           "active": ["join->file", "file"],

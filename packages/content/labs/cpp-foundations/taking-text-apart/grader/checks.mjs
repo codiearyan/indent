@@ -49,6 +49,9 @@ export const checks = {
           }
           if (w && r === text.replace(/^[ \t\r]+/, '')) return `trim of ${shown(text)} gave back ${shown(r)}: what is at the end is still there.`
           if (w && r === text.replace(/[ \t\r]+$/, '')) return `trim of ${shown(text)} gave back ${shown(r)}: what is at the start is still there.`
+          const first = text.search(/[^ \t\r]/)
+          const last = text.length - 1 - [...text].reverse().join('').search(/[^ \t\r]/)
+          if (w && r === text.substr(first, last) && r !== w) return `trim of ${shown(text)} gave back ${shown(r)}. The second number .substr takes is how many characters to take, not the position to stop at.`
           if (w && r.replace(/\s+/g, '') === w.replace(/\s+/g, '') && r !== w) return `trim of ${shown(text)} gave back ${shown(r)}. What is between the first and the last character that are not blank stays exactly as it is.`
           return `trim of ${shown(text)} gave back ${shown(r)}.`
         },
@@ -60,6 +63,7 @@ export const checks = {
   splitAt(t) {
     const lines = [
       ['4417,carriage clock,95', ',', 'three fields'],
+      [' 52 , pocket watch,30 ', ',', 'spaces around the fields'],
       ['5020,,30', ',', 'an empty field in the middle'],
       ['61,wall clock,', ',', 'an empty field at the end'],
       [';ship clock', ';', 'an empty field at the start, and another separator'],
@@ -125,7 +129,7 @@ export const checks = {
       fn: 'toWhole',
       sig: { returns: 'std::optional<int>', params: [{ type: 'const std::string&', what: 'the text' }] },
       callWith: 'const std::string&',
-      cases: texts.map(([text, want, what]) => ({
+      cases: [...texts.map(([text, want, what]) => ({
         name: `toWhole of ${quoted(text)}, ${what}`,
         code: `auto r = toWhole(${cppText(text)}); ${put('has', 'r ? 1 : 0')} if (r) { ${put('value', '*r')} }`,
         escaped: (got) =>
@@ -138,6 +142,7 @@ export const checks = {
           if (want === null) {
             if (!has) return null
             if (text === '' || text.trim() === '') return `For ${quoted(text)}, toWhole gave back ${value}. An empty field is not 0: it holds no number at all, so toWhole gives back std::nullopt.`
+            if (!/^\s*[-+]?\d/.test(text)) return `For ${quoted(text)}, toWhole gave back ${value}, and the text does not start with a number. The read of the number failed and left the variable as it was: give back std::nullopt when that read fails.`
             return `For ${quoted(text)}, toWhole gave back ${value}, and the text holds more than a whole number. Reading a number stops at the first character that cannot be part of it and says nothing about the rest: ask what is left after it.`
           }
           if (!has) return `For ${quoted(text)}, toWhole gave back std::nullopt, and the text is a whole number${what.includes('spaces') ? ' with spaces around it, which are allowed' : ''}.`
@@ -145,7 +150,18 @@ export const checks = {
           return null
         },
         output: (got) => `toWhole(${quoted(text)}) gave back ${got.threw ? `nothing: ${thrownText(got)} came out` : num(got, 'has') === 1 ? got.value : num(got, 'has') === 0 ? 'std::nullopt' : '?'}`
-      }))
+      })),
+      {
+        name: 'toWhole of "nine" and then of "36", one after the other',
+        code: `auto a = toWhole("nine"); auto r = toWhole("36"); ${put('first', 'a ? 1 : 0')} ${put('has', 'r ? 1 : 0')} if (r) { ${put('value', '*r')} }`,
+        judge: (got) => {
+          if (num(got, 'has') === 1 && num(got, 'value') === 36) return null
+          if (num(got, 'has') === 0) return 'Called right after "nine", toWhole gave back std::nullopt for "36". A string stream that failed stays failed, and one that is kept from call to call still holds what the last text left: make a new one for each text.'
+          return `Called right after "nine", toWhole gave back ${got.value} for "36".`
+        },
+        output: (got) => `toWhole("nine") gave back ${num(got, 'first') === 1 ? 'a number' : 'std::nullopt'}, then toWhole("36") gave back ${num(got, 'has') === 1 ? got.value : num(got, 'has') === 0 ? 'std::nullopt' : '?'}`
+      }
+      ]
     })
   },
 

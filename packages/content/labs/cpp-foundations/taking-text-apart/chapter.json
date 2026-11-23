@@ -46,7 +46,7 @@
       "id": "splitAt",
       "title": "Split a line into fields",
       "file": "src/fields.cpp",
-      "description": "Under `// Task 2`, write a function called `splitAt` that takes a line as a reference to a `const std::string` and a separator as a `char`, and gives back a `std::vector<std::string>`: the pieces of the line between the separators, in order, as they are, spaces kept. A line with 2 separators has 3 fields, an empty field counts as one, before, between or after the separators, and an empty line is one empty field. So `\"3104,pocket watch,\"` at `','` has 3 fields, the last one empty.\n\nCheck calls `splitAt` with lines of its own: empty fields at the start, in the middle and at the end, another separator, a line with none, and an empty line.",
+      "description": "Under `// Task 2`, write a function called `splitAt` that takes a line as a reference to a `const std::string` and a separator as a `char`, and gives back a `std::vector<std::string>`: the pieces of the line between the separators, in order, as they are, spaces kept. A line with 2 separators has 3 fields, an empty field counts as one, before, between or after the separators, and an empty line is one empty field: a field the form left empty keeps its place, so the fields after it are never taken for the wrong ones. So `\"3104,pocket watch,\"` at `','` has 3 fields, the last one empty.\n\nCheck calls `splitAt` with lines of its own: spaces around fields, empty fields at the start, in the middle and at the end, another separator, a line with none, and an empty line.",
       "nextSteps": [
         "Add the `#include` that `std::istringstream` comes from.",
         "Write the first line: the line and the separator in, a `std::vector<std::string>` back.",

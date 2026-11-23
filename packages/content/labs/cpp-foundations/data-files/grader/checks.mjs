@@ -31,6 +31,11 @@ const report = (repairs, refused) => {
   const parts = repairs.reduce((a, r) => a + r[3], 0)
   return `Repairs: ${repairs.length}\nMinutes: ${minutes}\nParts: ${parts.toFixed(2)}\nRefused: ${refused.length ? refused.join(', ') : 'none'}\n`
 }
+// The numbers of `refused` as a count that leaves the blank lines out would give them.
+const uncounted = (text, refused) => {
+  const lines = text.split('\n')
+  return refused.map((n) => lines.slice(0, n).filter((l) => l.trim()).length)
+}
 const reportLines = (text) => (text === null ? 'no file' : text === '' ? 'nothing' : text.split('\n').filter((l, i, all) => i < all.length - 1 || l !== '').map((l) => `  ${JSON.stringify(l)}`).join('\n'))
 
 /** What is wrong with a written report, in words that never show the report Check wanted. */
@@ -161,6 +166,7 @@ export const checks = {
               ? `readRepairs refused line ${numbers(refused.filter((n) => !s.refused.includes(n)))}, which holds only a carriage return, as an empty line of a Windows file does. A line of only blanks is skipped: look at whether the line is empty once its blanks are trimmed.`
               : `readRepairs refused lines ${numbers(refused)}, and some of them are blank. A line that is empty, or only blanks, is skipped, not refused.`
           }
+          if (s.refused.length && same(refused, uncounted(s.text, s.refused))) return `readRepairs refused lines ${numbers(refused)}: the blank lines were left out of the count. A blank line is skipped, and it still counts as a line, so the numbers match what a person sees in the file.`
           return `On ${s.what}, readRepairs gave back the repairs ${numbers(tickets)} and refused ${numbers(refused)}.`
         },
         output: (got) => `The stream holds ${quoted(s.text)}\nreadRepairs gave back the tickets ${numbers(listOf(got, 'tickets'))} and refused the lines ${numbers(listOf(got, 'refused'))}`
@@ -234,6 +240,7 @@ export const checks = {
             if (text === 'old report\n') return 'The report at the path Check handed runDay still holds the old report. runDay writes its report there.'
             if (text !== null && text.startsWith('old report\n')) return 'The old report is still at the top of the file, and the new one comes after it. The report is a new file in place of what was there.'
             if (text === '') return 'The report file is empty once runDay has returned. What is written to a stream can wait in the stream and reaches the file when the stream ends: look at where the stream that writes is made, and whether it ends before runDay returns.'
+            if (text === report([], [])) return 'The report says no repairs and no refused lines, and the tickets hold three lines after the heading. readRepairs found the stream already at its end: a stream that was read once stays at its end, so hand the tickets to readRepairs before anything else reads them.'
             if (text !== report([[4417, 'carriage clock', 95, 12.5], [52, 'pocket watch', 30, 0.75]], [3])) return 'The report runDay wrote is not the one writeReport writes for these tickets: the repairs it read, and the lines it refused, go to writeReport.'
             return null
           },

@@ -4,7 +4,8 @@ const FILE = 'src/sheet.cpp'
 const base = { files: [FILE], own: ['Bill'] }
 const put = (key, expr) => `indent_::put_("${key}", ${expr});`
 const line = (item, minutes, price) => `${item.padEnd(16)}${String(minutes).padStart(5)}${price.toFixed(2).padStart(9)}\n`
-const RULER = '|  item, 16 columns  |min 5|price 9 |'
+// One mark per column, as wide as the line: the item's 16, then the minutes' 5, then the price's 9.
+const RULER = '|item 16         min 5  price 9|'
 const shownLines = (text) => (text === null ? 'no file' : text === '' ? 'an empty file' : text.split('\n').map((l, i, all) => (i === all.length - 1 && l === '' ? null : `  ${JSON.stringify(l)}`)).filter(Boolean).join('\n'))
 const squeezed = (text) => text.trim().split(/\s+/).join(' ')
 
@@ -22,7 +23,9 @@ function lineProblem(got, item, minutes, price) {
   if (got.replace(/\n+$/, '') === want.slice(0, -1)) return 'The line ends with more than one line end: an empty line follows it on the sheet.'
   const parts = got.trim().split(/\s+/)
   const shownPrice = parts.at(-1)
-  if (squeezed(got.replace(shownPrice, price.toFixed(2))) === squeezed(want) && shownPrice !== price.toFixed(2)) {
+  const at = got.lastIndexOf(shownPrice)
+  const withPrice = at === -1 ? got : got.slice(0, at) + price.toFixed(2) + got.slice(at + shownPrice.length)
+  if (squeezed(withPrice) === squeezed(want) && shownPrice !== price.toFixed(2)) {
     return `The price reads ${shownPrice}. The task asks for exactly 2 decimals, whatever the price: look at what makes a stream write a set number of digits after the point, from part 1.`
   }
   if (squeezed(got) === squeezed(want)) {
@@ -126,6 +129,7 @@ export const checks = {
               if (num(got, 'ok') !== 1) return `writeSheet gave back false for a file it can write, ${name}.`
               if (text === w) return null
               if (text === null) return `After writeSheet, there is no file at the path Check handed it. It writes the sheet at that path.`
+              if (text === '' && !s.bills.length) return 'With no bills, the sheet is empty. A sheet always ends with its Total line, even when no bill comes before it.'
               if (text === '' || (s.old && text === s.old)) return 'The file Check read back once writeSheet had returned holds nothing new. What is written to a stream can wait in the stream and reaches the file when the stream ends, at the end of the block that made it: look at where the stream that writes is made, and whether it ends before writeSheet returns.'
               if (s.old && text.startsWith(s.old)) return 'The old sheet is still at the top of the file, and the new one comes after it. writeSheet writes a new file in place of what was there: look at how the stream is opened.'
               const lines = text.split('\n').filter(Boolean)
