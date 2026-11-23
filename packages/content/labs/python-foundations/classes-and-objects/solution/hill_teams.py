@@ -34,7 +34,7 @@ print(bravo.leader)
 
 # Task 2: Each vehicle its own kit
 # Dougie wrote this class for the vehicles. Run the file: the rope he put in the van shows up in
-# the Land Rover too. Change Vehicle so that every vehicle has a kit list of its own, empty when
+# the pickup too. Change Vehicle so that every vehicle has a kit list of its own, empty when
 # the vehicle is made.
 class Vehicle:
     def __init__(self, name):
@@ -43,9 +43,9 @@ class Vehicle:
 
 
 van = Vehicle("Van")
-land_rover = Vehicle("Land Rover")
+pickup = Vehicle("Pickup")
 van.kit.append("rope")
-print(land_rover.name, "carries", land_rover.kit)
+print(pickup.name, "carries", pickup.kit)
 
 # Task 3: Teams from the rota
 # Write a function called make_teams that takes a list of (call sign, leader) tuples and gives

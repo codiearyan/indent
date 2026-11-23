@@ -11,7 +11,7 @@ You have used objects that Python and its modules hand you: a date knows its wee
 
 ## The request from Ailsa
 
-> **Ailsa:** Every team on the hill is a dictionary on the radio desk, and three of us type the keys three ways: call_sign, callsign, Leader. Last night Bravo showed up as None led by None. Dougie tried something he calls a class for the vehicles, and now the rope he put in the van is in the Land Rover too.
+> **Ailsa:** Every team on the hill is a dictionary on the radio desk, and three of us type the keys three ways: call_sign, callsign, Leader. Last night Bravo showed up as None led by None. Dougie tried something he calls a class for the vehicles, and now the rope he put in the van is in the pickup too.
 
 All three tasks are in `hill_teams.py`.
 

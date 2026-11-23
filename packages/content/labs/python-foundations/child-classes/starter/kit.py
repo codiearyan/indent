@@ -64,4 +64,7 @@ if __name__ == "__main__":
         Kit("map", 0.25),
     ]
     for item in store:
-        print(item.label(), "ready" if item.ready() else "not ready")
+        if item.ready():
+            print(item.label(), "ready")
+        else:
+            print(item.label(), "not ready")

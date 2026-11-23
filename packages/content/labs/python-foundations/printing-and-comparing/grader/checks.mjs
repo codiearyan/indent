@@ -49,6 +49,8 @@ function printSteps(call) {
       hint: (v) =>
         v === line
           ? 'repr(call) gives the line of the log. __repr__ gives back the Python that makes the call, with the class name, round brackets and each value in quotes.'
+          : plain(v).replace(/"/g, "'") === repr
+            ? 'repr(call) puts double quotes around the values, and the task shows single quotes, the way Python writes the repr of a text: !r after a name in an f-string, or repr() around it, gives them.'
           : squash(plain(v)) === squash(repr) && !plain(v).includes("'")
             ? 'repr(call) shows the values without their quotes. The repr of a text has quotes around it: !r after a name in an f-string, or repr() around it, puts them there.'
             : (near('repr(call)', v, repr, '__repr__') ??
@@ -87,7 +89,7 @@ function eqSteps(base, again, later, other) {
     ask('first == again', true, (v) =>
       v === null
         ? 'first == again gives None: __eq__ ends without return. It gives back True or False.'
-        : 'Two calls with the same time and call sign are not equal. Without __eq__, == asks whether both names are one and the same object, and two calls made apart never are. Compare the time and the call sign, and leave the message out.'
+        : 'Two calls with the same time and call sign, and different messages, are not equal. Compare the time and the call sign, and leave the message out. Without __eq__ at all, == asks whether both names are one and the same object, and two calls made apart never are.'
     ),
     ask('first == later', false, 'Two calls with the same call sign at different times are equal. Compare the time too.'),
     ask('first == other', false, 'Two calls at the same time from different teams are equal. Compare the call sign too.'),
@@ -121,7 +123,10 @@ function sortSteps(calls) {
     {
       code: '[call.call_sign for call in sorted(calls)]',
       want,
-      hint: (v) => misses.find(([order]) => JSON.stringify(order) === JSON.stringify(v))?.[1] ?? 'sorted() does not put the calls in order of time, the earliest first.'
+      hint: (v, seen, rec) =>
+        rec.printed
+          ? 'sorted() does not put the calls in order of time, and __lt__ printed lines while it sorted. __lt__ gives back True or False with return: print only shows a line, and the method then gives back None.'
+          : (misses.find(([order]) => JSON.stringify(order) === JSON.stringify(v))?.[1] ?? 'sorted() does not put the calls in order of time, the earliest first.')
     },
     { code: `early = ${make(first)}` },
     { code: `late = ${make(last)}` },
@@ -147,11 +152,14 @@ function logSteps(calls, asks) {
     ...asks.map(([sign, want, nth]) => ({
       code: `${JSON.stringify(sign)} in log`,
       want,
-      hint: want
-        ? nth > 0
-          ? `"${sign}" in log is False, though ${sign} is the ${['first', 'second', 'third'][nth]} call sign in the log. Look at every call before you give back False: a return inside the loop ends it at the first call.`
-          : `"${sign}" in log is False, though ${sign} has called. A call sign is never equal to a whole call: compare it with the call_sign of each call.`
-        : `"${sign}" in log is True, though ${sign} has not called.`
+      hint: (v, seen, rec) =>
+        !want
+          ? `"${sign}" in log is True, though ${sign} has not called.`
+          : rec.printed
+            ? `"${sign}" in log is False, though ${sign} has called, and __contains__ printed a line. It gives back True or False with return: print only shows a line, and in counts what is given back.`
+            : nth > 0
+              ? `"${sign}" in log is False, though ${sign} is the ${['first', 'second', 'third'][nth]} call sign in the log. Look at every call before you give back False: a return inside the loop ends it at the first call.`
+              : `"${sign}" in log is False, though ${sign} has called. Compare the call sign with the call_sign of each call, and give back True when one matches: a call sign is never equal to a whole call.`
     }))
   ]
 }
@@ -234,6 +242,10 @@ export const checks = {
       task: 4,
       attrs: ATTRS,
       methods: METHODS,
+      explain: (error) =>
+        error.type === 'RecursionError'
+          ? 'a method calls itself, and that call calls it again, without end. len(self) inside __len__ runs __len__ again: count what the log holds, self.calls, instead'
+          : null,
       list: [
         {
           name: 'A night with three calls',
@@ -260,6 +272,7 @@ export const checks = {
               ['23:30', 'Mike', 'all well']
             ],
             [
+              ['Kilo', true, 0],
               ['Mike', true, 2],
               ['Juliet', false]
             ]

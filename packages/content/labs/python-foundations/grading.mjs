@@ -1852,7 +1852,7 @@ function classRunCause(error, blocks) {
     return `${found[1]} is a method, and Python hands it the object itself first, before the ${values} ${values === 1 ? 'value' : 'values'} in the call, ${found[3]} in all; its def line takes ${found[2]}. A method's def line starts with self, then one parameter for each value in the call`
   }
   if ((found = /^(?:\w+\.)?__init__\(\) missing \d+ required positional arguments?: (.+)$/.exec(m))) {
-    return `making an object of the class gives __init__ fewer values than its def line asks for: nothing was given for ${found[1].replace(/'/g, '')}. Its def line takes self, then the values the task names, and no more`
+    return `an object of the class was made with fewer values than its __init__ takes: nothing was given for ${found[1].replace(/'/g, '')}. Look at the line where it stops and at the def line of __init__: after self, one value for each parameter, in order`
   }
   if ((found = /^(\w+)\(\) takes no arguments$/.exec(m))) {
     return `${found[1]} has no __init__ that Python runs, so making one takes no values. Python runs the method called exactly __init__, with two underscores on each side, when an object is made`
@@ -1864,11 +1864,14 @@ function classRunCause(error, blocks) {
     return `super() looks for ${found[1]} in the class this one is built on, and finds none there. Check that the class line names the class it builds on in round brackets, and how ${found[1]} is spelt`
   }
   if ((found = /^'(\w+)' object has no attribute '(\w+)'/.exec(m)) && names[found[1]] === 'type') {
+    const owner = blocks.owners?.[found[2]]
     return names[found[2]] === 'function'
-      ? `${found[2]} is a function of the file, not a method of ${found[1]}: its def line is not moved in under the class, lined up with the other methods`
-      : (blocks.methods ?? []).includes(found[2])
-        ? `${found[1]} has no method ${found[2]}. A method is a def moved in under the class, lined up with __init__, and its def line starts with self`
-        : `a ${found[1]} object has no attribute ${found[2]}. An attribute is made on the object by a line such as self.${found[2]} = ..., usually in __init__; a name given a value without self. in front belongs to the method alone, and is gone when the method ends`
+      ? `${found[2]} is a function of the file, not a method of ${found[1]}: its def line is not moved in under the class`
+      : owner && owner !== blocks.task
+        ? `${found[1]} has no method ${found[2]} yet, and the code of this task uses it. ${found[2]} is Task ${owner}: write it first, or do this task without it`
+        : (blocks.methods ?? []).includes(found[2])
+          ? `${found[1]} has no method ${found[2]}. A method is a def moved in under the class, lined up with __init__, and its def line starts with self`
+          : `a ${found[1]} object has no attribute ${found[2]}. Check how ${found[2]} is spelt where it is read and where it is made. An attribute is made on the object by a line such as self.${found[2]} = ..., usually in __init__, or by a field of a dataclass; a name given a value without self. in front belongs to the method alone, and is gone when the method ends`
   }
   if ((found = /^name '(\w+)' is not defined/.exec(m))) {
     if (found[1] === 'self') {
@@ -1899,6 +1902,9 @@ function classRunCause(error, blocks) {
   if ((found = /^object of type '(\w+)' has no len\(\)$/.exec(m))) {
     return `len asks a ${found[1]} how many things it holds, and ${found[1]} has no __len__ to answer`
   }
+  if ((found = /^'(str|float)' object cannot be interpreted as an integer$/.exec(m))) {
+    return `a whole number was needed and the value is ${aKind(found[1])}. A method such as __len__ must give back a whole number, the count itself, not text or a decimal number`
+  }
   if (/^'NoneType' object cannot be interpreted as an integer$/.test(m)) {
     return 'a whole number was needed and the value is None. A method such as __len__ must give back its number with return: one that ends without return gives back None'
   }
@@ -1918,12 +1924,15 @@ function classRunCause(error, blocks) {
     return 'super is used without its round brackets. super() with round brackets gives the class this one is built on, and __init__ is called on that'
   }
   if (error.type === 'RecursionError') {
-    return 'a method calls itself, and that call calls it again, without end. Inside a method, self. and the method\'s own name, or len(self) inside __len__, calls that same method again: the version of the class it is built on is reached through super()'
+    return 'a method calls itself, and that call calls it again, without end. Look inside it for its own name, through self, or for what runs it again'
   }
   return null
 }
 
-/** The line each `# Task N` comment of the learner's file starts on, as Python counts lines. */
+/**
+ * The line each `# Task N` comment of the learner's file starts on, as Python counts lines, and
+ * the file's lines (`starts.lines`).
+ */
 async function taskStarts(t, file) {
   const text = await readFile(join(t.workspace, ...file.split('/')), 'utf8').catch(() => '')
   const all = text.replace(/\r/g, '').split('\n')
@@ -1933,7 +1942,19 @@ async function taskStarts(t, file) {
     const m = marker(line)
     if (m && !marker(all[i - 1]) && !marker(all[i + 1])) starts.set(Number(m[1]), i + 1)
   })
+  starts.lines = all
   return starts
+}
+
+/**
+ * An error placed on a decorator line, as newer Pythons place an error of making a decorated
+ * class, moved to the class or def line under it, so every Python names the same line.
+ */
+function belowDecorators(error, all) {
+  let line = error?.line
+  if (!line || !/^\s*@/.test(all[line - 1] ?? '')) return error
+  while (/^\s*@/.test(all[line - 1] ?? '')) line++
+  return { ...error, line }
 }
 
 /** The task whose lines hold `line`, or 0 for the lines above # Task 1. */
@@ -2016,11 +2037,12 @@ function stepRaise(step, rec, blocks) {
  * A case fails on its first step that goes wrong, with the steps up to it as Check ran them.
  * `names` ({ name: 'class' | 'function' }) must be in the file after the task's lines. `define` is
  * Python run right before Task `task` (Check's own versions of what earlier tasks make), `explain`
- * the task's own words for an error, `attrs` the attributes a method reaches through self, and
- * `methods` the methods and properties the learner writes.
+ * the task's own words for an error, `attrs` the attributes a method reaches through self,
+ * `methods` the methods and properties the learner writes, and `owners` the task that writes
+ * each method, so a task whose code calls another task's method not yet written says so.
  * The file runs under the name `module`, so its main guard does not run.
  */
-export async function classCases(t, { file, task, list, names = {}, define, explain, attrs = [], methods = [] }) {
+export async function classCases(t, { file, task, list, names = {}, define, explain, attrs = [], methods = [], owners }) {
   const module = file.split('/').pop().replace(/\.py$/, '')
   const [starts, runs] = await Promise.all([
     taskStarts(t, file),
@@ -2043,7 +2065,7 @@ export async function classCases(t, { file, task, list, names = {}, define, expl
   ])
   for (const r of runs) {
     if (!r.blocks) continue
-    Object.assign(r.blocks, { classes: true, attrs, methods, names: r.steps?.names ?? r.parts.get(task)?.names ?? {} })
+    Object.assign(r.blocks, { classes: true, task, attrs, methods, owners, names: r.steps?.names ?? r.parts.get(task)?.names ?? {} })
     if (explain) r.blocks.explain = explain
   }
   const words = (error, r) => runCause(error, {}, r.blocks)
@@ -2059,8 +2081,9 @@ export async function classCases(t, { file, task, list, names = {}, define, expl
   }
   const first = runs[0]
   let held = null
-  for (const [, part] of [...first.parts].filter(([k]) => k <= task)) {
-    if (!part.error) continue
+  for (const [, stored] of [...first.parts].filter(([k]) => k <= task)) {
+    if (!stored.error) continue
+    const part = { ...stored, error: belowDecorators(stored.error, starts.lines) }
     const at = taskAt(starts, part.error.line)
     if (at === 0) {
       return [

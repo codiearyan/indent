@@ -103,14 +103,14 @@ export const checks = {
     const label = (code, want, copied, kits) => ({
       code,
       want,
-      hint: (v) =>
-        v === kits
+      hint: (v, seen, rec) =>
+        v === null
+          ? `${code} gives back None: Rope's label ends without return.${rec.printed ? ' print only shows the label; return gives it back.' : ''}`
+          : v === kits
           ? `${code} gives Kit's label, with no length: Rope has no label of its own. A method of Rope is moved in under Rope, lined up with its __init__.`
           : v === copied
           ? "Rope's label does not build on Kit's: Check gave Kit a label written another way, and Rope's label stayed as it was. Copying Kit's code into Rope means a change to Kit never reaches the ropes. Get Kit's label from Rope's with super(), and add to what it gives back."
-          : v === null
-            ? `${code} gives back None: Rope's label ends without return.`
-            : typeof v === 'string' && v.startsWith('<bound method')
+          : typeof v === 'string' && v.startsWith('<bound method')
               ? "Rope's label puts the method itself into its text, not what it gives back: a method runs only with round brackets after its name."
               : `${code} is not Kit's label for the rope, then a comma, a space and the length in the shape the task shows.`
     })
@@ -120,6 +120,10 @@ export const checks = {
       attrs: ATTRS,
       methods: METHODS,
       names: { Rope: 'class' },
+      explain: (error) =>
+        error.type === 'RecursionError'
+          ? "a method calls itself, and that call calls it again, without end. self.label() inside Rope's label is Rope's label again: Kit's label for this rope is reached through super()"
+          : null,
       list: [
         {
           name: "A rope's label, and the others as they were",
@@ -155,16 +159,21 @@ export const checks = {
 
   ropes(t) {
     const kinds = { code: 'class StaticRope(Rope):\n    pass' }
-    const named = (code, want, kit) => ({
-      code,
-      want,
-      hint: (v) =>
-        Array.isArray(v) && v.length === kit.length
-          ? 'ropes_in gives back every piece of kit, not only the ropes. Every piece of kit is a Kit: ask whether each one is a Rope.'
-          : Array.isArray(v) && want.includes('static line') && !v.includes('static line')
-            ? 'ropes_in leaves out the static line, a StaticRope: a kind of rope built on Rope. type(item) == Rope is True only for a Rope itself; the task asks for every kind of rope too, and isinstance asks about the class and every class built on it.'
-            : 'ropes_in does not give back the ropes of the list, in the same order.'
-    })
+    const named = (code, want, kit) => {
+      const statics = kit.filter((m) => m.startsWith('StaticRope(')).map((m) => /"([^"]+)"/.exec(m)[1])
+      return {
+        code,
+        want,
+        hint: (v) => {
+          const left = Array.isArray(v) && statics.find((n) => !v.includes(n))
+          return Array.isArray(v) && v.length === kit.length && kit.length !== want.length
+            ? 'ropes_in gives back every piece of kit, not only the ropes. Every piece of kit is a Kit: ask whether each one is a Rope.'
+            : left && v.every((n) => want.includes(n))
+              ? `ropes_in leaves out the ${left}, a StaticRope: a kind of rope built on Rope. type(item) == Rope is True only for a Rope itself; the task asks for every kind of rope too, and isinstance asks about the class and every class built on it.`
+              : 'ropes_in does not give back the ropes of the list, in the same order.'
+        }
+      }
+    }
     const steps = (made, want) => [
       kinds,
       { code: `kit = [${made.join(', ')}]` },
@@ -172,7 +181,8 @@ export const checks = {
       {
         code: 'type(found).__name__',
         want: 'list',
-        hint: (v) => (v === 'NoneType' ? 'ropes_in gives back None: it ends without return.' : `ropes_in gives back a ${v}, and the task asks for a list.`)
+        hint: (v) => (v === 'NoneType' ? 'ropes_in gives back None: it ends without return.' : `ropes_in gives back a ${v}, and the task asks for a list.`),
+        hidden: '# Check asks what kind of value ropes_in gave back'
       },
       named('[item.name for item in found]', want, made),
       {
@@ -187,6 +197,10 @@ export const checks = {
       define: ROPE,
       attrs: ATTRS,
       names: { ropes_in: 'function' },
+      explain: (error) =>
+        /^'(str|int|float)' object has no attribute 'name'/.test(error.message)
+          ? 'ropes_in gives back a list that holds something other than kit, such as each rope\'s name. Put each rope itself into the list'
+          : null,
       list: [
         {
           name: 'Ropes of two kinds among other kit',
@@ -230,7 +244,7 @@ export const checks = {
               ? `check_kit names the ${other}, but the ${first} before it is not ready either. A Flare is a kind of kit check_kit has never heard of, and it knows whether it is ready: ask each item with its own ready method, in order.`
               : `check_kit raises NotReady, but its message does not name the first item that is not ready, the ${first}. Put the item's name into the message.`,
           swallowed: (rec) =>
-            `check_kit(kit) ${rec.printed ? 'printed a line and ' : ''}gave back ${rec.value?.repr ?? 'a value'}, though the ${first} is not ready.${other ? ' A Flare is a kind of kit check_kit has never heard of, and it knows whether it is ready itself: ask each item with its own ready method, not about its class.' : ''}${(rec.value?.data?.['@float'] ?? rec.value?.data) === all ? ' That is the weight of every item, as if all were ready: a method used without round brackets is the method itself, and Python counts it as true.' : ''} The task asks check_kit to raise NotReady.`
+            `check_kit(kit) ${rec.printed ? 'printed a line and ' : ''}gave back ${rec.value?.repr ?? 'a value'}, though the ${first} is not ready.${(rec.value?.data?.['@float'] ?? rec.value?.data) === all ? ' That is the weight of every item, as if all were ready: a method used without round brackets is the method itself, and Python counts it as true.' : ''} The task asks check_kit to raise NotReady.`
         }
       }
     ]
@@ -254,7 +268,9 @@ export const checks = {
               hint: (v) =>
                 v === null
                   ? 'check_kit gives back None: it ends without return. When every item is ready it gives back the total weight.'
-                  : 'check_kit does not give back the total weight of the list.'
+                  : (v?.['@float'] ?? v) === 3.75
+                    ? 'check_kit gives back the weight of the first item only: a return inside the loop ends it after the first item. Give back the total after the loop.'
+                    : 'check_kit does not give back the total weight of the list.'
             }
           ]
         },
@@ -265,7 +281,17 @@ export const checks = {
         },
         {
           name: 'Nothing to check',
-          steps: [...base, { code: 'check_kit([])', want: 0, hint: 'check_kit of an empty list does not give back 0.' }]
+          steps: [
+            ...base,
+            {
+              code: 'check_kit([])',
+              want: 0,
+              hint: (v) =>
+                v === null
+                  ? 'check_kit([]) gives back None. With nothing in the list the loop never runs: give back the total after the loop, where an empty list reaches it too.'
+                  : 'check_kit of an empty list does not give back 0.'
+            }
+          ]
         }
       ]
     })

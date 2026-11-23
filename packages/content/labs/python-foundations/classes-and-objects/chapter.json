@@ -37,10 +37,10 @@
       "id": "kit",
       "title": "Each vehicle its own kit",
       "file": "hill_teams.py",
-      "description": "Under `# Task 2`, Dougie's `Vehicle` keeps its `kit` list in the class, so every vehicle shares one list: the rope he put in the van shows up in the Land Rover too. Change `Vehicle` so that every vehicle has a `kit` list of its own, empty when the vehicle is made. A vehicle still keeps its name in `name`.\n\nCheck makes two vehicles of its own, reads the kit of each, puts a stretcher in one, and looks at whether the other's kit stays empty.",
+      "description": "Under `# Task 2`, Dougie's `Vehicle` keeps its `kit` list in the class, so every vehicle shares one list: the rope he put in the van shows up in the pickup too. Change `Vehicle` so that every vehicle has a `kit` list of its own, empty when the vehicle is made. A vehicle still keeps its name in `name`.\n\nCheck makes two vehicles of its own, reads the kit of each, puts a stretcher in one, and looks at whether the other's kit stays empty.",
       "nextSteps": [
         "Read the part of the lesson on one list for every object.",
-        "Run the file and see the rope turn up in the Land Rover.",
+        "Run the file and see the rope turn up in the pickup.",
         "Find where the kit list is made, and when that line runs.",
         "Make the list where each new vehicle gets a list of its own, and run the file again."
       ],

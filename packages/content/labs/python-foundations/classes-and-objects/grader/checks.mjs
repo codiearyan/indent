@@ -1,4 +1,4 @@
-import { classCases, pyLiteral, tuple } from '../../grading.mjs'
+import { classCases, tuple } from '../../grading.mjs'
 
 const FILE = 'hill_teams.py'
 
@@ -60,10 +60,12 @@ export const checks = {
       {
         code: 'first.kit',
         want: [],
-        hint: (v) =>
-          Array.isArray(v) && v.length
-            ? `A vehicle made just now already carries ${pyLiteral(v)}: what was put in another vehicle. ${VEHICLE_SHARED}`
-            : 'A new vehicle\'s kit is not an empty list. The task asks for a new, empty list for every vehicle.'
+        hint: (v, seen, rec) =>
+          Array.isArray(v) && v.includes('rope')
+            ? `A vehicle made just now already carries ${rec.value.repr}: what was put in another vehicle. ${VEHICLE_SHARED}`
+            : Array.isArray(v) && v.length
+              ? `A vehicle made just now already carries ${rec.value.repr}. The task asks for a new, empty list for every vehicle.`
+              : 'A new vehicle\'s kit is not an empty list. The task asks for a new, empty list for every vehicle.'
       },
       { code: 'first.kit.append("stretcher")' },
       {
@@ -100,6 +102,7 @@ export const checks = {
         {
           code: 'type(teams).__name__',
           want: 'list',
+          hidden: '# Check asks what kind of value make_teams gave back',
           hint: (v) =>
             v === 'NoneType'
               ? 'make_teams gives back None: it ends without reaching a return line. print only shows a line; the code that calls make_teams gets the list only from return.'
@@ -108,6 +111,7 @@ export const checks = {
         {
           code: '[type(team).__name__ for team in teams]',
           want: rows.map(() => 'Team'),
+          hidden: '# Check asks what kind of value each item of the list is',
           hint: (v) =>
             v.length !== rows.length
               ? `make_teams gives back ${v.length} ${v.length === 1 ? 'item' : 'items'} for ${rows.length} ${rows.length === 1 ? 'row' : 'rows'}. The task asks for one team for each tuple.`
@@ -126,6 +130,7 @@ export const checks = {
         {
           code: 'len({id(team) for team in teams})',
           want: rows.length,
+          hidden: '# Check counts the different Team objects in the list',
           hint: 'The list holds the same Team object more than once. Each Team(...) call makes a new object, so make one in each round of the loop.'
         },
         {

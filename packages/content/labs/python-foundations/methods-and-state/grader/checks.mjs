@@ -3,6 +3,7 @@ import { classCases, tuple } from '../../grading.mjs'
 const FILE = 'packs.py'
 const ATTRS = ['owner', 'limit', 'items', 'weight']
 const METHODS = ['add', 'weight', 'remove', 'without']
+const OWNERS = { add: 1, weight: 2, remove: 3, without: 4 }
 
 const has = (v, key) => v?.['@dict']?.some(([k]) => k === key)
 
@@ -48,6 +49,7 @@ export const checks = {
       task: 1,
       attrs: ATTRS,
       methods: METHODS,
+      owners: OWNERS,
       list: [
         {
           name: 'Two items into one pack, none into another',
@@ -119,7 +121,7 @@ export const checks = {
     const read = (code, want, count, stale = false) => ({
       code,
       want,
-      hint: (v) =>
+      hint: (v, seen, rec) =>
         v?.['@other'] === 'method'
           ? `${code} gives the method itself, not a number: without round brackets a plain method is not called. The task asks for a property, read with no round brackets, and @property on the line above the def does that.`
           : stale && typeof (v?.['@float'] ?? v) === 'number' && (v?.['@float'] ?? v) !== want
@@ -129,7 +131,7 @@ export const checks = {
               : typeof v === 'number' && v === count && count !== want
               ? 'weight gives back how many items there are, not what they weigh.'
               : v === null
-                ? 'weight gives back None: it ends without return.'
+                ? `weight gives back None: it ends without return.${rec.printed ? ' print only shows the total; return gives it back to the code that reads pack.weight.' : ''}`
                 : `${code} is not the total of the weights in items.`
     })
     return classCases(t, {
@@ -137,6 +139,7 @@ export const checks = {
       task: 2,
       attrs: ATTRS,
       methods: METHODS,
+      owners: OWNERS,
       list: [
         {
           name: 'The total, and again after one more item',
@@ -173,6 +176,7 @@ export const checks = {
       task: 3,
       attrs: ATTRS,
       methods: METHODS,
+      owners: OWNERS,
       list: [
         {
           name: 'One item out of two',
@@ -216,6 +220,7 @@ export const checks = {
         {
           code: 'type(lighter).__name__',
           want: 'Pack',
+          hidden: '# Check asks what kind of value without gave back',
           hint: (v) =>
             v === 'NoneType'
               ? 'without gives back None. The task asks it to give back the new pack, with return.'
@@ -256,6 +261,7 @@ export const checks = {
       task: 4,
       attrs: ATTRS,
       methods: METHODS,
+      owners: OWNERS,
       list: [
         { name: 'A pack without its flask', steps: steps('Morag', 11, { rope: 4.5, flask: 1.25, stove: 2.5 }, 'flask') },
         { name: 'Another pack, another item', steps: steps('Ross', 6, { map: 0.5, helmet: 0.75 }, 'map') }

@@ -88,7 +88,10 @@ if __name__ == "__main__":
     ]
     store.append(Rope("static line", 4.5, 50))
     for item in store:
-        print(item.label(), "ready" if item.ready() else "not ready")
+        if item.ready():
+            print(item.label(), "ready")
+        else:
+            print(item.label(), "not ready")
     print(ropes_in(store)[0].label())
     try:
         print(check_kit(store))

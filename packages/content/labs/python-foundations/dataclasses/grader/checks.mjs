@@ -125,6 +125,7 @@ function grid([east, north], [byEast, byNorth]) {
     {
       code: 'type(new).__name__',
       want: 'GridRef',
+      hidden: '# Check asks what kind of value moved gave back',
       hint: (v) =>
         v === 'NoneType'
           ? 'moved gives back None. The task asks it to give back a new GridRef, with return.'
