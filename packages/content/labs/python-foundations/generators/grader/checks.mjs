@@ -147,6 +147,15 @@ function linesSteps(path, lines) {
       want: true,
       hidden: '# Check asks whether the file was closed once every line was read',
       hint: `log_lines left ${path} open after its last line. A file opened on a with line inside the generator is closed when the lines under it end.`
+    },
+    { code: `again = log_lines(${s(path)})` },
+    { code: 'next(again)', value: true },
+    { code: 'again.close()', hidden: '# Check stops the generator after its first line, as a loop that ends early with break does' },
+    {
+      code: 'opened[-1].closed',
+      want: true,
+      hidden: '# Check asks whether the file was closed when the generator was stopped',
+      hint: `log_lines left ${path} open when it was stopped after its first line. A with line inside the generator closes the file when the generator is stopped early too; a close() after the loop runs only when every line was read.`
     }
   ]
 }
@@ -159,10 +168,12 @@ function teamSteps(lines, sign) {
     { code: `found = from_team(source, ${s(sign)})` },
     isGenerator('found', 'from_team', 'line'),
     {
-      code: 'next(found)',
+      code: 'next(found, None)',
       want: mine[0],
       hint: (v) =>
-        typeof v === 'string' && v.includes(sign)
+        v === null
+          ? `from_team gave no line at all, though ${mine.length} of the lines are from ${sign}. Look at how your code finds the call sign of a line: it is the second word, with a colon at its end.`
+          : typeof v === 'string' && v.includes(sign)
           ? `The first line from_team gives mentions ${sign}, but its call sign is another team's. The task asks for the lines whose call sign, the word after the time, is ${sign}.`
           : `The first line from_team gives is not the first line from ${sign}.`
     },

@@ -23,7 +23,7 @@
       "steps": [
         { "active": ["log"], "note": "The winter's log is far too long to hold in memory at once." },
         { "active": ["log", "log->lines", "lines"], "note": "Asked for a line, the reader takes one more line from the file and hands it over without its line end." },
-        { "active": ["lines"], "note": "Between two asks it waits, holding only the line it last gave, and it closes the file after the last." }
+        { "active": ["lines"], "note": "Between two asks it waits, holding only the line it last gave, and it closes the file after the last, or when it is stopped early." }
       ]
     },
     "team": {

@@ -13,7 +13,8 @@ const EXPLAIN = (error) => {
       ? 'send is a function of Check\'s own, and it takes one call sign. Your code called it with nothing in its round brackets'
       : `send is a function of Check's own, and it takes one call sign at a time. Your code called it with ${found[2]} values`
   }
-  if ((found = /^handler\(\) (missing|takes \d+ positional arguments? but (\d+) were given)/.exec(m))) {
+  // From Python 3.10 a nested function is named with its place, such as make_handler.<locals>.handler().
+  if ((found = /^(?:\w+\.<locals>\.)?handler\(\) (missing|takes \d+ positional arguments? but (\d+) were given)/.exec(m))) {
     return found[1] === 'missing'
       ? 'each handler is a function of Check\'s own, and it takes the text of the call. Your code called it with nothing in its round brackets'
       : `each handler is a function of Check's own, and it takes only the text of the call. Your code called it with ${found[2]} values`
@@ -22,10 +23,13 @@ const EXPLAIN = (error) => {
     return 'make_pager was called with only a call sign, as the task says, and its def line asks for more. make_pager takes the call sign alone: the message goes to the function it gives back'
   }
   if (
-    (found = /^(\w+)\(\) (missing \d+|takes \d+ positional arguments? but 1 was given)/.exec(m)) &&
+    (found = /^(?:\w+\.<locals>\.)?(\w+)\(\) (missing \d+|takes \d+ positional arguments? but \d+ (?:was|were) given)/.exec(m)) &&
     !['send_to_all', 'route', 'make_pager', 'pagers_for'].includes(found[1])
   ) {
-    return `a pager was called with one message, and its def line, ${found[1]}, does not take exactly one value. The function make_pager gives back takes the message`
+    // A line in the learner's file means their own code called it; none means Check called the pager.
+    return error.line
+      ? `${found[1]} was called inside make_pager, while the pager was being made. make_pager gives back the pager itself, its name without round brackets: the message comes later, when the pager is called`
+      : `a pager was called with one message, and its def line, ${found[1]}, does not take exactly one value. The function make_pager gives back takes the message`
   }
   return valueRunCause(error)
 }
@@ -87,6 +91,9 @@ function routeSteps([kind, text], [unknown, otherText]) {
   const calledHint = (want) => (v) => {
     const got = Array.isArray(v) ? v : []
     const fresh = got.slice(want.length - 1)
+    if (fresh.length === 0 && want.length === 2 && got.length > 0) {
+      return 'For a kind the dictionary does not have, none of the handlers in the dictionary route was given was called. That call goes to the dictionary\'s own handler under "other", whichever dictionary route is given.'
+    }
     if (fresh.length === 0) {
       return 'None of the handlers in the dictionary route was given was called. Looking a handler up in the dictionary gives the function itself, and it runs only when it is called with round brackets and the text in them.'
     }

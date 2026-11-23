@@ -58,7 +58,7 @@ def readings(path):
             yield float(line)
 ```
 
-Nothing is read until the first `next`. Each round reads one line, hands over its number and waits. The `with` line closes the file once the loop has gone through the last line.
+Nothing is read until the first `next`. Each round reads one line, hands over its number and waits. The `with` line closes the file once the loop has gone through the last line. When the code that asks for lines stops early, with `break` or once it has its answer, Python closes the generator as soon as nothing uses it any more, or at once when its `close()` method is called, and the `with` line closes the file then too.
 
 ## Joining generators
 

@@ -259,14 +259,14 @@ function longestSteps(path, rows, counts) {
       hint: (v) =>
         typeof v === 'string'
           ? `longest_callouts gives back ${v === 'NoneType' ? 'None' : `a ${v}`}, and the task asks for a list of Callout objects.`
-          : `longest_callouts gives back a list of ${v.join(' and ')}, and the task asks for Callout objects, made with the Callout class at the top of the file.`
+          : `longest_callouts gives back a list of ${v.map((k) => ({ dict: 'dictionaries', tuple: 'tuples', list: 'lists', str: 'text' })[k] ?? k).join(' and ')}, and the task asks for Callout objects, made with the Callout class at the top of the file.`
     },
     {
       code: '[(c.date, c.hill, c.hours) for c in best]',
       want: show(order.slice(0, counts[0])),
       hint: (v) => {
         if (Array.isArray(v) && v.some((t) => typeof t?.['@tuple']?.[2] === 'string')) {
-          return 'The hours of the callouts are text, as they are in the file, so they sort as text, where "11" comes before "9". The Callout class says hours is a whole number, and Python does not turn text into one because of a hint: int() does.'
+          return 'The hours of the callouts longest_callouts gives back are text, as they are in the file. The task asks for each callout\'s hours as a whole number: the Callout class\'s hint does not turn text into one, because Python does not check hints, and int() does.'
         }
         if (s(v) === s(show(newestFirst.slice(0, counts[0])))) return 'Of two callouts with the same hours, the newer comes first. The task asks for the older first.'
         if (s(v) === s(show(fewest.slice(0, counts[0])))) return 'longest_callouts gives the fewest hours first, and the task asks for the most hours first.'

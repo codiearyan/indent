@@ -55,7 +55,7 @@
       "id": "leader",
       "title": "A leader, or None",
       "file": "season_report.py",
-      "description": "Under `# Task 3`, write a function called `leader_of` that takes a call sign and a dictionary of leaders, each a call sign and a name, and gives back that team's leader, or `None` when the dictionary has no such call sign. The dictionary stays as it was. Give it hints: the call sign is text, the dictionary goes from text to text, and it gives back text or `None`, in a way this Python reads. `leader_of(\"Bravo\", leaders)` gives back `'Dougie'`.\n\nCheck calls `leader_of` with dictionaries of its own, with a call sign they have and one they do not, then reads the hints Python keeps for it.",
+      "description": "Under `# Task 3`, write a function called `leader_of` that takes a call sign and a dictionary of leaders, each a call sign and a name, and gives back that team's leader, or `None` when the dictionary has no such call sign. The dictionary stays as it was. Give it hints: the call sign is text, the dictionary goes from text to text, and it gives back text or `None`, written with `Optional` from the `typing` module, which every Python reads. `leader_of(\"Bravo\", leaders)` gives back `'Dougie'`.\n\nCheck calls `leader_of` with dictionaries of its own, with a call sign they have and one they do not, then reads the hints Python keeps for it.",
       "nextSteps": [
         "Read the parts of the lesson on a dictionary's hint and on text or None.",
         "Write the function, with None for a call sign that is not there.",

@@ -68,7 +68,7 @@ function longestSteps(rows) {
           [show(order(list, hours)), 'longest_first gives the fewest hours first, and the task asks for the most hours first.'],
           [show(order(list, hours).reverse()), 'Callouts with the same hours come out the other way round from the order they had. Python\'s sort keeps equal items in their old order, and turning the whole list round after sorting turns those round too.'],
           [show(order(list, (c) => String(c.hours), true)), 'The callouts are in the order their hours have as text, one character at a time, where "11" comes before "9". The task asks for the order of the numbers.'],
-          [show(list), 'longest_first gives the callouts back in the order they came in.'],
+          [show(list), 'longest_first gives the callouts back in the order they came in. sorted makes a new list and leaves the one it is given as it was, so the sorted list is the one it gives back.'],
           [show(order(list, (c) => c.hill)), 'The callouts are in the order of their hills, and the task asks for the order of their hours.'],
           [show(order(list, (c) => c.date, true)), 'The callouts are in the order of their dates, and the task asks for the order of their hours.']
         ],
@@ -116,7 +116,7 @@ function shelfSteps(tags) {
       want: order(tags, num),
       hint: nearMiss(
         [
-          [tags, 'The list Check gave shelve is as it was. sorted makes a new list and leaves the one it is given alone, and giving a name inside the function a new list does not reach the list the caller has. The task asks shelve to sort the list it is given.'],
+          [tags, 'The list Check gave shelve is as it was. The task asks shelve to sort the list it is given, its own parameter: sorted makes a new list and leaves the one it is given alone, a name given a new list inside the function does not reach the list the caller has, and a list kept elsewhere in the file is not the one Check hands in.'],
           [order(tags, (t) => t), 'The tags are sorted as text, one character at a time, so "R101" comes before "R3", because 1 comes before 3. The task asks for the order of the numbers after the R.'],
           [order(tags, num, true), 'The tags are sorted biggest number first, and the task asks for the smallest first.']
         ],
@@ -171,7 +171,16 @@ function readySteps(cases) {
     rows.length
       ? { code: `log${i} = ${pyLiteral(rows.map(callout))}`, hidden: `# Check makes log${i}, a list of ${rows.length} callouts of its own: ${hint.what}` }
       : { code: `log${i} = []` },
-    { code: `ready_to_close(log${i}, ${limit})`, want, hint: hint.words }
+    {
+      code: `ready_to_close(log${i}, ${limit})`,
+      want,
+      hint: (v) =>
+        v === null
+          ? 'ready_to_close gives back None: it ends without return, or only prints its answer. The task asks it to give back True or False.'
+          : typeof v !== 'boolean'
+            ? `ready_to_close gives back ${typeof v === 'string' ? `the text '${v}'` : s(v)}, not True or False themselves. The task asks for True or False, the values a comparison, all or any gives.`
+            : hint.words
+    }
   ])
 }
 

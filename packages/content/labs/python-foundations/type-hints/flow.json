@@ -50,7 +50,7 @@
     "longest": {
       "steps": [
         { "active": ["file", "file->longest", "longest"], "value": { "kind": "map", "label": "one line", "entries": [{ "key": "date", "value": "text" }, { "key": "hill", "value": "text" }, { "key": "hours", "value": "whole number" }] }, "note": "Each line of the season's file holds one callout." },
-        { "active": ["longest", "longest->callout", "callout"], "note": "Each line becomes a Callout, its hours a real number." },
+        { "active": ["longest", "longest->callout", "callout"], "note": "Each line becomes a Callout, its hours a whole number." },
         { "active": ["longest", "longest->rhona", "rhona"], "note": "Rhona gets the longest callouts first, the older first where hours are equal." }
       ]
     }

@@ -11,7 +11,7 @@
       "id": "lines",
       "title": "One line at a time",
       "file": "log_reader.py",
-      "description": "Under `# Task 1` in `log_reader.py`, write a generator function called `log_lines` that takes the path of a log file, opens it with `encoding=\"utf-8\"`, and gives its lines one at a time, each without the line end at its end. It reads a line of the file only when it is asked for the next one. `next(log_lines(\"winter_log.txt\"))` gives `'19:05 Alpha: leaving base'`.\n\nCheck writes log files of its own and watches how they are read. It asks for the first line, counts how many lines of the file were read by then, asks for the rest, then loops over the generator once more, and looks at whether the file was closed at the end.",
+      "description": "Under `# Task 1` in `log_reader.py`, write a generator function called `log_lines` that takes the path of a log file, opens it with `encoding=\"utf-8\"`, and gives its lines one at a time, each without the line end at its end. It reads a line of the file only when it is asked for the next one, and the file is closed once the last line is read, or when the generator is stopped early. `next(log_lines(\"winter_log.txt\"))` gives `'19:05 Alpha: leaving base'`.\n\nCheck writes log files of its own and watches how they are read. It asks for the first line, counts how many lines of the file were read by then, asks for the rest, then loops over the generator once more, and looks at whether the file was closed at the end. Then it stops a second generator after its first line and looks at whether that file was closed too.",
       "nextSteps": [
         "Read the parts of the lesson on yield and on reading a big file.",
         "Open the file on a with line inside the function.",

@@ -2229,7 +2229,7 @@ export function valueRunCause(error) {
       : `sorted, sort, min and max compare what they are given, and Python cannot say which of two ${found[1] === 'NoneType' ? 'Nones' : 'functions'} comes first. Look at what the function given to key gives back for each item`
   }
   if (/^unsupported operand type\(s\) for \|: /.test(m)) {
-    return 'this Python cannot read | between two kinds in a hint, such as str | None: that way of writing it works from Python 3.10 on. The lesson shows the way every Python reads'
+    return 'this Python cannot read | between two kinds in a hint, such as str | None: that way of writing it works from Python 3.10 on. Optional[str], with from typing import Optional at the top of the file, says the same, and every Python reads it'
   }
   if (error.type === 'NameError' && (found = /^name '(Optional|Union|Callable|List|Dict|Iterator|Generator|Iterable)' is not defined/.exec(m))) {
     return `Python does not know ${found[1]} by itself: it comes from the typing module, so the file needs an import line for it before the line that uses it`

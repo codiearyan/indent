@@ -20,6 +20,9 @@ const EXPLAIN = (error) => {
   if ((found = /^count_calls\(\) missing 1 required positional argument/.exec(m))) {
     return 'count_calls was called with nothing in its round brackets. On the @ line, the decorator is named without round brackets: Python calls it with the function below, by itself'
   }
+  if (/'Clock'/.test(m)) {
+    return 'clock is a function, and each reading of it is a call: clock() with round brackets. Without them, clock stands for the clock itself, not the time it gives'
+  }
   if (error.type === 'UnboundLocalError') {
     const name = /'(\w+)'/.exec(m)?.[1] ?? 'a name'
     return `inside the new function, ${name} gets a value with = or +=, so Python takes it as the new function's own name, and it has no value yet when the line reads it. A name made outside the new function cannot be changed from inside it that way: the lesson shows where the count is kept`
@@ -140,6 +143,7 @@ const CLOCK = (times) => `class Clock:
         self.times, self.reads = list(times), 0
     def __call__(self):
         self.reads += 1
+        seen.append("clock")
         return self.times[min(self.reads, len(self.times)) - 1] + max(0, self.reads - len(self.times))
 clock = Clock(${s(times)})`
 
@@ -156,7 +160,7 @@ function timedSteps(times, [a, b], other) {
     {
       code: 'slow_page.__name__',
       want: 'page',
-      hint: (v) => `slow_page.__name__ is ${s(v)}, the name of the new function itself. A traceback, or announce, would show that name. The task asks the new function to keep the name of the function it wraps.`
+      hint: (v) => `slow_page.__name__ is ${s(v)}, and the function it wraps is called page. A traceback, or announce, would show ${s(v)}. The task asks the new function to keep the name of the function it wraps.`
     },
     { code: `slow_page(${s(a)}, "at the ford")`, want: `${a} paged: at the ford`, hint: noneHint },
     { code: `slow_page(${s(b)}, "back at base", urgent=True)`, want: `${b} paged: back at base (urgent)`, hint: noneHint },
@@ -167,6 +171,12 @@ function timedSteps(times, [a, b], other) {
         v === 0
           ? 'timed never read the clock it was handed. Check hands in a clock of its own, and the task asks timed to read that clock, not the computer\'s.'
           : `timed read the clock ${v} times for two calls. The task asks for once before each call and once after it.`
+    },
+    {
+      code: '["clock" if x == "clock" else "call" for x in seen]',
+      want: ['clock', 'call', 'clock', 'clock', 'call', 'clock'],
+      hidden: '# Check asks in what order the clock was read and page was called',
+      hint: 'The clock was not read once right before each call of the function timed wraps and once right after it. The seconds a call took are the reading after the call take away the reading before it.'
     },
     {
       code: 'slow_page.times',

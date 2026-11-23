@@ -38,7 +38,8 @@ def hours_between(start: int, end: int) -> int:
 # Task 3: A leader, or None
 # Write a function called leader_of that takes a call sign and a dictionary of leaders, and gives
 # back that team's leader, or None when the dictionary has no such call sign. Give it hints: the
-# call sign is text, the dictionary goes from text to text, and it gives back text or None.
+# call sign is text, the dictionary goes from text to text, and it gives back text or None,
+# written with Optional from the typing module.
 def leader_of(call_sign: str, leaders: dict[str, str]) -> Optional[str]:
     return leaders.get(call_sign)
 
