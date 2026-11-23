@@ -10,18 +10,35 @@ import Extras from '../components/Extras.astro'
 import Faq from '../components/Faq.astro'
 import Closing from '../components/Closing.astro'
 import { listRepos } from '../lib/content'
+import { RELEASES_URL, VERSION } from '../lib/downloads'
 
 const repos = listRepos().sort(
   (a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title)
 )
-const issues = repos.reduce((n, repo) => n + repo.issues.length, 0)
-const tasks = repos.reduce((n, repo) => n + repo.tasks, 0)
+const description = `A desktop app for learning to code: ${repos.length} hands-on repos in JavaScript, TypeScript, Python, SQL, Java and C++, checked by hidden tests. Free for personal use.`
+const site = Astro.site!.href
+// What search engines read about the app; every field is also on the page.
+const structured = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${site}#website`, name: 'Indent', url: site },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Indent',
+      url: site,
+      description,
+      applicationCategory: 'EducationalApplication',
+      operatingSystem: 'macOS, Windows, Linux',
+      softwareVersion: VERSION,
+      downloadUrl: RELEASES_URL,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+    }
+  ]
+}
 ---
 
-<Layout
-  title="Indent: learn to code by fixing real problems"
-  description={`A local-first desktop app where you learn by doing. ${repos.length} repos, ${issues} issues and ${tasks} tasks, each checked by hidden tests on your own machine.`}
->
+<Layout title="Indent: learn to code by fixing real problems" description={description}>
+  <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(structured)} />
   <Nav />
   <main id="main">
     <Hero />
