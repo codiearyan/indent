@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why was a week of fares wrong?",
+      "note": "The council raised the fare."
+    },
+    {
+      "title": "The programs",
+      "text": "The adult fare typed in four places"
+    },
+    {
+      "title": "Your ticket roll",
+      "file": "TicketRoll.java",
+      "mine": true,
+      "gap": "Nothing is kept just once",
+      "tasks": ["Number every ticket", "One adult fare", "Each ticket's line"]
+    },
+    {
+      "title": "Harbour office",
+      "text": "Checks each ticket by its number."
+    }
+  ],
+  "ticket": {
+    "label": "Fare",
+    "wrong": "one place missed",
+    "why": "Four copies",
+    "right": "one place"
+  },
+  "captions": [
+    "The ticket roll at the hut. Bridie wants numbered tickets and one adult fare.",
+    "The fare is typed in four places, and last spring one of them was missed.",
+    "You write a count every ticket shares, a fare kept once, and each ticket's line.",
+    "Now every ticket has its own number, and a new fare is one change in one line.",
+    "static, static final and why main is static. Next: more than one file."
+  ]
+}

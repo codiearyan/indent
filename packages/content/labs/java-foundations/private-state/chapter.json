@@ -1,0 +1,129 @@
+{
+  "id": "private-state",
+  "title": "Private fields and the rules they keep",
+  "files": ["Manifest.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the manifest here, and try your boat from main.",
+    "suggestedCommand": "java Manifest.java"
+  },
+  "tasks": [
+    {
+      "id": "fields",
+      "title": "Keep the boat's fields private",
+      "file": "Manifest.java",
+      "description": "Under `// Task 1`, inside the class `Boat`, write three `private` fields: a `String` called `name`, an `int` called `seats` and an `ArrayList<String>` called `aboard`, the names of the people on board. Write a constructor `Boat(String name, int seats)` that starts with nobody aboard, and three methods: `String getName()`, `int getSeats()` and `int countAboard()`.\n\nCheck makes boats of its own, two at once included, and reads what the three methods give back. Then its own code tries to change each field from outside `Boat`, and Java must refuse.",
+      "nextSteps": [
+        "Read the part of the lesson about `private` and the error it brings.",
+        "Write the three fields with `private` in front.",
+        "Write the constructor: it sets the name and the seats, and makes the empty list.",
+        "Write the three methods, then take the `//` off the first lines in `main` and run the file."
+      ],
+      "hints": [
+        "With `private` in front, a field can be used only by code inside `Boat`. The methods are how code outside reads it.",
+        "The list has to be made with `new ArrayList<>()`, or `aboard` holds `null` and `countAboard` stops with a `NullPointerException`.",
+        "The constructor: `this.name = name;`, `this.seats = seats;`, `this.aboard = new ArrayList<>();`. `countAboard` gives back `aboard.size()`."
+      ],
+      "docs": [
+        {
+          "title": "Controlling access to members of a class",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html"
+        },
+        {
+          "title": "Declaring member variables",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/variables.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Private fields, getters and setters",
+          "url": "https://www.youtube.com/watch?v=xZatSY8U_LU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rule",
+      "title": "Board and land passengers, never more than the seats",
+      "file": "Manifest.java",
+      "description": "Under `// Task 2`, write `boolean board(String passenger)`: while a seat is free it adds the passenger to `aboard` and gives back `true`; on a full boat it changes nothing and gives back `false`. Then write `boolean land(String passenger)`: it takes that passenger off and gives back `true`, or gives back `false` when nobody of that name is aboard. It builds on Task 1.\n\nCheck makes boats of its own, two at once included, boards them up to their seats and one past, lands passengers who are aboard and one who is not, and reads what each call gives back and how many are aboard.",
+      "nextSteps": [
+        "Read the part of the lesson about methods that keep a rule.",
+        "In `board`, refuse first, then add.",
+        "In `land`, walk the list and compare each name with `equals`.",
+        "Try it from `main`: board one passenger more than the seats."
+      ],
+      "hints": [
+        "The boat is full when the number aboard has reached the seats.",
+        "`aboard.size()` is how many are aboard. Compare names with `equals`, never `==`, and remove by position with `remove(i)`.",
+        "`board`: `if (aboard.size() >= seats) { return false; }`, then `aboard.add(passenger);` and `return true;`."
+      ],
+      "docs": [
+        {
+          "title": "Controlling access to members of a class",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html"
+        },
+        {
+          "title": "ArrayList: add, get, remove and size",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "copy",
+      "title": "Hand out a copy of the passenger list",
+      "file": "Manifest.java",
+      "description": "Under `// Task 3`, write `ArrayList<String> passengers()`. It gives back a new list of the names aboard, in the order they boarded, so that changing that list never changes who is aboard. It builds on Tasks 1 and 2.\n\nCheck boards passengers, reads the list `passengers()` gives back, then adds a name to it and takes one off, and reads who is aboard afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson about handing out a list.",
+        "Decide what the caller gets: the boat's own list, or a new one.",
+        "Make the new list with the same names in it.",
+        "Try it from `main`: clear the list you get back, then count who is aboard."
+      ],
+      "hints": [
+        "Giving back `aboard` itself hands out a second name for the boat's own list, and anyone could add to it past the seats.",
+        "`new ArrayList<>(other)` makes a new list holding the same items as `other`.",
+        "One line: `return new ArrayList<>(aboard);`."
+      ],
+      "docs": [
+        {
+          "title": "ArrayList(Collection) constructor",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html#%3Cinit%3E(java.util.Collection)"
+        },
+        {
+          "title": "Using objects: references",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/usingobject.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "to-string",
+      "title": "Say what a boat is when it is printed",
+      "file": "Manifest.java",
+      "description": "Under `// Task 4`, write `public String toString()`. It gives back the boat's name, how many are aboard and how many seats are free, in the form `Linnet: 4 aboard, 8 free`. It builds on Tasks 1 and 2.\n\nCheck makes boats of its own, boards some passengers, and reads the text `toString` gives back and what printing the boat shows.",
+      "nextSteps": [
+        "Read the part of the lesson about printing an object.",
+        "Write the first line exactly as the task gives it.",
+        "Build the text from the boat's fields, and give it back.",
+        "Take the `//` off the last line in `main` and run the file."
+      ],
+      "hints": [
+        "Without a `toString` of its own, printing a boat shows `Boat@` and a code. With one, `println` uses yours.",
+        "The first line must be exactly `public String toString()`. The seats free are the seats minus the number aboard.",
+        "The shape: `return name + \": \" + aboard.size() + \" aboard, \" + (seats - aboard.size()) + \" free\";`."
+      ],
+      "docs": [
+        {
+          "title": "Object.toString()",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()"
+        },
+        {
+          "title": "Methods of the Object class",
+          "url": "https://docs.oracle.com/javase/tutorial/java/IandI/objectclass.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

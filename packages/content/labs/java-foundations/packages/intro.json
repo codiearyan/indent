@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Who decides what Lachie pays?",
+      "note": "The code is all in one heap."
+    },
+    {
+      "title": "The hut's program",
+      "text": "Could work out a fare of its own"
+    },
+    {
+      "title": "Your packages",
+      "file": "Hut.java",
+      "mine": true,
+      "gap": "Nothing keeps the parts apart",
+      "tasks": ["Fares kept inside", "A public ticket", "The hut prints them"]
+    },
+    {
+      "title": "Ticket package",
+      "text": "The only place a fare is worked out."
+    }
+  ],
+  "ticket": {
+    "label": "Lachie's fare",
+    "wrong": "made up",
+    "why": "No walls",
+    "right": "from Fares"
+  },
+  "captions": [
+    "The ticket hut's code. Bridie wants the fares where only the ticket code can reach.",
+    "Everything sits in one heap, so the hut could make up a fare of its own.",
+    "You split it into packages: the fares and tickets in one, the hut in another.",
+    "Now the hut makes tickets and prints them, and every fare comes from one place.",
+    "Packages, import, public and javac -d. Part 3 is done: the program has its parts."
+  ]
+}
