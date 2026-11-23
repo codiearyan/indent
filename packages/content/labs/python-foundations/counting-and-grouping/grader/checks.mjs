@@ -152,7 +152,7 @@ export const checks = {
           after: (c) => ({
             '@dict': [...c.groups, ...(c.groups.some(([hill]) => hill === c.args[1]) ? [] : [[c.args[1], []]])]
           }),
-          hint: 'callouts_on adds the hill it was asked about to the dictionary, with an empty list, when the hill had no callouts. Asking a defaultdict for a key it does not have makes that key. Ask whether the hill is in it first, or use get.'
+          hint: 'callouts_on adds the hill it was asked about to the dictionary, with an empty list, when the hill had no callouts. Reading a key a defaultdict does not have makes that key, even when you only wanted to look.'
         }
       ],
       typed: 'callouts_on gives back the same number whatever Check gives it. Count the dates of the hill it is given.',

@@ -9,7 +9,7 @@ const MODULE = 'callouts.py'
 // Python, reads what the import printed and which functions of the workspace it called, then
 // calls a function of it. report.py is judged by running it, as python3 report.py does.
 
-/** Check's own reading functions, set in callouts first for Task 3, so it never depends on Task 1. */
+/** Check's own reading functions, set in callouts before and after its lines for Task 3, so it never depends on Task 1. */
 const READERS = `
 def parts_of(line):
     return [part.strip() for part in line.split(";")]

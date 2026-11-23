@@ -42,7 +42,8 @@
 # "@datetime"), and dictionaries such as a Counter or a defaultdict. A call may `watch` dotted
 # names ("datetime.date.today") and reports which it reached (`watched`), and may stand in the
 # clock (`clock`, seconds) for what reads time.time. With `module` (a name), the file is imported
-# as that module instead of being run by its tasks, `define` first set in it, and the import is
+# as that module instead of being run by its tasks, `define` set in it before its lines run and
+# again after them (so Check's own helpers stand whatever the file defines), and the import is
 # reported as part `upto`: what it printed, its error, and the functions of the workspace it
 # called (`calls`). `call` then calls a function of the module.
 import _thread
@@ -769,6 +770,8 @@ def import_module(spec, watchdog, task):
         'loaded': loaded
     })
     if spec.get('call') and not error and not stopped:
+        if spec.get('define'):
+            exec(compile(spec['define'], '<check>', 'exec'), module.__dict__)
         record = called(watchdog, task, spec['call'], module.__dict__)
         record['loaded'] = sorted(
             n for n, m in list(sys.modules.items())
