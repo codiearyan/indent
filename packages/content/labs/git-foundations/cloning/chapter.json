@@ -1,0 +1,82 @@
+{
+  "id": "cloning",
+  "title": "A copy from the server",
+  "files": ["NOTES.md", "shop/visit.html", "setup.mjs"],
+  "terminal": {
+    "description": "A shell in the top folder. Run the setup once to build the stand-in for the shop's server, then clone it from here and work inside shop.",
+    "suggestedCommand": "node setup.mjs"
+  },
+  "tasks": [
+    {
+      "id": "clone",
+      "title": "Clone the shop's repository into shop",
+      "file": "shop/visit.html",
+      "description": "Run `node setup.mjs` in the top folder. It builds `server/shop.git`, which stands in for the shop's server, and leaves `shop` empty: your laptop is new.\n\nFrom the top folder, copy the server's repository into `shop` with Git, so that `shop` has the whole history and knows where the server is.\n\nThe check expects `shop` to be a repository with a remote called `origin` that points at `server/shop.git`, and a branch `main` with the server's history.",
+      "nextSteps": [
+        "Run `node setup.mjs` and stay in the top folder.",
+        "Copy the server's repository with the command from the lesson, with `server/shop.git` as the address and `shop` as the folder.",
+        "Run `cd shop`, then `git remote -v`: `origin` points at the server.",
+        "Run `git status`: main is up to date with origin/main."
+      ],
+      "hints": [
+        "A copy of a repository with its whole history and a link back to where it came from is called a clone.",
+        "`git clone` takes the address of the repository to copy, then the folder to put the copy in. Run it in the top folder, not inside shop.",
+        "In the top folder, run `git clone server/shop.git shop`."
+      ],
+      "docs": [
+        { "title": "git clone", "url": "https://git-scm.com/docs/git-clone" },
+        {
+          "title": "Cloning an existing repository",
+          "url": "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository#_git_cloning"
+        },
+        { "title": "git remote", "url": "https://git-scm.com/docs/git-remote" }
+      ],
+      "videos": [{ "title": "What a clone makes", "url": "https://www.youtube.com/watch?v=zigbUJHBsL4" }],
+      "points": 10
+    },
+    {
+      "id": "branch",
+      "title": "Get Wilma's gift-vouchers branch onto your laptop",
+      "file": "shop/visit.html",
+      "description": "Wilma started gift vouchers on a branch of the server, `gift-vouchers`. Your copy knows it as `origin/gift-vouchers`, but `git branch` lists only `main`.\n\nGet a branch of your own called `gift-vouchers` that starts where the server's does and follows it.\n\nThe check expects a branch `gift-vouchers` in `shop` with Wilma's commit on it, following `origin/gift-vouchers`.",
+      "nextSteps": [
+        "In `shop`, run `git branch -a`: `remotes/origin/gift-vouchers` is the server's branch.",
+        "Use the lesson's way to get a branch of your own from a branch of the server.",
+        "Read what Git prints: it says which branch yours is set up to track.",
+        "Run `git status`: up to date with `origin/gift-vouchers`."
+      ],
+      "hints": [
+        "origin/gift-vouchers is Git's memory of the server's branch. You do not commit on it; you make a branch of your own from it.",
+        "Switching to a branch you do not have yet, when origin has one with that exact name, makes yours from it and has it follow the server's.",
+        "In shop, run `git switch gift-vouchers`."
+      ],
+      "docs": [
+        { "title": "Tracking branches", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches#_tracking_branches" },
+        { "title": "git switch --guess", "url": "https://git-scm.com/docs/git-switch#Documentation/git-switch.txt---guess" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix",
+      "title": "Commit the voucher fix on gift-vouchers, and keep it on your laptop",
+      "file": "shop/visit.html",
+      "description": "On `gift-vouchers`, the voucher line in `shop/visit.html` says the vouchers never expire. They last two years. Change the last sentence of that line to:\n\n```\nThey can be used for two years.\n```\n\nSave it and commit it on `gift-vouchers`. Change nothing else. Do not send it to the server: Wilma wants to read it first.\n\nThe check expects a commit on `gift-vouchers` after Wilma's whose voucher line says two years, no other change, and the server's `gift-vouchers` as it was.",
+      "nextSteps": [
+        "Make sure `git status` says `On branch gift-vouchers`.",
+        "Change the sentence in `shop/visit.html` and save.",
+        "Stage and commit as always. If Git says `Author identity unknown`, this copy has no name and email yet: set them as in the first issue.",
+        "Run `git status`: your branch is ahead of `origin/gift-vouchers` by 1 commit."
+      ],
+      "hints": [
+        "The voucher line is only on gift-vouchers. On main, visit.html does not have it.",
+        "A commit in your copy stays in your copy. Nothing reaches the server until you send it, so the usual edit, add and commit is all there is.",
+        "On gift-vouchers, change the sentence in the editor and save, then run `git add visit.html` and `git commit -m \"Say that gift vouchers last two years\"`."
+      ],
+      "docs": [
+        { "title": "Working with remotes", "url": "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes" },
+        { "title": "git status", "url": "https://git-scm.com/docs/git-status" }
+      ],
+      "points": 10
+    }
+  ]
+}

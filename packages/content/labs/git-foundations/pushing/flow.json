@@ -1,0 +1,51 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "wilma", "label": "Wilma", "kind": "story" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "vouchers", "label": "Vouchers branch", "kind": "data" },
+      { "id": "main", "label": "main", "kind": "data" },
+      { "id": "server", "label": "Shop's server", "kind": "data" },
+      { "id": "femi", "label": "Femi", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "wilma", "to": "you", "label": "two requests" },
+      { "from": "you", "to": "main", "label": "closing week" },
+      { "from": "vouchers", "to": "server", "label": "push" },
+      { "from": "main", "to": "server", "label": "push" },
+      { "from": "femi", "to": "server", "label": "new find" },
+      { "from": "server", "to": "main", "label": "pull" }
+    ],
+    "note": "Your branches go to the server, and a refused push is solved by a pull first."
+  },
+  "tasks": {
+    "vouchers": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "Wilma has read the voucher fix and says yes." },
+        { "active": ["vouchers"], "note": "Your vouchers branch has commits the server's does not." },
+        { "active": ["vouchers", "vouchers->server", "server"], "note": "A push sends them, and the server's branch moves forward." }
+      ]
+    },
+    "closed": {
+      "steps": [
+        { "active": ["wilma", "wilma->you", "you"], "note": "The shop closes for a week in August to count the stock." },
+        { "active": ["you", "you->main", "main"], "note": "The closing week is committed on main." },
+        { "active": ["main", "main->server", "server"], "note": "The push of main is refused." }
+      ]
+    },
+    "pull": {
+      "steps": [
+        { "active": ["femi", "femi->server", "server"], "note": "Femi sent a new find this morning, so the server has a commit your main does not." },
+        { "active": ["server", "server->main", "main"], "note": "A pull brings his commit into your main." },
+        { "active": ["main"], "note": "A merge commit joins his find and your closing week." }
+      ]
+    },
+    "push": {
+      "steps": [
+        { "active": ["main"], "note": "Your main now has everything the server has, and more." },
+        { "active": ["main", "main->server", "server"], "note": "This time the push moves the server's main forward." },
+        { "active": ["server"], "note": "The site has the closing week and Femi's find, and nobody's work was lost." }
+      ]
+    }
+  }
+}
