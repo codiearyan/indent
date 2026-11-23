@@ -1,104 +1,53 @@
 ---
-import type { ImageMetadata } from 'astro'
 import SectionHead from './SectionHead.astro'
-import Shot from './Shot.astro'
-import lesson from '../assets/screens/lesson.png'
-import workspace from '../assets/screens/workspace.png'
 
-interface Step {
-  title: string
-  body: string[]
-  src: ImageMetadata
-  crop: [number, number, number, number]
-  alt: string
-}
-
-const steps: Step[] = [
+const steps = [
   {
     title: 'Read the lesson',
-    body: [
-      'Each issue opens with a short lesson: who runs the company, what they need, and what you have to know to build it. The examples are real code you can run.',
-      'No time to read? The lesson reads itself aloud, part by part. Rather watch? Tasks come with short videos and a Resources tab of docs, all opened in the app.'
-    ],
-    src: lesson,
-    crop: [20, 205, 1080, 940],
-    alt: 'The lesson of the issue A server that answers, with a read aloud player above the heading and a short note from the owner of a kayak rental.'
+    body: 'Who runs the company, what they need and what you need to know. It reads itself aloud if you would rather listen.'
   },
   {
     title: 'Write the code',
-    body: [
-      'The files you need open in a real editor, in a folder on your own disk. Your work is saved as you type.',
-      'There is no fill in the blanks. You write the function the issue asks for, the way you would at work.',
-      'Prefer your own IDE? Open the issue there, and Indent docks beside it with the lesson, the tasks and the tutor.'
-    ],
-    src: workspace,
-    crop: [1110, 100, 1320, 940],
-    alt: 'The editor with src/respond.js open: a sendJson function that writes the status, the content type and the content length, then ends the response.'
+    body: 'The files open in a real editor, in a folder on your disk. You write the function the issue asks for.'
   },
   {
-    title: 'Run it in the terminal',
-    body: [
-      'A real shell sits under the editor, already in your workspace, with a command to try. Run your code and read what it prints.',
-      'Use git, node or anything else you have installed. It is your machine.'
-    ],
-    src: workspace,
-    crop: [1110, 1120, 1250, 660],
-    alt: 'The terminal after node try.js: GET /health answers 200, GET /boats answers 200 with the fleet, GET /canoes answers 404 and DELETE /boats answers 405.'
+    title: 'Run it',
+    body: 'A real shell sits under the editor, already in your workspace. Use node, git or anything you have installed.'
   },
   {
     title: 'Press Check',
-    body: [
-      'Hidden tests run against your code. Each task turns green, or tells you in plain words what to look at, next to what your code produced.',
-      'A task pays its points once, the first time it passes. The tests themselves never enter your workspace.'
-    ],
-    src: workspace,
-    crop: [130, 1030, 960, 620],
-    alt: 'The checks of the task Send JSON responses after pressing Check: four checks, each with a green mark and a link to what your code produced, above the Check button.'
+    body: 'Hidden tests run against your code. Each task turns green, or says in plain words what to look at.'
   }
 ]
 ---
 
-<section id="how" aria-labelledby="how-title" class="scroll-mt-8 border-t border-rule py-28 sm:py-40">
+<section id="loop" aria-labelledby="loop-title" class="scroll-mt-8 border-t border-rule py-28 sm:py-40">
   <div class="wrap">
     <SectionHead
-      id="how-title"
+      id="loop-title"
       label="/how it works"
       step={3}
       muted="One issue, four moves."
       bright="The same loop you use at work."
-    >
-      <p>
-        No quiz at the end. You read a little, write code, run it, and let the tests tell you where
-        you are.
-      </p>
-    </SectionHead>
+    />
 
-    <ol class="mt-20 space-y-24 sm:mt-28 sm:space-y-36">
+    <ol class="mt-16 grid overflow-hidden rounded-lg border border-border sm:grid-cols-2 lg:grid-cols-4">
       {
         steps.map((step, i) => (
-          <li class="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
-            <div class:list={['lg:col-span-5', i % 2 === 1 && 'lg:order-2']}>
-              <span class="block font-mono text-[56px] leading-none tracking-[-0.04em] text-muted-foreground/60 tabular-nums sm:text-[72px]">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <h3 class="headline mt-8 text-[30px] sm:text-[36px]">{step.title}</h3>
-              {step.body.map((paragraph) => (
-                <p class="mt-4 max-w-[440px] text-[17px] leading-[1.6] text-pretty text-muted-foreground">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            <div class:list={['lg:col-span-7', i % 2 === 1 && 'lg:order-1']}>
-              <div class="rounded-[18px] border border-border bg-card p-1.5">
-                <Shot
-                  src={step.src}
-                  crop={step.crop}
-                  alt={step.alt}
-                  maxWidth={700}
-                  class="rounded-[13px]"
-                />
-              </div>
-            </div>
+          <li
+            class:list={[
+              'flex flex-col p-6 sm:p-8',
+              i > 0 && 'border-t border-rule',
+              i % 2 === 1 && 'sm:border-l',
+              i === 1 && 'sm:border-t-0',
+              i === 2 && 'lg:border-t-0 lg:border-l'
+            ]}
+          >
+            <span class="font-mono text-[40px] leading-none tracking-[-0.04em] text-muted-foreground/60 tabular-nums">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3 class="headline mt-8 text-[24px]">{step.title}</h3>
+            <p class="mt-3 text-[15px] leading-[1.6] text-pretty text-muted-foreground">{step.body}</p>
           </li>
         ))
       }

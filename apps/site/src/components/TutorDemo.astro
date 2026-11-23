@@ -1,0 +1,215 @@
+---
+import Check from '@lucide/astro/icons/check'
+import X from '@lucide/astro/icons/x'
+import ProviderLogo from './ProviderLogo.astro'
+
+// The tutor's own shape of a diagram (a small top-down flowchart), drawn here by hand.
+const main = [
+  { y: 0, text: 'A request comes in' },
+  { y: 66, text: 'A route for this path?', ask: true },
+  { y: 132, text: 'Takes this method?', ask: true },
+  { y: 198, text: 'Answer it' }
+]
+const side = [
+  { y: 66, text: '404, not here' },
+  { y: 132, text: '405, not this way' }
+]
+const choices = [
+  { text: '200 with an empty list' },
+  { text: '404 not_found', correct: true },
+  { text: '405 method_not_allowed' }
+]
+---
+
+<figure class="tutor-demo rounded-lg border border-border bg-card" data-tutor-demo>
+  <div class="flex h-12 items-center justify-between gap-3 border-b border-rule px-5">
+    <p class="text-sm font-semibold">Tutor</p>
+    <span class="inline-flex h-7 items-center gap-2 rounded-sm border border-border px-2 text-[12px]">
+      <ProviderLogo id="claude-code" class="size-3.5" />
+      Claude Code
+    </span>
+  </div>
+
+  <div class="flex min-h-[560px] flex-col gap-4 p-4 sm:min-h-[600px] sm:p-5">
+    <div class="beat ml-auto max-w-[88%] rounded-lg bg-accent px-4 py-3" data-at="0">
+      <span class="inline-flex items-center gap-1.5 rounded-sm border border-border px-1.5 py-0.5 text-[12px] text-muted-foreground">
+        <X class="size-3 text-destructive" stroke-width={2} aria-hidden="true" />
+        A wrong method answers 405
+      </span>
+      <p class="mt-2 text-[14px]">Why does DELETE /boats answer 404?</p>
+    </div>
+
+    <p class="beat max-w-[92%] text-[14px] leading-[1.6]" data-at="1100">
+      Your server asks one question about each request, and it needs to ask two. Here is the order:
+    </p>
+
+    <svg
+      viewBox="-1 -1 362 236"
+      class="w-full max-w-[420px] font-sans"
+      role="img"
+      aria-label="A flowchart. A request comes in. Is there a route for this path? If not, 404, not here. If there is, does it take this method? If not, 405, not this way. If it does, answer it."
+    >
+      <defs>
+        <marker id="tutor-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" class="fill-muted-foreground"></path>
+        </marker>
+      </defs>
+      {
+        main.map((node, i) => (
+          <g class="beat" data-at={String(2200 + i * 900)}>
+            <rect x="10" y={node.y} width="170" height="34" rx="6" class:list={['stroke-border', node.ask ? 'fill-accent' : 'fill-card']} />
+            <text x="95" y={node.y + 21.5} text-anchor="middle" class="fill-foreground text-[12px]">{node.text}</text>
+          </g>
+        ))
+      }
+      {
+        side.map((node, i) => (
+          <g class="beat" data-at={String(3550 + i * 900)}>
+            <path d={`M180 ${node.y + 17} H218`} class="edge stroke-muted-foreground" marker-end="url(#tutor-arrow)" pathLength="1" />
+            <text x="199" y={node.y + 11} text-anchor="middle" class="fill-muted-foreground text-[10px]">no</text>
+            <rect x="220" y={node.y} width="140" height="34" rx="6" class="fill-card stroke-border" stroke-dasharray="3 3" />
+            <text x="290" y={node.y + 21.5} text-anchor="middle" class="fill-muted-foreground font-mono text-[11px]">{node.text}</text>
+          </g>
+        ))
+      }
+      {
+        main.slice(1).map((node, i) => (
+          <g class="beat" data-at={String(2200 + (i + 1) * 900)}>
+            <path d={`M95 ${node.y - 32} V${node.y - 2}`} class="edge stroke-muted-foreground" marker-end="url(#tutor-arrow)" pathLength="1" />
+            {i > 0 && <text x="103" y={node.y - 13} class="fill-muted-foreground text-[10px]">yes</text>}
+          </g>
+        ))
+      }
+    </svg>
+
+    <div class="beat rounded-lg border border-border" data-at="6200">
+      <p class="border-b border-rule px-4 py-2.5 text-[12px] text-muted-foreground">Check yourself</p>
+      <div class="px-4 py-3">
+        <p class="text-[14px]">GET /canoes, and the fleet has no canoes. What comes back?</p>
+        <ul class="mt-3 flex flex-col gap-1.5">
+          {
+            choices.map((choice) => (
+              <li
+                class:list={[
+                  'flex h-9 items-center gap-2 rounded-md border border-input px-3 font-mono text-[12px]',
+                  choice.correct && 'picked'
+                ]}
+              >
+                {choice.text}
+                {choice.correct && (
+                  <Check class="mark ml-auto size-4 text-success" stroke-width={2} aria-label="Right" />
+                )}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="beat mt-3 text-[13px] leading-[1.5] text-muted-foreground" data-at="8200">
+          Nothing lives at that path, so the first question already says no.
+        </p>
+      </div>
+    </div>
+  </div>
+  <figcaption class="sr-only">
+    The tutor answers a failed check with a flowchart and a question to check yourself, without writing
+    the code.
+  </figcaption>
+</figure>
+
+<style>
+  .playing .beat {
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity var(--motion-enter) var(--ease-out),
+      transform var(--motion-enter) var(--ease-out);
+  }
+  .playing .beat.on {
+    opacity: 1;
+    transform: none;
+  }
+  .edge {
+    fill: none;
+    stroke-width: 1.25;
+  }
+  .playing .edge {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 420ms var(--ease-in-out);
+  }
+  .on > .edge {
+    stroke-dashoffset: 0;
+  }
+  rect {
+    stroke-width: 1;
+  }
+  .picked {
+    transition:
+      background-color var(--motion-state) var(--ease-out),
+      border-color var(--motion-state) var(--ease-out);
+  }
+  .picked .mark {
+    opacity: 0;
+    transition: opacity var(--motion-state) var(--ease-out);
+  }
+  .tutor-demo:not(.playing) .picked,
+  .tutor-demo.answered .picked {
+    border-color: color-mix(in oklch, var(--success) 50%, transparent);
+    background-color: color-mix(in oklch, var(--success) 10%, transparent);
+  }
+  .tutor-demo:not(.playing) .picked .mark,
+  .tutor-demo.answered .picked .mark {
+    opacity: 1;
+  }
+  .tutor-demo.resting .beat {
+    transition-duration: var(--motion-exit);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .beat {
+      transform: none;
+    }
+    .edge {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Plays the answer in beats while the card is on screen, rests, then starts again.
+  const LOOP = 13000
+  const ANSWERED = 7600
+
+  for (const demo of document.querySelectorAll<HTMLElement>('[data-tutor-demo]')) {
+    const beats = [...demo.querySelectorAll<Element>('[data-at]')]
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+    let timers: number[] = []
+
+    const stop = (): void => {
+      timers.forEach(clearTimeout)
+      timers = []
+    }
+    const play = (): void => {
+      stop()
+      demo.classList.remove('resting', 'answered')
+      beats.forEach((beat) => beat.classList.remove('on'))
+      for (const beat of beats) {
+        timers.push(window.setTimeout(() => beat.classList.add('on'), Number(beat.getAttribute('data-at'))))
+      }
+      timers.push(window.setTimeout(() => demo.classList.add('answered'), ANSWERED))
+      timers.push(
+        window.setTimeout(() => {
+          demo.classList.add('resting')
+          beats.forEach((beat) => beat.classList.remove('on'))
+          demo.classList.remove('answered')
+        }, LOOP - 600)
+      )
+      timers.push(window.setTimeout(play, LOOP))
+    }
+
+    // Without the script or with reduced motion, the whole answer simply shows.
+    if (reduced) continue
+    demo.classList.add('playing')
+    new IntersectionObserver(([entry]) => (entry.isIntersecting ? play() : stop()), {
+      threshold: 0.35
+    }).observe(demo)
+  }
+</script>

@@ -3,13 +3,10 @@ import type { Repo } from '../lib/content'
 // Patterns is hidden for now; uncomment it here, below, in Nav and in Closing to bring it back.
 // import { listPatterns } from '../lib/content'
 import { listRoadmaps } from '../lib/content'
-import BuildStrip from './BuildStrip.astro'
 import SectionHead from './SectionHead.astro'
 import Shot from './Shot.astro'
 // import pattern from '../assets/screens/pattern.png'
 import activity from '../assets/screens/activity.png'
-import Bell from '@lucide/astro/icons/bell'
-import CalendarPlus from '@lucide/astro/icons/calendar-plus'
 import {
   DAILY_GOALS,
   DAYS_PER_FREEZE,
@@ -27,8 +24,6 @@ const { repos } = Astro.props
 //   group,
 //   items: patterns.filter((p) => p.group === group)
 // }))
-const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-const practiceDays = new Set(['Mon', 'Tue', 'Thu'])
 const keepUp = [
   {
     title: 'A daily goal',
@@ -44,20 +39,11 @@ const keepUp = [
   }
 ]
 const byId = new Map(repos.map((repo) => [repo.id, repo]))
-const roadmaps = listRoadmaps().map((roadmap) => {
-  const inOrder = roadmap.stages.flatMap((stage) => stage.labs).map((id) => byId.get(id))
-  const members = inOrder.filter((repo): repo is Repo => repo !== undefined)
-  return {
-    ...roadmap,
-    stages: roadmap.stages.map((stage) => ({
-      title: stage.title,
-      soon: stage.soon ?? [],
-      repos: stage.labs.map((id) => byId.get(id)).filter((repo): repo is Repo => repo !== undefined)
-    })),
-    issues: members.reduce((n, repo) => n + repo.issues.length, 0),
-    tasks: members.reduce((n, repo) => n + repo.tasks, 0)
-  }
-})
+const roadmaps = listRoadmaps().map((roadmap) => ({
+  ...roadmap,
+  stages: roadmap.stages.length,
+  repos: roadmap.stages.flatMap((stage) => stage.labs).filter((id) => byId.has(id)).length
+}))
 ---
 
 {/*
@@ -130,48 +116,22 @@ const roadmaps = listRoadmaps().map((roadmap) => {
     <SectionHead
       id="roadmaps-title"
       label="/roadmaps"
-      step={6}
+      step={4}
       muted="Not sure where to start?"
-      bright="A roadmap puts the repos in order."
-    >
-      <p>
-        Each roadmap is a set of repos toward one goal, in stages that build on each other. Follow
-        one from the top, or skip what you already know.
-      </p>
-    </SectionHead>
+      bright="Pick a roadmap."
+    />
 
-    <ul
-      class="mt-16 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-2 md:[&>*:last-child:nth-child(odd)]:col-span-2"
-    >
+    <ul class="mt-16 rounded-lg border border-border">
       {
         roadmaps.map((roadmap) => (
-          <li class="flex flex-col bg-background p-6 sm:p-8">
-            <h3 class="text-[20px] font-medium tracking-[-0.015em]">{roadmap.title}</h3>
-            <p class="mt-2 text-[15px] leading-[1.55] text-muted-foreground">{roadmap.tagline}</p>
-            <ol class="mt-8 mb-8">
-              {roadmap.stages.map((stage, i) => (
-                <li class="grid grid-cols-[2rem_1fr] border-t border-rule py-3.5">
-                  <span class="font-mono text-[12px] leading-6 text-muted-foreground">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <div>
-                    <p class="text-[14px] leading-6 font-medium">{stage.title}</p>
-                    {stage.repos.map((repo) => (
-                      <p class="text-[14px] leading-6 text-muted-foreground">{repo.title}</p>
-                    ))}
-                    {stage.soon.map((title) => (
-                      <p class="text-[14px] leading-6 text-muted-foreground">{title}, coming soon</p>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div class="mt-auto border-t border-rule pt-5">
-              <BuildStrip groups={roadmap.stages.map((stage) => stage.repos.length)} size="md" />
-              <p class="mt-3 font-mono text-[12px] text-muted-foreground tabular-nums">
-                {roadmap.stages.length} stages, {roadmap.issues} issues, {roadmap.tasks} tasks
-              </p>
+          <li class="grid gap-3 border-b border-rule px-6 py-5 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-8 sm:px-8">
+            <div>
+              <h3 class="text-[17px] font-medium tracking-[-0.01em]">{roadmap.title}</h3>
+              <p class="mt-1 text-[14px] leading-[1.5] text-muted-foreground">{roadmap.tagline}</p>
             </div>
+            <p class="font-mono text-[12px] text-muted-foreground tabular-nums sm:text-right">
+              {roadmap.stages} stages, {roadmap.repos} repos
+            </p>
           </li>
         ))
       }
@@ -188,15 +148,10 @@ const roadmaps = listRoadmaps().map((roadmap) => {
     <SectionHead
       id="activity-title"
       label="/activity"
-      step={7}
+      step={5}
       muted="Progress you can see."
       bright="Points, levels and a streak, kept honest by the tests."
-    >
-      <p>
-        A task pays its points once, the first time it passes. Every day you meet your goal fills a
-        square on the board and keeps your streak going.
-      </p>
-    </SectionHead>
+    />
 
     <div class="mt-16 rounded-[18px] border border-border bg-card p-1.5">
       <Shot
@@ -215,68 +170,15 @@ const roadmaps = listRoadmaps().map((roadmap) => {
       />
     </div>
 
-    <div class="mt-6 grid gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-2">
-      <article class="flex flex-col bg-background p-6 sm:p-10">
-        <h3 class="text-[22px] font-medium tracking-[-0.015em]">A study schedule that reminds you</h3>
-        <p class="mt-3 max-w-[460px] text-[16px] leading-[1.6] text-muted-foreground">
-          Pick your days and a time. On those days a reminder opens your last issue, skips a day you
-          already practiced and snoozes for an hour. Add it to your calendar too, so it reminds you
-          when Indent is closed.
-        </p>
-        <div class="mt-10 rounded-lg border border-border bg-card">
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-5 py-4">
-            <p class="text-[14px]">Practice days</p>
-            <ul class="flex gap-1" aria-label="Monday, Tuesday and Thursday are picked">
-              {
-                days.map((day) => (
-                  <li
-                    class:list={[
-                      'rounded-sm px-1.5 py-0.5 font-mono text-[12px]',
-                      practiceDays.has(day) ? 'bg-accent text-foreground' : 'text-muted-foreground'
-                    ]}
-                  >
-                    {day}
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-          <div class="flex h-14 items-center justify-between gap-3 border-b border-rule px-5">
-            <p class="text-[14px]">Time</p>
-            <p class="font-mono text-[13px] tabular-nums">19:30, 45 min</p>
-          </div>
-          <div class="flex h-14 items-center gap-3 border-b border-rule px-5">
-            <Bell class="size-4 text-muted-foreground" stroke-width={1.5} aria-hidden="true" />
-            <p class="text-[14px]">Notifications</p>
-            <span
-              class="relative ml-auto h-5 w-9 rounded-full bg-primary"
-              role="img"
-              aria-label="Switch, on"
-            >
-              <span class="absolute top-0.5 right-0.5 size-4 rounded-full bg-primary-foreground"></span>
-            </span>
-          </div>
-          <div class="flex h-14 items-center gap-3 px-5">
-            <CalendarPlus class="size-4 text-muted-foreground" stroke-width={1.5} aria-hidden="true" />
-            <p class="text-[14px]">Add to calendar</p>
-            <p class="ml-auto text-[13px] text-muted-foreground">A repeating event</p>
-          </div>
-        </div>
-        <p class="mt-4 text-[13px] text-muted-foreground">
-          Indent can wait in the tray or menu bar and open at login. Home shows your next session.
-        </p>
-      </article>
-
-      <ul class="flex flex-col bg-background">
-        {
-          keepUp.map((item) => (
-            <li class="flex flex-1 flex-col justify-center border-b border-rule p-6 last:border-b-0 sm:p-10">
-              <h3 class="text-[22px] font-medium tracking-[-0.015em]">{item.title}</h3>
-              <p class="mt-3 max-w-[460px] text-[16px] leading-[1.6] text-muted-foreground">{item.body}</p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+    <ul class="mt-6 grid gap-px overflow-hidden rounded-lg border border-border bg-border md:grid-cols-3">
+      {
+        keepUp.map((item) => (
+          <li class="bg-background p-6 sm:p-8">
+            <h3 class="text-sm font-semibold">{item.title}</h3>
+            <p class="mt-2 text-[15px] leading-[1.6] text-muted-foreground">{item.body}</p>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
