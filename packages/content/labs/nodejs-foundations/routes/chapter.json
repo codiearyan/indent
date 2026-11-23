@@ -1,0 +1,110 @@
+{
+  "id": "routes",
+  "title": "Routes by hand",
+  "files": [
+    "server.js",
+    "requests.txt",
+    "plots.txt",
+    "ask.js"
+  ],
+  "terminal": {
+    "description": "A terminal in your workspace. `node ask.js server.js` starts your server, sends it each request in `requests.txt`, shows every answer and what the server printed, then stops it.",
+    "suggestedCommand": "node ask.js server.js"
+  },
+  "tasks": [
+    {
+      "id": "routes",
+      "title": "Answer each address in its own way",
+      "file": "server.js",
+      "description": "`server.js` is the server from the last issue: for now every request gets the free plots. Change it so that the address decides the answer. All three are plain text with status 200:\n\n- `GET /` answers `Marrowfield Allotment Society. Try /plots or /free.`\n- `GET /plots` answers every plot of `plots.txt`, one a line, with its holder or `free`:\n\n```\nA1: Maud Pask\nA2: Lionel Barnes\nA3: free\n```\n\n- `GET /free` answers the free plots, as before.\n\nCheck starts your server with a `plots.txt` of its own and sends a request to each address.",
+      "nextSteps": [
+        "Run `node ask.js server.js` and look at what each request in `requests.txt` gets now.",
+        "In the function that answers, look at the path of the request, `req.url`.",
+        "Give each of the three paths its own answer, with an `if` for each.",
+        "For `/plots`, write one line for each plot, with `free` where the holder is empty."
+      ],
+      "hints": [
+        "The function given to `createServer` runs for every request, whatever its address. It is your code that tells the addresses apart.",
+        "`req.url` is the address without the computer's name: `/plots` for `http://localhost:3000/plots`. Compare it, and `return` after each answer so only one is sent.",
+        "`if (path === '/plots') { res.end(plots.map((p) => `${p.plot}: ${p.holder || 'free'}\\n`).join('')); return }`."
+      ],
+      "docs": [
+        {
+          "title": "message.url",
+          "url": "https://nodejs.org/api/http.html#messageurl"
+        },
+        {
+          "title": "Array.prototype.map()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "not-found",
+      "title": "Say when an address or a method is wrong",
+      "file": "server.js",
+      "description": "Change `server.js` so that a wrong request gets a status that says what is wrong, still as plain text:\n\n- An address that is not one of the three, such as `GET /gate` or `GET /plots/A1`, gets status `404` and the body `No page at /gate.`, with the path asked for. That holds whatever the method.\n- One of the three addresses with a method other than `GET`, such as `POST /plots`, gets status `405`, the header `Allow: GET`, and the body `Only GET works at /plots.`\n\nCheck sends requests to addresses that are not there and to the three with other methods, then a `GET /plots`.",
+      "nextSteps": [
+        "Add `GET /gate` and `DELETE /free` to `requests.txt`, and see what they get now.",
+        "First decide whether the path is one of the three; if not, answer 404.",
+        "Then look at `req.method`; if it is not `GET`, answer 405 with the `Allow` header.",
+        "Only then answer the three addresses as in task 1."
+      ],
+      "hints": [
+        "A status of 200 tells every program that all went well. A page that is not there, answered with 200, looks like a page whose text is \"No page\".",
+        "`req.method` is the method in capitals, such as `'GET'` or `'POST'`. 404 means the address is not there at all; 405 means it is there, but not for this method.",
+        "`if (req.method !== 'GET') { res.statusCode = 405; res.setHeader('Allow', 'GET'); res.end(`Only GET works at ${path}.`); return }`."
+      ],
+      "docs": [
+        {
+          "title": "message.method",
+          "url": "https://nodejs.org/api/http.html#messagemethod"
+        },
+        {
+          "title": "405 Method Not Allowed",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/405"
+        },
+        {
+          "title": "Allow",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Allow"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "query",
+      "title": "Read the row from the query",
+      "file": "server.js",
+      "description": "People by the tap want only the free plots of their row. Change `server.js` so that `GET /free?row=B` answers:\n\n```\nFree plots in row B: B2.\n```\n\nor `No free plots in row D.` when that row has none. The row is a plot's letter, typed in either case: `row=b` is row B too. With no `row`, or an empty one, `/free` answers every free plot as before.\n\nA query never changes which address it is: `/plots?sort=holder` is still `/plots`, and `/?from=noticeboard` is still `/`. Read the query with the URL tools built into Node, so that a query with several names, in any order, works too.\n\nCheck sends requests with queries of its own, with other names around `row` and with the row written in code, the way addresses write some letters.",
+      "nextSteps": [
+        "Add `GET /free?row=B` to `requests.txt` and run `node ask.js server.js`: what path does your code see now?",
+        "Make a `URL` from `req.url`, and use its `pathname` wherever you compared the path.",
+        "Read `row` from its `searchParams`, and keep only the free plots that start with that letter.",
+        "Say so when the row has none."
+      ],
+      "hints": [
+        "`req.url` holds the query too: `/free?row=B`. Compared as it is, it matches none of your paths.",
+        "`new URL(req.url, 'http://localhost')` needs a full address, so give it any computer's name as the second part. Its `pathname` is the path alone, and `searchParams.get('row')` the row, or `null`.",
+        "`const url = new URL(req.url, 'http://localhost')`, then `const row = (url.searchParams.get('row') ?? '').toUpperCase()`."
+      ],
+      "docs": [
+        {
+          "title": "URL",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL"
+        },
+        {
+          "title": "URLSearchParams.get()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/get"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Every part of a web address",
+          "url": "https://www.youtube.com/watch?v=oRMhGI0jnhQ"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
