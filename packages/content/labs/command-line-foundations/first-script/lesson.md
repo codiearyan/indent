@@ -38,7 +38,7 @@ The first line of a script can name the program that reads the rest:
 echo "Shop closed."
 ```
 
-`#!` must be the very first two characters of the file, with no space and no empty line before them. `/bin/sh` is on every Mac and every Linux. On Linux, `sh` can be a smaller shell than bash, so keep to the commands from this repo. Other shells, such as zsh, are not on every computer.
+`echo` prints the words after it, which is how a script says something. `#!` must be the very first two characters of the file, with no space and no empty line before them. `/bin/sh` is on every Mac and every Linux. On Linux, `sh` can be a smaller shell than bash, so keep to the commands from this repo. Other shells, such as zsh, are not on every computer.
 
 To start the script by its name, let yourself run it, then give its path:
 
@@ -60,7 +60,7 @@ grep -c "$1" guests.txt
 
 `./find.sh Ana` counts the lines with `Ana`. Keep `$1` in double quotes, so a name with a space stays one name; without them, `week one.csv` becomes `week` and `one.csv`. A path given as an argument is read from the folder you are in, the same as for any command. From inside `notes`, the same script is `../find.sh`.
 
-`<` hands a file to a command as what it reads: `wc -l < guests.txt` prints the number alone, without the file's name after it.
+`<` hands a file to a command as what it reads: `wc -l < guests.txt` prints the number alone, without the file's name after it. A Mac puts spaces in front of the number; Linux usually does not.
 
 ## Exit status
 

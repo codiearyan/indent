@@ -26,7 +26,7 @@ echo $GUEST
 Ana Lind
 ```
 
-A `$` in front of a name puts in its value, anywhere on a line. Names are usually capitals, and `guest` is another name than `GUEST`. Quotes keep a value with a space together: without them, `GUEST=Ana Lind` stops at the space and says `command not found: Lind`. With spaces around the `=`, the shell takes the name for a command: zsh says `command not found: GUEST`, bash says `GUEST: command not found`. Inside single quotes a `$` is a plain sign, so `echo '$GUEST'` prints `$GUEST`.
+A `$` in front of a name puts in its value, anywhere on a line. Names are usually capitals, and `guest` is another name than `GUEST`. Quotes keep a value with a space together: without them, `GUEST=Ana Lind` stops at the space and tries to run `Lind`: zsh says `command not found: Lind`, bash says `Lind: command not found`. With spaces around the `=`, the shell takes the name for a command: zsh says `command not found: GUEST`, bash says `GUEST: command not found`. Inside single quotes a `$` is a plain sign, so `echo '$GUEST'` prints `$GUEST`.
 
 The shell sets some variables for you. `HOME` is your home folder, the one `~` stands for. `USER` is your name, and `SHELL` the shell your account starts: often `/bin/zsh` on a Mac and `/bin/bash` on Linux.
 
@@ -68,7 +68,7 @@ When two folders hold the same name, the one in front wins. `PATH=/home/sam/tool
 
 ## Making a setting last
 
-All of these live only as long as the shell. A new shell starts from its startup file, which it reads before the first prompt. Yours is in your home folder: `~/.zshrc` for zsh, `~/.bashrc` for bash. It is yours to change when you are ready; in this repo you change a stand-in, so nothing outside the issue changes.
+All of these live only as long as the shell. A new shell starts from its startup file, which it reads before the first prompt. Yours is in your home folder: `~/.zshrc` for zsh, `~/.bashrc` for bash on Linux (bash on a Mac reads `~/.bash_profile` in a new window). It is yours to change when you are ready; in this repo you change a stand-in, so nothing outside the issue changes.
 
 `shop-settings.sh` plays that part. The dot command loads it into the shell you are in:
 

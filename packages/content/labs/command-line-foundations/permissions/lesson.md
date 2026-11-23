@@ -51,7 +51,7 @@ You will also meet numbers, such as `chmod 644 leek.txt`. Each digit is one grou
 
 ## Read-only, and changeable again
 
-A file is read-only when nobody has `w`. `chmod a-w leek.txt` takes `w` from all three and leaves `r` alone. After that, sending output into the file fails:
+A file is read-only when nobody has `w`. `chmod a-w leek.txt` takes `w` from all three and leaves `r` alone. After that, sending output into the file fails. `echo` prints the words after it, and `>>` sends them to the end of the file:
 
 ```
 echo "two leeks" >> leek.txt
@@ -62,10 +62,10 @@ Bash says `bash: leek.txt: Permission denied`. The editor cannot save the file e
 
 Locking a folder is not locking its files. A folder without `w` stops names from being added or removed, but each file inside can still be changed while it has its own `w`.
 
-Never take `r` away from yourself. A file that nobody may read cannot be shown in the editor, opened by the app or read by Check. If it happens, `chmod u+r` gives it back.
+Never take `r` away from yourself. A file that nobody may read cannot be shown in the editor, opened by the app or read by Check. If it happens, `chmod u+r` and the file's name give it back. A folder needs its owner's `r` and `x` the same way, or nothing in it can be reached: `chmod u+rwx` and the folder's name give them back.
 
 ## Your work in this issue
 
 The terminal starts in the top folder. Run `ls -l` before and after each `chmod`, and read the letters each time. For the new price, unlock the list, change the line in the editor or from the terminal, and lock it again.
 
-If a file goes wrong, Reset puts back every file this issue started with, as it was. On Linux, Reset cannot rewrite a file that is locked: give it `w` back first.
+If a file goes wrong, Reset puts back every file this issue started with, as it was. Reset cannot rewrite a locked file in a locked folder, nor on Linux a locked file at all: give them `w` back first with `chmod u+w`.

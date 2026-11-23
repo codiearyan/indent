@@ -298,7 +298,7 @@ export function topFile(t, name, file) {
   const path = join(ws, file)
   if (!whoHas(modeOf(path), 'r').includes('the owner')) {
     return fail(
-      `Nobody may read ${file} now, you included: its owner has no r. Give yourself read permission on it again.`,
+      `Nobody may read ${file} now, you included: its owner has no r. chmod u+r ${file} gives it back.`,
       modeLine(ws, file)
     )
   }
@@ -393,7 +393,7 @@ export async function withSandbox(t, name, fn) {
       : 'a file in the top folder'
     const message =
       error?.code === 'EACCES'
-        ? `Check copies the top folder before it runs anything, and it could not read ${where}: nobody, you included, may read it now. Give yourself read permission on it again.`
+        ? `Check copies the top folder before it runs anything, and it could not read ${where}. A file needs its owner's r, and a folder its owner's r and x: chmod u+r gives a file its r back, and chmod u+rwx a folder.`
         : `Check could not copy the top folder: ${error?.message ?? error}`
     return [check(name, false, message, '')]
   }

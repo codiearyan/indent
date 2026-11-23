@@ -23,7 +23,7 @@ const LISTS = ['prices-2023.csv', 'prices-2024.csv', 'prices-2025.csv']
 const OLD_FOX = 'fox poster A3,18.00'
 const NEW_FOX = 'fox poster A3,22.00'
 const RESET =
-  'Reset puts the starter files back as they were. A file that is locked may need its w back before Reset can rewrite it.'
+  'Reset puts the starter files back as they were. A locked file, or a file in a locked folder, may need its w back first, with chmod u+w.'
 const VERB = { r: 'read', w: 'change', x: 'run' }
 
 const same = (a, b) => a.length === b.length && a.every((line, i) => line === b[i])
@@ -37,7 +37,7 @@ function ownerLost(rel, mode, letters) {
   const lost = [...letters].filter((l) => !ownerHas(mode, l))
   if (!lost.length) return null
   if (lost.includes('r')) {
-    return `Nobody may read ${rel} now, you included: its owner has no r. Give yourself read permission on it again.`
+    return `Nobody may read ${rel} now, you included: its owner has no r. chmod u+r ${rel} gives it back.`
   }
   return `You may no longer change ${rel} yourself: its owner has no w.`
 }
@@ -50,7 +50,7 @@ const changedElsewhere = (t, skip, test) =>
 
 /** Who still has w on a file that should be locked, in a sentence. */
 const stillChange = (rel, writers) =>
-  `${cap(listWords(writers))} can still change ${rel}: ${writers.length === 1 ? 'it' : 'each'} still ${has(writers)} w.`
+  `${cap(listWords(writers))} can still change ${rel}: ${writers.length === 1 ? 'it' : 'each'} still has w.`
 
 export const checks = {
   async lock(t) {
@@ -74,7 +74,7 @@ export const checks = {
     const unread = ['the owner', 'the group', 'others'].filter((w) => !whoHas(mode, 'r').includes(w))
     if (unread.length) {
       return fail(
-        `Nobody can change prices.csv now, but ${listWords(unread)} may no longer read it either. Idris wants everyone to read it: locking takes away w and leaves r alone.`
+        `Nobody can change prices.csv now, but ${listWords(unread)} cannot read it. Idris wants everyone to read it: give ${unread.length === 1 && unread[0] !== 'others' ? 'it' : 'them'} r as well.`
       )
     }
     const runners = whoHas(mode, 'x')
@@ -88,6 +88,18 @@ export const checks = {
 
   async private(t) {
     const name = 'Only you may read and change bank-details.txt'
+    const folderMode = modeOf(at(t, 'accounts'))
+    const shut = folderMode === null ? [] : ['r', 'x'].filter((l) => !ownerHas(folderMode, l))
+    if (shut.length) {
+      return [
+        check(
+          name,
+          false,
+          `You may no longer ${shut.includes('x') ? 'open' : 'list'} the accounts folder: its owner has no ${listWords(shut)}, so nothing in it can be reached. chmod u+rwx accounts gives it back. This task changes the file in the folder, not the folder.`,
+          modeLine(t.workspace, 'accounts')
+        )
+      ]
+    }
     if (!isFile(t.workspace, ...BANK.split('/'))) {
       return [check(name, false, `${BANK} is gone. ${RESET}`, '')]
     }
@@ -108,9 +120,12 @@ export const checks = {
               .map(([who, letters], i) => `${cap(who)} may still ${verbs(letters)} ${i ? 'it' : BANK}.`)
               .join(' ')
       const other = changedElsewhere(t, [BANK, PRICES, 'archive'], (m) => !whoHas(m, 'r').includes('others'))
+      const folderClosed = folderMode !== null && !whoHas(folderMode, 'r').includes('others')
       const note = other.length
         ? ` ${other[0]} is private now, but this task is about ${BANK}.`
-        : ''
+        : folderClosed
+          ? ` The accounts folder itself is closed now, but this task is about the file in it.`
+          : ''
       return fail(`${said} Nobody but you may read, change or run it.${note}`)
     }
     return [check(name, true, '', output)]
@@ -129,7 +144,7 @@ export const checks = {
     const shut = ['r', 'x'].filter((l) => !ownerHas(dirMode, l))
     if (shut.length) {
       return fail(
-        `You may no longer ${shut.includes('x') ? 'open' : 'list'} the archive folder: its owner has no ${listWords(shut)}. Locking the files inside leaves the folder's own r and x alone. Give them back to the owner.`
+        `You may no longer ${shut.includes('x') ? 'open' : 'list'} the archive folder: its owner has no ${listWords(shut)}. chmod u+rwx archive gives them back. Locking the files inside leaves the folder's own r and x alone.`
       )
     }
     const gone = rels.filter((rel) => !isFile(ws, ...rel.split('/')))
@@ -138,7 +153,7 @@ export const checks = {
     const unreadable = rels.find((rel, i) => !ownerHas(modes[i], 'r'))
     if (unreadable) {
       return fail(
-        `Nobody may read ${unreadable} now, you included: its owner has no r. Locking takes away w and leaves r alone.`
+        `Nobody may read ${unreadable} now, you included: its owner has no r. chmod u+r ${unreadable} gives it back. Locking takes away w and leaves r alone.`
       )
     }
     const open = rels.filter((rel, i) => whoHas(modes[i], 'w').length)
@@ -162,7 +177,7 @@ export const checks = {
     const unread = rels.find((rel, i) => whoHas(modes[i], 'r').length < 3)
     if (unread) {
       return fail(
-        `Nobody can change the price lists now, but not everyone may read ${unread} any more. Lock them the way prices.csv is locked: everyone may still read them.`
+        `Nobody can change the price lists now, but not everyone may read ${unread}. Lock them the way prices.csv is locked: everyone may still read them, so give them r as well.`
       )
     }
     const runnable = rels.find((rel, i) => whoHas(modes[i], 'x').length)
@@ -222,7 +237,7 @@ export const checks = {
     }
     if (missing.length || extra.length) {
       return fail(
-        `The fox poster's price is right, but ${missing.length || extra.length} other line${(missing.length || extra.length) === 1 ? ' is' : 's are'} not as they were. Only the fox poster's line changes. ${RESET}`
+        `The fox poster's price is right, but ${missing.length || extra.length} other line${(missing.length || extra.length) === 1 ? ' is not as it was' : 's are not as they were'}. Only the fox poster's line changes. ${RESET}`
       )
     }
     return fail('Every line is there, but not in the order they had. Only the fox poster\'s line changes.')

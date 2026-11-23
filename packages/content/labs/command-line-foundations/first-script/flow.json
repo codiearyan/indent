@@ -22,11 +22,11 @@
       "steps": [
         {
           "active": ["idris", "idris->evening", "evening"],
-          "note": "Idris's four evening lines go into one file, in his order."
+          "note": "Idris's four evening lines go into one file, in the same order."
         },
         {
           "active": ["orders", "orders->evening", "evening"],
-          "note": "The script reads today's orders, as the lines did when he typed them."
+          "note": "The script reads today's orders, as the lines did when Idris typed them."
         },
         {
           "active": ["evening", "evening->terminal", "terminal"],

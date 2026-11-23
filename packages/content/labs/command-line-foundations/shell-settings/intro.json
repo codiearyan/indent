@@ -25,6 +25,6 @@
     "The terminal forgets every setting when it closes, and Sol's tool cannot be found.",
     "You set variables, pass them on and keep them in a settings file, in four small tasks.",
     "Loaded in any new shell, the settings name the sender and find Sol's tool.",
-    "Idris opens a terminal, and the shop's settings are there every morning."
+    "Idris loads one file in a new terminal, and the shop's settings are all back."
   ]
 }

@@ -59,14 +59,19 @@ const leading = (line) => {
 }
 const numbers = (r) => printed(r.stdout).map(leading).filter((n) => n !== null)
 
+const same = (a, b) => a.length === b.length && a.every((line, i) => line === b[i])
+
 /** Compares what evening.sh printed with what Idris's commands print, or null when they agree. */
-function eveningProblem(t, got, want, how) {
+function eveningProblem(t, got, want, how, before) {
   if (got.timedOut) {
     return `${how} did not finish within ${SECONDS} seconds. A command in it may be waiting for something, or running forever.`
   }
   const g = printed(got.stdout)
   const w = printed(want.stdout)
-  if (g.length === w.length && g.every((line, i) => line === w[i])) return null
+  if (same(g, w)) return null
+  if (before && same(g, printed(before.stdout))) {
+    return `${how} printed the same numbers for two order files with different numbers. A script has to run the commands, not print numbers typed into it.`
+  }
   const start = starterLines(t, 'orders/today.csv')
   const typed = [String(start.length), String(start.filter((l) => l.endsWith(',unpaid')).length)]
   if (typed.every((n) => g.includes(n)) && !w.slice(1).every((n) => g.includes(n))) {
@@ -75,19 +80,31 @@ function eveningProblem(t, got, want, how) {
   if (got.stderr.trim()) return `${how} printed an error: ${quoted(firstError(got))}`
   const i = w.findIndex((line, n) => g[n] !== line)
   if (i === -1) {
-    return `${how} printed ${g.length} lines, and Idris's commands print ${w.length}. Copy his four commands, and nothing else.`
+    return `${how} printed ${g.length} lines, and Idris's commands print ${w.length}. Copy Idris's four commands, and nothing else.`
   }
   if (g[i] === undefined) {
     return `${how} printed ${g.length} line${g.length === 1 ? '' : 's'}, and Idris's commands print ${w.length}.`
   }
-  return `Line ${i + 1} of what ${how} printed is ${quoted(g[i])}, where Idris's commands print ${quoted(w[i])}.`
+  // A count is the check's own data, so it is never said.
+  return /^\d+$/.test(w[i])
+    ? `Line ${i + 1} of what ${how} printed is ${quoted(g[i])}, which is not what Idris's commands print there.`
+    : `Line ${i + 1} of what ${how} printed is ${quoted(g[i])}, where Idris's commands print ${quoted(w[i])}.`
 }
 
+/** Runs the script on two sets of orders, so numbers typed into it cannot pass. */
 async function evening(t, dir, how, file, args) {
-  put(dir, 'orders/today.csv', orders(6, 2, 7001))
-  const want = await run(dir, '/bin/sh', ['-c', COMMANDS])
-  const got = await run(dir, file, args)
-  return { got, want, problem: got.error ? null : eveningProblem(t, got, want, how) }
+  let before
+  for (const [count, unpaid] of [
+    [6, 2],
+    [11, 4]
+  ]) {
+    put(dir, 'orders/today.csv', orders(count, unpaid, 7001))
+    const want = await run(dir, '/bin/sh', ['-c', COMMANDS])
+    const got = await run(dir, file, args)
+    const problem = got.error ? null : eveningProblem(t, got, want, how, before)
+    if (got.error || problem || before) return { got, want, problem }
+    before = got
+  }
 }
 
 /** The script a task is about, or the one detail that says why there is nothing to run. */
@@ -125,6 +142,9 @@ function firstLineProblem(file, text) {
     return 'The first line names zsh. Many Linux computers have no zsh, so the task wants sh, which every Mac and every Linux has.'
   }
   if (name !== 'sh' && name !== 'bash') return `The first line names ${program || 'env alone'}, not sh.`
+  if (!env && !program.startsWith('/')) {
+    return `The first line names ${program} without the folder it is in. After #! comes the full path of the program, as the lesson shows.`
+  }
   if (!env && !existsSync(program)) {
     return `The first line names ${program}, which is not on this computer. sh is at /bin/sh on a Mac and on Linux.`
   }
@@ -248,6 +268,9 @@ export const checks = {
       const okLines = printed(ok.stdout)
       const badLines = printed(bad.stdout)
       if (!numbers(ok).includes(8)) {
+        if (ok.stderr.trim()) {
+          return fail(`For a file that exists, count.sh printed an error: ${quoted(firstError(ok))}`)
+        }
         return fail(
           'count.sh did not print the number of orders in the file it was given, so the third task is not right yet.'
         )

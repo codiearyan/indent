@@ -1,6 +1,6 @@
 // shop-settings.sh stands in for a startup file. Checks load it with sh in a fresh copy of the
-// workspace, with the copy as the working folder and as home and a small environment, and read
-// what it leaves behind. They never touch the learner's own startup files.
+// workspace, with an empty folder in the copy as home and a small environment, and read what it
+// leaves behind. They never touch the learner's own startup files.
 import { mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { isAbsolute, join, resolve } from 'node:path'
@@ -71,12 +71,16 @@ function settings(t, name) {
   return found
 }
 
+// An empty home, so a $HOME path never lands on the copy's own bin.
+const homeIn = (dir) => join(dir, '.check-home')
+
 /** Loads shop-settings.sh with sh in `cwd`, then runs `after` in the same shell. */
 async function load(dir, cwd, after) {
   mkdirSync(cwd, { recursive: true })
+  mkdirSync(homeIn(dir), { recursive: true })
   const r = await runScript('/bin/sh', ['-c', `. "$1"\nprintf '\\n__LOADED__\\n'\n${after}`, 'sh', join(dir, SETTINGS)], {
     cwd,
-    env: scriptEnv(dir)
+    env: scriptEnv(homeIn(dir))
   })
   const [, rest] = r.stdout.split('\n__LOADED__\n')
   const stderr = r.stderr.split(join(dir, SETTINGS)).join(SETTINGS)
@@ -88,13 +92,20 @@ const loadFailed = (r) =>
     ? `Loading ${SETTINGS} did not finish within a few seconds. A line in it may be waiting for something.`
     : `Loading ${SETTINGS} stopped with an error${r.stderr.trim() ? `: ${quoted(r.stderr.trim().split('\n')[0])}` : '.'}`
 
+/** A PATH entry as the learner wrote it: the stand-in home shown as $HOME. */
+const asWritten = (entry, dir) =>
+  entry === homeIn(dir) || entry.startsWith(`${homeIn(dir)}/`)
+    ? `$HOME${entry.slice(homeIn(dir).length)}`
+    : entry
+
 /** Where each PATH entry points, read the way the shell reads it from `cwd`. */
 function entries(path, cwd, dir) {
+  const fake = homeIn(dir)
   return path.split(':').map((entry) => {
     const at = entry === '' ? cwd : isAbsolute(entry) ? entry : resolve(cwd, entry)
-    // The copy is home while the file loads, so a $HOME path points into it; the learner meant their own home.
-    const home = at === dir || at.startsWith(`${dir}/`) ? homedir() + at.slice(dir.length) : null
-    return { entry, places: home ? [at, home] : [at] }
+    // A $HOME path points into the stand-in home; the learner meant their own home.
+    const home = at === fake || at.startsWith(`${fake}/`) ? homedir() + at.slice(fake.length) : null
+    return { entry: asWritten(entry, dir), places: home ? [home] : [at] }
   })
 }
 
@@ -195,7 +206,7 @@ export const checks = {
       const away = await look(join(dir, 'elsewhere'))
       const output = [
         'PATH after loading the file in another folder:',
-        ...(away.r.rest ? away.r.rest.split(':') : ['(empty)']),
+        ...(away.r.rest ? away.r.rest.split(':').map((entry) => asWritten(entry, dir)) : ['(empty)']),
         away.r.stderr.trim()
       ]
         .filter(Boolean)
