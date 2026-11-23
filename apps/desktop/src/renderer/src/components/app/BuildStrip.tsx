@@ -3,8 +3,8 @@ import { chapterKey } from '@shared/rules'
 import { cn } from '@/lib/utils'
 
 /**
- * A lab drawn as what it is made of: one group per chapter, one cell per task.
- * A cell turns green when its task has passed, so the strip fills in as the lab gets built.
+ * A lab drawn as its issues, one cell each. A finished issue is a full cell; the issue being
+ * worked on fills as its tasks pass.
  */
 export function BuildStrip({
   lab,
@@ -15,32 +15,30 @@ export function BuildStrip({
   chapters: ProgressState['chapters']
   className?: string
 }): React.JSX.Element {
-  const groups = lab.chapters.map((chapter) => {
-    const tasks = chapters[chapterKey(lab.id, chapter.id)]?.tasks ?? {}
-    const done = Object.values(tasks).filter((task) => task.passed).length
-    return { id: chapter.id, count: chapter.taskCount, done }
+  const cells = lab.chapters.map((chapter) => {
+    const progress = chapters[chapterKey(lab.id, chapter.id)]
+    if (progress?.completedAt) return { id: chapter.id, fill: 1 }
+    const passed = Object.values(progress?.tasks ?? {}).filter((task) => task.passed).length
+    return { id: chapter.id, fill: chapter.taskCount > 0 ? passed / chapter.taskCount : 0 }
   })
-  const passed = groups.reduce((sum, group) => sum + group.done, 0)
-  const total = groups.reduce((sum, group) => sum + group.count, 0)
+  const finished = cells.filter((cell) => cell.fill === 1).length
 
   return (
     <div
       role="img"
-      aria-label={`${passed} of ${total} tasks passed`}
+      aria-label={`${finished} of ${cells.length} issues finished`}
       className={cn('flex h-1.5 gap-1', className)}
     >
-      {groups.map((group) => (
-        <div key={group.id} className="flex min-w-0 gap-px" style={{ flexGrow: group.count }}>
-          {Array.from({ length: group.count }, (_, i) => (
-            <span
-              key={i}
-              className={cn(
-                'h-full min-w-0 flex-1 transition-colors first:rounded-l-full last:rounded-r-full',
-                i < group.done ? 'bg-brand' : 'bg-accent'
-              )}
-            />
-          ))}
-        </div>
+      {cells.map((cell) => (
+        <span
+          key={cell.id}
+          className="h-full min-w-0 flex-1 overflow-hidden rounded-full bg-accent"
+        >
+          <span
+            className="block h-full rounded-full bg-brand transition-[width]"
+            style={{ width: `${cell.fill * 100}%` }}
+          />
+        </span>
       ))}
     </div>
   )

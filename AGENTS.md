@@ -79,7 +79,7 @@ the chrome is neutral, and the one hue is a calm orange.
 - **Three levels, no more.** The frame is `bg-background`. The sheet is `bg-card rounded-2xl border`
   inset 8px from the window edges. Cards on the sheet are `rounded-lg border border-border` with no
   fill of their own and no shadow. Shadows are only for what floats (menus, popovers, dialogs).
-- **Colour is meaning.** `brand` is the orange. It marks progress (a filled task cell in the build
+- **Colour is meaning.** `brand` is the orange. It marks progress (a filled issue cell in the build
   strip, the level meter, the activity heatmap) and it is the one main action of a view
   (`bg-primary text-primary-foreground`: an orange button with ink text). `success` is the small green
   mark of a passed check and `destructive` the red mark of a failed one; they are status marks, never
@@ -110,9 +110,10 @@ the chrome is neutral, and the one hue is a calm orange.
   No icon in a tinted square, no sparkline, no coloured figure.
 - **Lists are rules and alignment.** Rows separated by `border-rule`, no zebra, no header band,
   numbers right-aligned in tabular figures, one status mark per row.
-- **Progress is the build strip.** A lab's progress is drawn with `components/app/BuildStrip`: one
-  group per chapter, one cell per task, green when passed. Use it instead of a generic progress bar
-  wherever a lab's progress is shown.
+- **Progress is counted in issues.** Where there is room, a lab's progress is drawn with
+  `components/app/BuildStrip`: one cell per chapter, full when it is finished, filling as the tasks
+  of the chapter being worked on pass. In narrow places (a row, a small card) it is
+  `components/app/Meter`, a thin bar, with the count beside it ("3/45"). Never one cell per task.
 - **Empty states keep the frame**: the card and its header stay, with one plain sentence inside.
 - **Covers are the one blur.** Content the learner chooses when to see (the Resources tab of an
   issue) is drawn as it is with `blur-sm`, `inert` and `aria-hidden`, under a floating card with one

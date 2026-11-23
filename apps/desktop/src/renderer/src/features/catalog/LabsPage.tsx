@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Check, Search } from 'lucide-react'
 import { repoRequestUrl } from '@shared/repo'
-import type { Kind, LabSummary, ProgressState } from '@shared/types'
-import { BuildStrip } from '@/components/app/BuildStrip'
+import type { Kind, LabSummary } from '@shared/types'
 import { Cover } from '@/components/app/Cover'
 import { LanguageIcon } from '@/components/app/LanguageIcon'
+import { Meter } from '@/components/app/Meter'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -177,7 +177,7 @@ export function LabsPage(): React.JSX.Element {
                   </div>
                   <ul className={grid}>
                     {inSection.map(({ lab, progress: p }) => (
-                      <RepoCard key={lab.id} lab={lab} progress={p} chapters={progress.chapters} />
+                      <RepoCard key={lab.id} lab={lab} progress={p} />
                     ))}
                   </ul>
                 </section>
@@ -272,12 +272,10 @@ function Facet({
 
 function RepoCard({
   lab,
-  progress,
-  chapters
+  progress
 }: {
   lab: LabSummary
   progress: LabProgress
-  chapters: ProgressState['chapters']
 }): React.JSX.Element {
   return (
     <li>
@@ -298,20 +296,22 @@ function RepoCard({
           </p>
           <NeedsTools lab={lab} className="mt-2" />
           <div className="mt-auto pt-4">
-            <BuildStrip lab={lab} chapters={chapters} />
+            <Meter
+              value={progress.chaptersDone}
+              max={progress.chapterCount}
+              label="issues finished"
+            />
             <div className="mt-2.5 flex items-center justify-between gap-3 text-[13px] text-muted-foreground tabular-nums">
-              <span>
-                {plural(progress.chapterCount, 'issue')}, {plural(progress.taskCount, 'task')}
-              </span>
+              <span>{plural(progress.chapterCount, 'issue')}</span>
               {progress.status === 'completed' ? (
                 <span className="flex items-center gap-1.5 text-foreground">
                   <Check className="size-4 text-success" strokeWidth={2} aria-hidden />
                   Finished
                 </span>
               ) : (
-                <span className="text-foreground">
-                  {progress.tasksPassed} of {progress.taskCount}
-                </span>
+                progress.status === 'in-progress' && (
+                  <span className="text-foreground">{progress.chaptersDone} finished</span>
+                )
               )}
             </div>
           </div>

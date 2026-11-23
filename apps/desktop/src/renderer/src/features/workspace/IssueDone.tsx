@@ -45,7 +45,13 @@ export function IssueDone({
           <ArrowRight />
         </Button>
       </div>
-      {lab && chapters && <BuildStrip lab={lab} chapters={chapters} className="mt-3 mr-1 ml-8" />}
+      {lab && chapters && (
+        <BuildStrip
+          lab={lab}
+          chapters={chapters}
+          className="mt-3 mr-1 ml-8 [&>span]:bg-foreground/10"
+        />
+      )}
     </div>
   )
 }
