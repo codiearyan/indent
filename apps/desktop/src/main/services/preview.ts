@@ -1,10 +1,10 @@
 import { BrowserWindow, net, protocol, shell } from 'electron'
 import { randomBytes } from 'crypto'
-import { readFile } from 'fs/promises'
+import { readFile, stat } from 'fs/promises'
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'http'
 import { createRequire } from 'module'
 import type { AddressInfo } from 'net'
-import { join } from 'path'
+import { join, relative, sep } from 'path'
 import { Readable } from 'stream'
 import type { ReadableStream } from 'stream/web'
 import { pathToFileURL } from 'url'
@@ -25,7 +25,10 @@ import { CONSOLE_MARKER, RELOAD_PATH, checkRequest, parseConsoleLine } from './p
 import { isAppPath, resolveInside } from './workspaceFiles'
 
 interface Esbuild {
-  build(options: Record<string, unknown>): Promise<{ outputFiles: { text: string }[] }>
+  build(options: Record<string, unknown>): Promise<{
+    outputFiles: { text: string }[]
+    metafile: { inputs: Record<string, unknown> }
+  }>
 }
 
 interface BuildFailure {
@@ -77,8 +80,47 @@ const script = (code: string): Response => respond(code, 'text/javascript; chars
 
 const report = (message: string): Response => script(`console.error(${JSON.stringify(message)})`)
 
+/** Workspace files each issue's page has asked for, by `labId/chapterId`, bundled imports included. */
+const used = new Map<string, Set<string>>()
+
+function markUsed(labId: string, chapterId: string, paths: string[]): void {
+  const key = `${labId}/${chapterId}`
+  const set = used.get(key) ?? new Set()
+  for (const path of paths) set.add(path)
+  used.set(key, set)
+}
+
+/** A workspace file as the editor names it, or null for one outside the workspace. */
+function workspacePath(dir: string, file: string): string | null {
+  const path = relative(dir, file)
+  return !path || path.startsWith('..') ? null : path.split(sep).join('/')
+}
+
+/** A bundle is built again only when one of the files that went into it changed on disk. */
+const bundles = new Map<string, { code: string; inputs: Map<string, number> }>()
+
+const modified = (file: string): Promise<number> =>
+  stat(file).then(
+    (info) => info.mtimeMs,
+    () => -1
+  )
+
+async function fresh(file: string): Promise<string | null> {
+  const kept = bundles.get(file)
+  if (!kept) return null
+  const now = await Promise.all([...kept.inputs.keys()].map(modified))
+  return [...kept.inputs.values()].every((time, i) => time === now[i]) ? kept.code : null
+}
+
 /** JSX and TypeScript cannot run as written, so an entry file is served as one bundled module. */
-async function bundle(dir: string, file: string): Promise<Response> {
+async function bundle(
+  labId: string,
+  chapterId: string,
+  dir: string,
+  file: string
+): Promise<Response> {
+  const kept = await fresh(file)
+  if (kept) return script(kept)
   const status = await ensureRuntime()
   if (!status.ready) return report(status.error ?? 'The runtime dependencies are not installed.')
   try {
@@ -94,9 +136,19 @@ async function bundle(dir: string, file: string): Promise<Response> {
       jsx: 'automatic',
       sourcemap: 'inline',
       logLevel: 'silent',
+      metafile: true,
       define: { 'process.env.NODE_ENV': '"development"' }
     })
-    return script(result.outputFiles[0].text)
+    const inputs = Object.keys(result.metafile.inputs).map((input) => join(dir, input))
+    const times = await Promise.all(inputs.map(modified))
+    const code = result.outputFiles[0].text
+    bundles.set(file, { code, inputs: new Map(inputs.map((input, i) => [input, times[i]])) })
+    markUsed(
+      labId,
+      chapterId,
+      inputs.map((input) => workspacePath(dir, input)).filter((path) => path !== null)
+    )
+    return script(code)
   } catch (error) {
     const errors = (error as BuildFailure).errors
     const lines = errors?.map((e) =>
@@ -118,7 +170,9 @@ async function serve(labId: string, chapterId: string, path: string): Promise<Re
     const dir = workspaceDir(labId, chapterId)
     const file = resolveInside(dir, path)
     if (isAppPath(dir, file)) return new Response('Not found', { status: 404 })
-    if (/\.(jsx|tsx|ts)$/.test(file)) return await bundle(dir, file)
+    // Even a file that is not there yet: once it is saved, the page can load it.
+    markUsed(labId, chapterId, [workspacePath(dir, file) ?? path])
+    if (/\.(jsx|tsx|ts)$/.test(file)) return await bundle(labId, chapterId, dir, file)
     if (file.endsWith('.html')) {
       return respond(withBridge(await readFile(file, 'utf8')), 'text/html; charset=utf-8')
     }
@@ -331,6 +385,8 @@ function reload(labId: string, chapterId: string): void {
 /** The learner left the issue, reset it, or the app is closing. */
 export function closeAll(): void {
   closes++
+  used.clear()
+  bundles.clear()
   for (const window of windows.values()) window.close()
   stopServer()
 }
@@ -344,7 +400,14 @@ export function register(): void {
       return new Response('Not found', { status: 404 })
     }
   })
-  handle('preview', { openWindow, openInBrowser })
+  handle('preview', {
+    openWindow,
+    openInBrowser,
+    uses: async (labId, chapterId, paths) => {
+      const set = used.get(`${labId}/${chapterId}`)
+      return Array.isArray(paths) && paths.some((path) => set?.has(String(path)))
+    }
+  })
   listen('preview', {
     reload: (labId, chapterId) => reload(String(labId), String(chapterId)),
     close: closeAll

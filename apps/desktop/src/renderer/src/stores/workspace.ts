@@ -66,7 +66,7 @@ interface WorkspaceStore {
   layout: EditorLayout
   /** The active file of the focused group. */
   activePath: string | null
-  /** Counts writes to disk, so the Browser panel knows when to reload. */
+  /** Counts writes to disk that change the issue's page, so the Browser panel knows when to reload. */
   revision: number
   /** Task ids being checked right now, or null. */
   checking: string[] | null
@@ -154,7 +154,11 @@ export const useWorkspace = create<WorkspaceStore>()((set, get) => {
       })
       throw error
     }
-    set((s) => ({ revision: s.revision + 1 }))
+    // A page reloads only for a file it loaded, not for a test or a note.
+    const page = chapter?.preview
+      ? await api.preview.uses(chapter.labId, chapter.id, [path]).catch(() => true)
+      : true
+    if (page && get().chapter === chapter) set((s) => ({ revision: s.revision + 1 }))
   }
 
   const setLayout = (layout: EditorLayout): void => {
