@@ -1,0 +1,72 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "roll", "label": "Ticket roll", "kind": "data" },
+      { "id": "ticket", "label": "Ticket", "kind": "data", "mine": true },
+      { "id": "today", "label": "Today's departures", "kind": "data" },
+      { "id": "most", "label": "MostSeatsFirst", "kind": "function", "mine": true },
+      { "id": "board", "label": "Board", "kind": "function", "mine": true },
+      { "id": "desk", "label": "Desk and noticeboard", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "roll", "to": "ticket", "label": "serials" },
+      { "from": "ticket", "to": "board", "label": "natural order" },
+      { "from": "today", "to": "most", "label": "two at a time" },
+      { "from": "most", "to": "board", "label": "seats order" },
+      { "from": "board", "to": "desk", "label": "sorted lists" }
+    ],
+    "note": "Tickets learn their own order, departures get an order of the desk's choosing, and both come out sorted."
+  },
+  "tasks": {
+    "ticket": {
+      "steps": [
+        {
+          "active": ["roll", "roll->ticket", "ticket"],
+          "value": { "kind": "array", "label": "a ticket", "values": ["serial", "passenger"] },
+          "note": "Each ticket carries a long serial from the roll, and a passenger."
+        },
+        {
+          "active": ["ticket"],
+          "note": "Two tickets are compared by serial, however far apart the serials are."
+        },
+        {
+          "active": ["ticket"],
+          "note": "A reprinted ticket shares a serial, so then the passengers decide."
+        }
+      ]
+    },
+    "seats": {
+      "steps": [
+        {
+          "active": ["today", "today->most", "most"],
+          "value": { "kind": "array", "label": "a departure", "values": ["boat", "hour", "seats free"] },
+          "note": "The desk compares two departures at a time."
+        },
+        {
+          "active": ["most"],
+          "note": "The one with more seats free goes first."
+        },
+        {
+          "active": ["most"],
+          "note": "With the same seats free, the earlier hour goes first."
+        }
+      ]
+    },
+    "board": {
+      "steps": [
+        {
+          "active": ["ticket", "ticket->board", "board"],
+          "note": "The stub book's tickets are put in their natural order, in the book itself."
+        },
+        {
+          "active": ["today", "most", "most->board", "board"],
+          "note": "The departures with a seat free are copied out, and sorted most seats first."
+        },
+        {
+          "active": ["board", "board->desk", "desk"],
+          "note": "The desk gets its list, and today's departures stay as they were."
+        }
+      ]
+    }
+  }
+}

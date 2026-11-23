@@ -587,7 +587,9 @@ const METHOD_GLOSS = [
 
 function gloss(e, src, methods) {
   const table =
-    methods === 'exceptions'
+    methods === 'collections'
+      ? [...COLLECTION_GLOSS, ...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
+      : methods === 'exceptions'
       ? [...EXCEPTION_GLOSS, ...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
       : methods === 'families'
       ? [...FAMILY_GLOSS, ...OBJECT_GLOSS, ...METHOD_GLOSS, ...GLOSS]
@@ -673,7 +675,7 @@ function compileProblem(spec, b, task, unit, result) {
   if (elsewhere) return fail(`${label(n)} compiles`, elsewhere, shown)
   return fail(
     `${label(n)} compiles`,
-    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
+    `The compiler refuses a line of ${label(n)}, so Check cannot run it. Run ${spec.command ?? `java ${spec.file}`} in the terminal, read the first error, and fix the line it points at.${gloss(mine[0], lines[mine[0].line - 1], spec.collections ? 'collections' : spec.exceptions ? 'exceptions' : spec.families ? 'families' : spec.objects ? 'objects' : spec.methods)}`,
     shown
   )
 }
@@ -844,7 +846,7 @@ function runProblem(spec, task, result, given = {}, call) {
     )
   }
   if (result.exception && spec.families) {
-    const known = [...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
+    const known = [...(spec.collections ? COLLECTION_THROWN : []), ...FAMILY_THROWN, ...METHOD_THROWN, ...THROWN].find(([re]) => re.test(result.exception))
     // A method that calls itself leaves a thousand lines of trace: the first few say it all.
     const trace = result.exception.replace(/\n\tat [\w$.]*\.main\(.*/g, '').split('\n').slice(0, 6).join('\n')
     return fail(
@@ -1378,6 +1380,10 @@ function objectProblem(spec, b, task, unit, errors) {
   const message = (x) => x.message.replace(/\bjava\.(?:lang|util)\.(?=[A-Z])/g, '')
   const reads = Object.values(c.reads ?? {})
   const asIs = `${ranText(c) ? `Check ran:\n${indent(ranText(c))}\n` : ''}${reads.length && !c.show ? `${ranText(c) ? 'and read' : 'Check read'}:\n${indent(Object.keys(c.reads).join('\n'))}` : ''}\n\n${checkOwn(errors).map(message).join('\n\n')}`
+  if (spec.collections) {
+    const said = collectionProblem(task, message(e), asIs)
+    if (said) return said
+  }
   if (spec.exceptions) {
     const said = exceptionProblem(task, message(e), asIs)
     if (said) return said
@@ -2237,7 +2243,7 @@ export function outcome(run, mainClass, names = Object.keys(run.case.after ?? {}
  * mistake (`mistakes: [{ when(run, x, runs, { text, section }), hint }]`), what it gives back staying the
  * same whatever Check passes (`typed`), then the case's own hint.
  */
-export function outcomeCases({ file, mainClass = file.replace(/\.java$/, ''), mistakes = [], typed }) {
+export function outcomeCases({ file, mainClass = file.replace(/\.java$/, ''), mistakes = [], typed, explain }) {
   return (runs, { text, section }) => {
     const plain = runs.filter((r) => !r.case.refuse && !r.case.throws && 'got' in (r.case.expected ?? {}))
     const stuck =
@@ -2266,7 +2272,7 @@ export function outcomeCases({ file, mainClass = file.replace(/\.java$/, ''), mi
               c.name,
               w.purpose && !w.given
                 ? `The throw on line ${w.line} threw ${an(x.name)} on purpose, and the task asks for ${an(c.throws)} here. ${c.hint}`
-                : `${fromWhere(x, text, file, section)} The task asks for ${an(c.throws)} here. ${c.hint}`,
+                : `${fromWhere(x, text, file, section)}${explain?.(x) ? ` ${explain(x)}` : ''} The task asks for ${an(c.throws)} here. ${c.hint}`,
               said
             )
           }
@@ -2278,7 +2284,7 @@ export function outcomeCases({ file, mainClass = file.replace(/\.java$/, ''), mi
             c.name,
             w.purpose && !w.given
               ? `The throw on line ${w.line} threw ${an(x.name)} on purpose, where the task expects no exception. ${c.hint}`
-              : `${fromWhere(x, text, file, section)} The task expects no exception here: read the stack trace below from the top. ${c.hint}`,
+              : `${fromWhere(x, text, file, section)}${explain?.(x) ? ` ${explain(x)}` : ''} The task expects no exception here: read the stack trace below from the top. ${c.hint}`,
             said
           )
         }
@@ -2402,3 +2408,161 @@ const EXCEPTION_GLOSS = [
 
 /** True when two pieces of code are the same, comments and spaces aside. */
 export const sameCode = (a, b) => bare(a) === bare(b)
+
+// --- Collections and generics -------------------------------------------------------------------
+// From part 6 a task takes and gives back lists, sets and maps, and writes generic types of its
+// own. Check's own code hands over collections of the types the task names (a List made with
+// List.of where any List may come in) and keeps what comes back in a variable of the type the task
+// names, so a type that does not fit is refused by the compiler. Issues set `collections: true`
+// beside `objects`, `families` and `exceptions`.
+
+const generic = (type) => /^(\w+)<(.+)>$/.exec(type)
+
+/** Why Check's own code did not compile against the learner's collections or generic types, or null. */
+function collectionProblem(task, msg, asIs) {
+  const n = task.task
+  const first = msg.split('\n')[0]
+  const conv = /^incompatible types: (.+?) cannot be converted to (.+?)$/.exec(first) ?? /argument mismatch; (.+?) cannot be converted to (.+?)$/m.exec(msg)
+  if (conv) {
+    const [, from, to] = conv
+    const f = generic(from)
+    const t = generic(to)
+    const bound = /^(Comparable|Comparator)<(\w+)>$/.exec(to)
+    if (bound && !generic(from))
+      return fail(
+        `${from} is ${an(to)}`,
+        `Check keeps ${an(from)} in a variable of type ${to}, as the task says it can, and Java says ${an(from)} is not one. A class is ${an(to)} only when its first line says it implements ${to}, with the type in angle brackets.`,
+        asIs
+      )
+    if (f && t && f[1] === 'List' && t[1] === 'ArrayList')
+      return fail(
+        `${label(n)} takes any List`,
+        `Check hands over a List, as the task says it may, and the method asks for an ArrayList. An ArrayList is one kind of List, and a list made with List.of is another: ask for the List interface, and any list can come in.`,
+        asIs
+      )
+    if (f && t && f[1] === t[1])
+      return fail(
+        `${label(n)} uses the types the task names`,
+        `Java says ${an(from)} cannot be used as ${an(to)}: the types in angle brackets have to match exactly. A List<String> is not a List<Object>, even though a String is an Object, because a List<Object> may be handed any Object at all. Compare the types in angle brackets in your first lines with the task.`,
+        asIs
+      )
+    if (f || t)
+      return fail(
+        `${label(n)} uses the types the task names`,
+        `Java says ${an(from)} cannot be used as ${an(to)}. Compare your method's first line with the task: the type of what it takes, and of what it gives back.`,
+        asIs
+      )
+    if (from === 'Object')
+      return fail(
+        `${label(n)} gives back the type it was handed`,
+        `Check keeps what comes back in ${an(to)}, and Java says it is only an Object, so it would need a cast. With a type parameter in its first line, a class or method gives back exactly the type it was handed, and no cast is needed: the lesson shows how.`,
+        asIs
+      )
+  }
+  const plain = /^type (\w+) does not take parameters|^cannot infer type arguments for (\w+)/.exec(first)
+  if (plain) {
+    const name = plain[1] ?? plain[2]
+    return fail(
+      `${name} is generic`,
+      `Check writes ${name} with types in angle brackets, as the task says it can, and Java says ${name} takes none. A class that can hold any type names its type parameters in angle brackets after its name: the lesson shows how.`,
+      asIs
+    )
+  }
+  const wrongCount = /^wrong number of type arguments; required (\d+)/.exec(first)
+  if (wrongCount)
+    return fail(
+      `${label(n)} has the type parameters the task names`,
+      `Check writes the class with the number of types in angle brackets the task gives, and Java says it takes ${wrongCount[1]}. Compare the angle brackets after the class's name with the task.`,
+      asIs
+    )
+  return null
+}
+
+// Errors collections and generics bring, read first in those issues.
+const COLLECTION_GLOSS = [
+  [
+    /^compiler\.err\.prob\.found\.req/,
+    (e) => {
+      const m = /cannot be converted to (\S+)$/.exec(e.message.split('\n')[0])
+      const from = /incompatible types: (\S+) cannot/.exec(e.message)?.[1]
+      const f = from && generic(from.replace(/java\.util\./g, ''))
+      const t = m && generic(m[1].replace(/java\.util\./g, ''))
+      if (f && t && f[1] === t[1])
+        return `A ${t[1]} of one type is never a ${t[1]} of another, even when one type fits inside the other: the types in angle brackets have to match. The message names both.`
+      if (f || t)
+        return 'A value of one type is put where another is needed. A List, a Set and a Map are different types, and an ArrayList is a List, but a List is not always an ArrayList. The message names both.'
+      return false
+    }
+  ],
+  [
+    /^compiler\.err\.non-static\.cant\.be\.ref/,
+    (e) =>
+      /type variable/.test(e.message) &&
+      'A type parameter is chosen for each object when it is made, so a static field or method of the class, which belongs to no object, cannot use it. Leave static off what uses the type parameter.'
+  ],
+  [
+    /^compiler\.err\.cant\.resolve/,
+    (e) =>
+      /symbol:\s+method compareTo\(/.test(e.message) &&
+      /location: (?:class (?:java\.lang\.)?Object|variable \w+ of type [A-Z]\b)/.test(e.message) &&
+      'A type parameter with nothing after it can be any type at all, and not every type has compareTo, so Java will not call it. A bound after the type parameter says which types it may be: the lesson shows how.'
+  ],
+  [
+    /^compiler\.err\.cant\.apply\.symbols?/,
+    (e) =>
+      /\bsort\(/.test(e.message) &&
+      /Comparable/.test(e.message) &&
+      'Collections.sort with only a list sorts by the natural order, so it works only on a list of a type that implements Comparable. To sort by another order, hand it a Comparator as well.'
+  ],
+  [
+    /^compiler\.err\.operator\.cant\.be\.applied/,
+    (e) =>
+      /'[<>]=?'/.test(e.message) &&
+      !/first type:\s+(?:int|long|double|float|short|byte|char)\s*\n\s*second type:\s+(?:int|long|double|float|short|byte|char)\b/.test(e.message) &&
+      '< and > compare plain numbers only. Objects, text and type parameters among them, are compared with compareTo, which gives back a number below 0, 0, or above 0.'
+  ],
+  [
+    /^compiler\.err\.type\.found\.req/,
+    () =>
+      'A list, a set or a map holds objects, not plain values like int or long. A list of whole numbers is written with Integer, the object form of int.'
+  ],
+  [
+    /^compiler\.err\.(?:cant\.apply\.diamond|type\.doesnt\.take\.params)/,
+    () => 'That class has no type parameter, so it takes nothing in angle brackets.'
+  ],
+  [
+    /^compiler\.err\.generic\.array\.creation/,
+    () => 'Java cannot make an array of a type parameter. A list of it works: new ArrayList<>().'
+  ]
+]
+
+// What an exception usually means in a collections issue, in plain words, without the fix.
+const COLLECTION_THROWN = [
+  [
+    /UnsupportedOperationException/,
+    'A list, set or map made with List.of, Set.of or Map.of can never be changed: add, remove, put, sort and retainAll on one all throw this. To change one, copy it into a new collection first.'
+  ],
+  [
+    /ConcurrentModificationException/,
+    "A collection was changed while a for-each loop was walking through it, and Java stopped the loop. An iterator's own remove takes items off safely."
+  ],
+  [
+    /NullPointerException: Cannot invoke "java\.lang\.(?:Integer|Long|Double|Boolean)\.\w+Value\(\)" because the return value of "java\.util\.\w*Map\.get\(Object\)" is null/,
+    "A map's get gives back null for a key that is not in the map, and Java cannot turn null into a plain number. Ask whether the key is there first, or let the map give a value of your own for a missing key: the lesson shows both."
+  ],
+  [
+    /ClassCastException: class \S+ cannot be cast to class java\.lang\.Comparable/,
+    'Things were put in order, or into a TreeSet or TreeMap, and their class has no natural order: it does not implement Comparable. Give it one, or hand over a Comparator.'
+  ],
+  [
+    /IllegalStateException\n\tat java\.base\/java\.util\.\w+\$\w*Itr\.remove/,
+    "An iterator's remove takes off the item that next() last gave back, so each remove needs a next() before it."
+  ],
+  [/NoSuchElementException/, "An iterator's next() was called when nothing was left. Ask hasNext() first."]
+]
+
+/** One sentence on what an exception from a collection usually means, or null. For outcomeCases. */
+export function explainCollection(x) {
+  const text = `${x.type}${x.message === null ? '' : `: ${x.message}`}\n${x.frames.map((f) => `\tat ${f}`).join('\n')}`
+  return COLLECTION_THROWN.find(([re]) => re.test(text))?.[1] ?? null
+}

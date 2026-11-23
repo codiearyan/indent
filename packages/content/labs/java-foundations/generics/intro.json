@@ -1,0 +1,51 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "One rota tool, for anything at all",
+      "note": "Three copies of the same code."
+    },
+    {
+      "title": "Hut programs",
+      "text": "A rota for skippers, another for boats"
+    },
+    {
+      "title": "Your tools",
+      "file": "HutTools.java",
+      "mine": true,
+      "gap": "Every type needs its own copy",
+      "tasks": [
+        "A pair of any types",
+        "Any rota, next week",
+        "Largest of anything"
+      ]
+    },
+    {
+      "title": "Skippers' rota",
+      "rows": [
+        [
+          "Innes"
+        ],
+        [
+          "Tormod"
+        ],
+        [
+          "Euan"
+        ]
+      ]
+    }
+  ],
+  "ticket": {
+    "label": "The rota",
+    "wrong": "in three copies",
+    "why": "One per type",
+    "right": "written once"
+  },
+  "captions": [
+    "The hut's programs. Bridie wants one rota tool that works for skippers, boats, anything.",
+    "Today each kind of list has its own copy of the same code, and they drift apart.",
+    "You write a pair of any types, a rota for any list, and the largest of anything.",
+    "Now one rota tool turns every rota on a week, whatever it holds.",
+    "One rota tool for the whole hut. Part 6 is done: everyone counted, in order."
+  ]
+}

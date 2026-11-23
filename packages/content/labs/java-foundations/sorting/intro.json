@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Most seats free at the top, please",
+      "note": "Passengers read the board first."
+    },
+    {
+      "title": "Noticeboard",
+      "text": "Departures pinned up in any order"
+    },
+    {
+      "title": "Your order",
+      "file": "Noticeboard.java",
+      "mine": true,
+      "gap": "Nothing knows what comes first",
+      "tasks": [
+        "A ticket's own order",
+        "Most seats first",
+        "Sorted lists"
+      ]
+    },
+    {
+      "title": "Passenger",
+      "say": "The top one has room. That one!",
+      "note": "No hunting down the board."
+    }
+  ],
+  "ticket": {
+    "label": "Board",
+    "wrong": "in any order",
+    "why": "No order",
+    "right": "most room on top"
+  },
+  "captions": [
+    "The noticeboard by the gangway. Bridie wants the emptiest departures at the top.",
+    "Today departures are pinned up any old way, and tickets in the stub book too.",
+    "You give tickets a natural order, write the desk's own order, and sort both.",
+    "Now the board shows the most seats free first, and the stub book is in order.",
+    "The board and the stub book in order. Next: one tool for every rota."
+  ]
+}

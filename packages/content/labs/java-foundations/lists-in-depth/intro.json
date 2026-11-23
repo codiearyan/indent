@@ -1,0 +1,42 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why is Innes on the desk's list too?",
+      "note": "One list, two people changing it."
+    },
+    {
+      "title": "Booking desk",
+      "text": "Hands over its own list, not a copy"
+    },
+    {
+      "title": "Your lists",
+      "file": "BoardingList.java",
+      "mine": true,
+      "gap": "Every change lands on every list",
+      "tasks": [
+        "A copy of its own",
+        "A seat by its number",
+        "Void while walking"
+      ]
+    },
+    {
+      "title": "Gangway",
+      "say": "Innes is on, the desk's list is fine",
+      "note": "Each list changes only where it should."
+    }
+  ],
+  "ticket": {
+    "label": "Innes",
+    "wrong": "on both lists",
+    "why": "One list",
+    "right": "boarding"
+  },
+  "captions": [
+    "The gangway. Bridie adds a late passenger to the Gannet's boarding list.",
+    "Today the desk's own list grows too, and the wrong seat comes free.",
+    "You write a copy of its own, free a seat by its number, and void tickets safely.",
+    "Now Innes boards, the desk's list stays as it was, and every voided ticket goes.",
+    "Lists that change only where they should. Next: Ossian's evening tally."
+  ]
+}

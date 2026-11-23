@@ -1,0 +1,105 @@
+{
+  "id": "sorting",
+  "title": "Order: Comparable and Comparator",
+  "files": ["Noticeboard.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the noticeboard here, and try your types from main.",
+    "suggestedCommand": "java Noticeboard.java"
+  },
+  "tasks": [
+    {
+      "id": "ticket",
+      "title": "Give tickets a natural order",
+      "file": "Noticeboard.java",
+      "description": "Under `// Task 1`, write a record `Ticket` with a `long serial` and a `String passenger`, in that order, that implements `Comparable<Ticket>`. Its `compareTo` puts the smaller serial first, however far apart two serials are, and two tickets with the same serial in alphabetical order of their passengers, so it gives back 0 only for equal tickets.\n\nCheck compares pairs of its own both ways round: serials close together, serials billions apart, equal tickets, and the same serial with different passengers. It judges each answer by its sign alone. Then it sorts a list with `Collections.sort`, whose right order differs from the order reversed, from ties broken the other way, and from serials compared as text.",
+      "nextSteps": [
+        "Read the parts of the lesson about what compareTo gives back, and about the traps.",
+        "Write the record's first line, with the interface and its type in angle brackets.",
+        "Write compareTo: compare the serials first, in a way that cannot overflow.",
+        "When the serials are the same, compare the passengers."
+      ],
+      "hints": [
+        "Only the sign of what compareTo gives back counts: below 0, 0, or above 0. Every one of the three has to be possible.",
+        "Taking one long from the other and casting to int keeps only part of the difference. Long has its own way to compare two values, and text has its own compareTo.",
+        "Inside compareTo: `int bySerial = Long.compare(serial, other.serial); if (bySerial != 0) { return bySerial; } return passenger.compareTo(other.passenger);`."
+      ],
+      "docs": [
+        {
+          "title": "Object ordering",
+          "url": "https://docs.oracle.com/javase/tutorial/collections/interfaces/order.html"
+        },
+        {
+          "title": "Comparable",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Comparable.html"
+        },
+        {
+          "title": "Long.compare",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html#compare(long,long)"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Comparable and Comparator explained",
+          "url": "https://www.youtube.com/watch?v=XExohnyL2xM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "seats",
+      "title": "Put the departures with most seats first",
+      "file": "Noticeboard.java",
+      "description": "Under `// Task 2`, write a class `MostSeatsFirst` that implements `Comparator<Departure>`. Its `compare` puts the departure with more seats free first, and of two with the same seats free, the one that leaves at the earlier hour. Two departures with the same seats free and the same hour compare as 0. `Departure` is given above the tasks.\n\nCheck compares pairs of its own both ways round, judging each answer by its sign alone: more seats against fewer, the same seats at different hours, and the same seats and hour on different boats. Then it sorts a list of its own with your comparator, whose right order differs from fewest seats first, from ties broken the other way, and from seats compared as text.",
+      "nextSteps": [
+        "Read the part of the lesson about a Comparator for another order.",
+        "Write the class's first line, with the interface and the type it compares.",
+        "In compare, compare the seats free so that more seats comes first.",
+        "When the seats are the same, compare the hours, earlier first."
+      ],
+      "hints": [
+        "compare(a, b) follows the same rules as compareTo: below 0 when a comes first. Most seats first is the opposite of the numbers' own order.",
+        "Comparing b with a, where the numbers' own order compares a with b, turns the order round. The second rule is used only when the first gives 0.",
+        "Inside compare: `int bySeats = Integer.compare(b.seatsFree(), a.seatsFree()); if (bySeats != 0) { return bySeats; } return Integer.compare(a.hour(), b.hour());`."
+      ],
+      "docs": [
+        {
+          "title": "Comparator",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Comparator.html"
+        },
+        {
+          "title": "Integer.compare",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Integer.html#compare(int,int)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "board",
+      "title": "Sort the tickets, and make the desk's list",
+      "file": "Noticeboard.java",
+      "description": "Under `// Task 3`, write a class `Board` with two methods. `static void sortTickets(List<Ticket> tickets)` sorts the caller's own list in the tickets' natural order. `static List<Departure> forDesk(List<Departure> today)` gives back a new list of the departures with at least one seat free, most seats first as `MostSeatsFirst` orders them. `today` stays as it is.\n\nCheck runs your class beside a `Ticket` and a `MostSeatsFirst` of its own, written as Tasks 1 and 2 ask, so this task is judged on its own lines. It sorts lists of its own with `sortTickets` and reads the caller's list afterwards, and checks that `sortTickets` is void. It calls `forDesk` with lists of its own, one made with `List.of`, one where every departure is full, and reads the list that comes back in order and `today` afterwards.",
+      "nextSteps": [
+        "Read the parts of the lesson about sorting and about a Comparator.",
+        "Write sortTickets: sort the list it is handed, by the natural order.",
+        "Write forDesk: copy the departures with a seat free into a new list.",
+        "Sort the new list with a MostSeatsFirst, and give it back."
+      ],
+      "hints": [
+        "sortTickets changes the caller's list, so it gives nothing back. forDesk must not change today, which may be a list that can never change.",
+        "Sorting with no comparator uses the natural order, which Ticket has. Departure has none, so its sort needs a comparator object.",
+        "sortTickets is `Collections.sort(tickets);`. forDesk adds each departure with `seatsFree() > 0` to a new list, then `desk.sort(new MostSeatsFirst());` and `return desk;`."
+      ],
+      "docs": [
+        {
+          "title": "Collections.sort",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collections.html#sort(java.util.List)"
+        },
+        {
+          "title": "List.sort",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html#sort(java.util.Comparator)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
