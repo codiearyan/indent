@@ -1,0 +1,52 @@
+{
+  "stations": [
+    {
+      "title": "Agnieszka",
+      "say": "Why does the card still say Hettie?",
+      "note": "Front desk. BL-44."
+    },
+    {
+      "title": "Member list",
+      "rows": [
+        [
+          "Hettie Penrose"
+        ],
+        [
+          "Delphine Nwosu"
+        ],
+        [
+          "Mateo Quiroga"
+        ]
+      ],
+      "mark": 1
+    },
+    {
+      "title": "Your fix",
+      "file": "MemberDesk.jsx",
+      "mine": true,
+      "gap": "Runs too rarely, then too often",
+      "tasks": [
+        "Follow the pick",
+        "One swim per press",
+        "Calm while typing"
+      ]
+    },
+    {
+      "title": "Member card",
+      "text": "The pass and the swims this season."
+    }
+  ],
+  "ticket": {
+    "label": "Delphine",
+    "wrong": "shows Hettie",
+    "why": "Not asked",
+    "right": "on the card"
+  },
+  "captions": [
+    "Next, Agnieszka picks Delphine at the desk, and the card still shows Hettie.",
+    "The card never asks for the member picked, and + logs a swim again and again.",
+    "You mend two effects and keep the card calm while a note is typed, in three tasks.",
+    "Delphine is picked, her answer comes, and the card shows her.",
+    "Same members, same keyboard. Each effect now runs when it should, and only then."
+  ]
+}

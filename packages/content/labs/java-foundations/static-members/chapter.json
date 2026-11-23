@@ -1,0 +1,101 @@
+{
+  "id": "static-members",
+  "title": "Static: what belongs to the class",
+  "files": ["TicketRoll.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the ticket roll here, and try your tickets from main.",
+    "suggestedCommand": "java TicketRoll.java"
+  },
+  "tasks": [
+    {
+      "id": "numbers",
+      "title": "Number every ticket",
+      "file": "TicketRoll.java",
+      "description": "Under `// Task 1`, inside the class `Ticket`, write four fields: a `String passenger`, an `int age` and an `int number`, which each ticket has for itself, and a `static int issued`, one count shared by every ticket. Then write a constructor `Ticket(String passenger, int age)` that counts the ticket in `issued` and gives it the next number: the first ticket is number 1.\n\nCheck makes tickets of its own, a handful and then more, and reads each ticket's number, passenger and age, and `Ticket.issued` through the class's name.",
+      "nextSteps": [
+        "Read the part of the lesson about a field that belongs to the class.",
+        "Write the four fields: decide which one has `static` in front.",
+        "In the constructor, set the passenger and the age, count the ticket, then give it its number.",
+        "Take the `//` off the first three lines in `main` and run the file."
+      ],
+      "hints": [
+        "A `static` field exists once, for the whole class, whatever the number of tickets. A field without `static` exists once per ticket.",
+        "Add one to `issued` first; after that, `issued` is this ticket's number.",
+        "In the constructor, after setting the passenger and the age: `issued++;` then `number = issued;`."
+      ],
+      "docs": [
+        {
+          "title": "Understanding class members",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/classvars.html"
+        },
+        {
+          "title": "Using the this keyword",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Static and non-static fields and methods",
+          "url": "https://www.youtube.com/watch?v=-Y67pdWHr9Y"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "constant",
+      "title": "Keep the adult fare in one place",
+      "file": "TicketRoll.java",
+      "description": "Under `// Task 2`, write a constant, a `static final int ADULT_PENCE` of `320`. Then write a method `static int fareFor(int age)`: anyone under 16 pays half of `ADULT_PENCE`, everyone else all of it.\n\nCheck reads `Ticket.ADULT_PENCE` and calls `Ticket.fareFor` through the class's name, with no ticket, for ages of its own on both sides of 16. Its own code also tries to give `ADULT_PENCE` a new value, and Java must refuse. Check reads your lines for `ADULT_PENCE` inside `fareFor`.",
+      "nextSteps": [
+        "Read the part of the lesson about constants and static methods.",
+        "Write the constant with both words in front of its type.",
+        "Write `fareFor` with `static`, and work out both fares from the constant.",
+        "Take the `//` off the line that prints a child's fare and run the file."
+      ],
+      "hints": [
+        "`final` means the value can never change after it is set; `static` means it belongs to the class, so `Ticket.ADULT_PENCE` reads it with no ticket.",
+        "A `static` method is called through the class's name, as `Ticket.fareFor(9)`. It has no ticket of its own, so it uses only its parameter and static fields.",
+        "`static final int ADULT_PENCE = 320;`, and in `fareFor`: `if (age < 16) { return ADULT_PENCE / 2; }`, then `return ADULT_PENCE;`."
+      ],
+      "docs": [
+        {
+          "title": "Understanding class members: constants",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/classvars.html"
+        },
+        {
+          "title": "final variables",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-4.html#jls-4.12.4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "Give each ticket its line",
+      "file": "TicketRoll.java",
+      "description": "Under `// Task 3`, write `String line()`, which gives back the ticket's number, passenger and fare in the form `Ticket 4: Lachie, 160p`. It builds on Tasks 1 and 2.\n\nCheck makes tickets of its own, three at once included, and reads the line each one gives back.",
+      "nextSteps": [
+        "Read the part of the lesson about what a method without `static` can use.",
+        "Write `line` without `static`: it reads one ticket's own fields.",
+        "Get the fare from Task 2's method, with the ticket's age.",
+        "Take the `//` off the last line in `main` and run the file."
+      ],
+      "hints": [
+        "`number` is this ticket's own number; `issued` is how many tickets there are so far. Only one of them belongs in the line.",
+        "A method without `static` can use the ticket's fields and also anything `static`, such as `fareFor`.",
+        "`return \"Ticket \" + number + \": \" + passenger + \", \" + fareFor(age) + \"p\";`"
+      ],
+      "docs": [
+        {
+          "title": "Understanding class members: class methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/classvars.html"
+        },
+        {
+          "title": "Defining methods",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

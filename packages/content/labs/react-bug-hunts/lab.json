@@ -1,0 +1,13 @@
+{
+  "id": "react-bug-hunts",
+  "title": "React bug hunts",
+  "description": "Brimwell Lido is a seawater pool on the harbour wall, and its desk screen, written in React over one busy spring, now lies to the staff a few times a day. Work through five tickets, each a bug that honest React code falls into: see it happen on the page, mend the cause, and make sure the fix keeps working while the desk is busy. You learn to spot state read from an old draw, state changed in place, keys that name a place, effects that do too much or too little, and answers that arrive out of order.",
+  "category": "Interview bug cases",
+  "language": "react",
+  "tags": ["React", "Debugging"],
+  "kind": "bug-hunt",
+  "parts": [
+    { "title": "State the screen does not see", "chapters": ["clock-stuck", "names-stay-on", "notes-move-rows"] },
+    { "title": "Effects and answers that come later", "chapters": ["card-stays-on-first", "old-search-results"] }
+  ]
+}

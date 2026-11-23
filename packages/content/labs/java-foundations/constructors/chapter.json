@@ -1,0 +1,101 @@
+{
+  "id": "constructors",
+  "title": "Constructors: a booking made whole",
+  "files": ["Bookings.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the bookings here, and try your constructors from main.",
+    "suggestedCommand": "java Bookings.java"
+  },
+  "tasks": [
+    {
+      "id": "constructor",
+      "title": "Give Booking a constructor",
+      "file": "Bookings.java",
+      "description": "Under `// Task 1`, inside the class `Booking`, write three fields: a `String` called `passenger`, an `int` called `seats` and an `int` called `hour`. Then write a constructor `Booking(String passenger, int seats, int hour)` that gives each field the value of the parameter with its name.\n\nCheck makes bookings of its own with `new Booking(...)`, two at once included, and reads every field of each.",
+      "nextSteps": [
+        "Read the part of the lesson about constructors and the word `this`.",
+        "Write the three fields under the `// Task 1` comment.",
+        "Write the constructor: its name is the class's name, with nothing in front of it.",
+        "Take the `//` off the first two lines in `main` and run the file."
+      ],
+      "hints": [
+        "A constructor looks like a method with the class's name and no type in front, not even `void`. With `void` in front it is a method, and `new` never runs it.",
+        "Inside the constructor, `passenger` alone means the parameter. `this.passenger` means the field of the booking being made.",
+        "Inside: `this.passenger = passenger;`, `this.seats = seats;` and `this.hour = hour;`."
+      ],
+      "docs": [
+        {
+          "title": "Providing constructors for your classes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/constructors.html"
+        },
+        {
+          "title": "Using the this keyword",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Constructors in Java",
+          "url": "https://www.youtube.com/watch?v=pgBk8HC7jbU"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "one-seat",
+      "title": "Add a constructor for one seat",
+      "file": "Bookings.java",
+      "description": "Under `// Task 2`, write a second constructor, `Booking(String passenger, int hour)`, for a booking of one seat. The constructor of Task 1 stays as it is. It builds on Task 1.\n\nCheck makes bookings with both constructors and reads every field of each.",
+      "nextSteps": [
+        "Read the part of the lesson about a second constructor.",
+        "Write its first line: the same name, with the two parameters the task gives.",
+        "Give every field a value: one of them is not among its parameters.",
+        "Take the `//` off the lines for the single booking in `main` and run the file."
+      ],
+      "hints": [
+        "A class can have several constructors, as long as their parameters differ. `new` picks the one whose parameters fit.",
+        "A field this constructor does not set keeps what Java gives it, 0 for a number. One seat has to be set on purpose.",
+        "Either set the three fields yourself, or hand the work to the first constructor in one line: `this(passenger, 1, hour);`."
+      ],
+      "docs": [
+        {
+          "title": "Providing constructors for your classes",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/constructors.html"
+        },
+        {
+          "title": "Using this with a constructor",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "moves",
+      "title": "Count how often a booking moves",
+      "file": "Bookings.java",
+      "description": "Under `// Task 3`, add a field `int moves`, which no constructor sets, and a `void` method `moveTo(int hour)` that gives the booking the new hour and adds one to `moves`. It builds on Task 1.\n\nCheck makes bookings of its own, reads `moves` before any move, moves the bookings, and reads `hour` and `moves` of each.",
+      "nextSteps": [
+        "Read the part of the lesson about what Java gives a field that nobody sets.",
+        "Write the field without a value.",
+        "Write `moveTo`: it changes two fields of the booking it is called on.",
+        "Take the `//` off the last lines in `main` and run the file."
+      ],
+      "hints": [
+        "A number field nobody sets starts at 0, so a new booking has no moves without any line of yours.",
+        "The parameter is called `hour`, like the field, so the field needs `this.` in front. `int moves = 0;` inside the method would make a new variable, not change the field.",
+        "Inside `moveTo`: `this.hour = hour;` and `moves++;`."
+      ],
+      "docs": [
+        {
+          "title": "Default values of fields",
+          "url": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html"
+        },
+        {
+          "title": "Using the this keyword",
+          "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/thiskey.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

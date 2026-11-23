@@ -22,6 +22,11 @@
 # tuples as {"@tuple": [...]} and sets as {"@set": [...]}, and reports what it gave back and what
 # each argument holds after the call in the same form (dictionaries as {"@dict": [[key, value]]}),
 # so Check compares values, never their printed form, and sees a list the function changed.
+#
+# A call with `files` ({path: text}) also writes Check's own files into the sandbox copy before
+# the call, as exact bytes in UTF-8, takes {"@path": "..."} arguments as pathlib.Path, notes every
+# file the function opens and how, and afterwards reports which of them it left open and what each
+# file named in `read` holds, its line ends read the same on every system.
 import _thread
 import ast
 import builtins
@@ -29,6 +34,7 @@ import io
 import json
 import math
 import os
+import pathlib
 import re
 import signal
 import sys
@@ -234,6 +240,8 @@ def value_of(value):
 
 
 MAX_ITEMS = 1000
+# Set when a call has `files`: Paths then travel as {"@path": "..."}, never in an issue without.
+FILES = {'on': False, 'root': ''}
 
 
 def encode(value, depth=0):
@@ -253,6 +261,8 @@ def encode(value, depth=0):
     if type(value) in (set, frozenset):
         items = inner(list(value))
         return {'@set': sorted(items, key=lambda v: json.dumps(v, sort_keys=True))}
+    if FILES['on'] and isinstance(value, pathlib.PurePath):
+        return {'@path': value.as_posix()}
     if type(value) is dict:
         pairs = list(value.items())[:MAX_ITEMS]
         return {'@dict': [[encode(k, depth + 1), encode(v, depth + 1)] for k, v in pairs]}
@@ -270,6 +280,8 @@ def decode(value):
             return {decode(v) for v in value['@set']}
         if list(value) == ['@dict']:
             return {decode(k): decode(v) for k, v in value['@dict']}
+        if FILES['on'] and list(value) == ['@path']:
+            return pathlib.Path(value['@path'])
         return {k: decode(v) for k, v in value.items()}
     return value
 
@@ -342,6 +354,103 @@ def task_starts(lines):
     return starts
 
 
+def check_path(rel):
+    """Check's own file name, refused unless it stays inside the sandbox copy."""
+    if os.path.isabs(rel) or '..' in pathlib.PurePosixPath(rel).parts:
+        raise ValueError('Check names a file outside the workspace: ' + rel)
+    return os.path.join(FILES['root'], *pathlib.PurePosixPath(rel).parts)
+
+
+def shown_path(path, root):
+    """A path the function opened, relative to the sandbox copy when it is inside it."""
+    try:
+        real = os.path.realpath(os.path.abspath(os.fsdecode(os.fspath(path))))
+    except (TypeError, ValueError):
+        return repr(path)[:300]
+    if real == root or real.startswith(root + os.sep):
+        return pathlib.Path(os.path.relpath(real, root)).as_posix()
+    return pathlib.Path(real).as_posix()
+
+
+class Default(str):
+    """An encoding Python chose because the code gave none."""
+
+
+class Opens:
+    """Notes every file opened while it is on, through open() and pathlib alike, and keeps each
+    file object, so one the function left open is still open when the call returns."""
+
+    def __init__(self, root):
+        self.root = root
+        self.list = []
+        self.kept = []
+        self.real = builtins.open
+
+    def __enter__(self):
+        real = self.real
+        real_default = self.real_default = getattr(io, 'text_encoding', None)
+
+        def tracked(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None,
+                    closefd=True, opener=None):
+            if not isinstance(file, int):
+                self.list.append({
+                    'path': shown_path(file, self.root),
+                    'mode': mode if isinstance(mode, str) else repr(mode),
+                    'binary': isinstance(mode, str) and 'b' in mode,
+                    'encoding': encoding if type(encoding) is str else None,
+                    'newline': newline if isinstance(newline, str) else None
+                })
+            if isinstance(encoding, Default):
+                encoding = str(encoding)
+            f = real(file, mode, buffering, encoding, errors, newline, closefd, opener)
+            if not isinstance(file, int):
+                self.kept.append((self.list[-1]['path'], f))
+            return f
+
+        # From 3.10 pathlib fills in a missing encoding through io.text_encoding before it opens,
+        # as "utf-8" in UTF-8 mode: marked here, it counts as missing on every Python.
+        def default(encoding, stacklevel=2):
+            return Default(real_default(None)) if encoding is None else encoding
+
+        builtins.open = io.open = tracked
+        if real_default:
+            io.text_encoding = default
+        return self
+
+    def __exit__(self, *exc):
+        builtins.open = io.open = self.real
+        if self.real_default:
+            io.text_encoding = self.real_default
+        return False
+
+    def left_open(self):
+        """The files still open, each closed now so what it wrote reaches the disk."""
+        left = []
+        for path, f in self.kept:
+            if not f.closed:
+                left.append(path)
+                try:
+                    f.close()
+                except Exception:
+                    pass
+        return left
+
+
+def read_back(rel):
+    """What one of Check's files holds: its text with every line end as \\n, None when it is not
+    there, or {'bad': ...} when it is not UTF-8 text."""
+    path = check_path(rel)
+    if not os.path.isfile(path):
+        return None
+    with open(path, 'rb') as f:
+        data = f.read(MAX_SENT * 10)
+    try:
+        text = data.decode('utf-8')
+    except UnicodeDecodeError:
+        return {'bad': repr(data[:300])}
+    return {'text': text.replace('\r\n', '\n').replace('\r', '\n')}
+
+
 def called(watchdog, task, call, ns):
     """Calls the function `call['name']` with Check's own arguments."""
     record = {'kind': 'call', 'task': task, 'names': names_in(ns)}
@@ -354,10 +463,26 @@ def called(watchdog, task, call, ns):
         return record
     args = call.get('args') or []
     kwargs = call.get('kwargs') or {}
+    files = call.get('files')
+    if files is not None:
+        FILES['on'] = True
+        for rel, text in files.items():
+            path = check_path(rel)
+            if os.path.dirname(path):
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, 'wb') as f:
+                f.write(text.encode('utf-8'))
     if call.get('data'):
         args = decode(args)
         kwargs = decode(kwargs)
-    result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
+    if files is None:
+        result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
+    else:
+        with Opens(FILES['root']) as opens:
+            result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
+        record['opened'] = opens.list
+        record['left_open'] = opens.left_open()
+        record['files'] = {rel: read_back(rel) for rel in call.get('read') or []}
     record.update({
         'printed': printed.text()[:MAX_SENT],
         'error': error,
@@ -378,6 +503,7 @@ def main():
     sys.stdin = io.StringIO('')
     shown = spec['shown']
     root = os.path.realpath(spec['root'])
+    FILES['root'] = root
     with open(spec['file'], 'rb') as f:
         source = f.read()
 

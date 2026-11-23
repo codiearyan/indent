@@ -1,7 +1,7 @@
 {
   "id": "python-foundations",
   "title": "Python foundations",
-  "description": "Brackenridge Mountain Rescue is a team of volunteers, and its callout log, kit lists and rota live in a notebook and a spreadsheet nobody trusts. You have never written a line of code, and you start there: make the laptop at the base print, count, store and check what the team needs, and learn to read what Python says when something is wrong. Then you teach it to decide and repeat, with if, for and while, and to reuse your work in functions of your own. After that you keep many values at once in lists, tuples, dictionaries and sets, and learn which code changes them and which only reads them. Each issue teaches one part of Python in one small program you run yourself in a real terminal.",
+  "description": "Brackenridge Mountain Rescue is a team of volunteers, and its callout log, kit lists and rota live in a notebook and a spreadsheet nobody trusts. You have never written a line of code, and you start there: make the laptop at the base print, count, store and check what the team needs, and learn to read what Python says when something is wrong. Then you teach it to decide and repeat, with if, for and while, and to reuse your work in functions of your own. After that you keep many values at once in lists, tuples, dictionaries and sets, and learn which code changes them and which only reads them. Then you tidy, split and format text, and keep the team's log, kit list and store in files: plain text, CSV and JSON. Each issue teaches one part of Python in one small program you run yourself in a real terminal.",
   "category": "Programming languages",
   "language": "python",
   "tags": ["Python"],
@@ -39,6 +39,16 @@
         "tuples-and-unpacking",
         "dictionaries",
         "sets"
+      ]
+    },
+    {
+      "title": "Text and files",
+      "chapters": [
+        "text-methods",
+        "split-and-join",
+        "formatting",
+        "files",
+        "csv-and-json"
       ]
     }
   ]

@@ -1,0 +1,111 @@
+{
+  "id": "errors-you-can-act-on",
+  "title": "Errors a person can act on",
+  "files": [
+    "src/json.js",
+    "src/try.js",
+    "data/card.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where your parser reads the supplier lists and a few broken pieces, and says what is wrong.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "where",
+      "title": "Say the line and the column",
+      "file": "src/json.js",
+      "description": "Implement `lineAndColumn(text, at)` in `src/json.js` and put its answer on every `JsonError`.\n\n- `lineAndColumn(text, at)` returns `{ line, column }` for index `at`, both counting from 1: the first character of the text is line 1, column 1\n- only a line feed (`\\n`) starts a new line, so a text with `\\r\\n` line ends has as many lines as one with `\\n`; a tab counts as one column\n- every `JsonError` that `tokenize` and `parse` throw has `line` and `column`, as numbers, and keeps its `at`\n- its message says them, as `line 4, column 3`\n\nThe check parses broken texts of its own, over many lines, and reads the line, the column and the message of each error.",
+      "nextSteps": [
+        "Run `node src/try.js` and read what it says about `card.json`.",
+        "Write `lineAndColumn`: count the line feeds before `at`, and find where the last line started.",
+        "Decide where the error gets its line and column: in the JsonError constructor, or where each error is made.",
+        "Change the message so it ends with the line and the column."
+      ],
+      "hints": [
+        "Every JsonError already has an at. Line and column are just another way to say the same place, worked out from the text and at.",
+        "The line is 1 plus the number of line feeds before at. The column is how far at is from the start of its own line, the character just after the last line feed before it, plus 1. The JsonError needs the text to work them out, so pass it in.",
+        "`const before = text.slice(0, at)`, then `before.split('\\n').length` is the line and `at - (before.lastIndexOf('\\n') + 1) + 1` the column."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.split()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split"
+        },
+        {
+          "title": "String.prototype.lastIndexOf()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf"
+        },
+        {
+          "title": "Error, and errors of your own",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "expected",
+      "title": "Say what was expected and what was found",
+      "file": "src/json.js",
+      "description": "Give every `JsonError` an `expected` and a `found`, and say both in its message.\n\n- `expected` says in words what would have fitted where the text goes wrong: every mark that would fit, as the mark itself (`, or ]`), and in words where a value, a key or the end of the text would fit (`a value`, `a key`, `the end of the text`)\n- `found` is what is there, exactly as it is written in the text: `2`, `}`, `\"price\"` with its quotes, or the stray character\n- the message says both and where: `Expected , or } but found \"per\" at line 4, column 3`\n- errors from `tokenize`, such as a broken number or escape, have an `expected` and a `found` too\n\nThe check parses broken texts of its own and reads `expected`, `found` and the message.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error for the missing comma.",
+        "List the places your code throws. At each one, what would have fitted there?",
+        "Give the error what was found: the token as written in the text, or the character.",
+        "Build the message from expected, found, line and column."
+      ],
+      "hints": [
+        "Each throw already knows what it wanted: the parser that wanted a comma or a bracket is the one that throws. Put that into words where it throws.",
+        "A token knows its at and its end, so the text from at to end is the token as it was written, quotes and all. A shared helper that throws for the token at the position of the reader saves writing that at every throw.",
+        "`fail(reader, ', or ]')` can find `reader.tokens[reader.pos]` and throw `new JsonError(text, token.at, expected, text.slice(token.at, token.end))`."
+      ],
+      "docs": [
+        {
+          "title": "String.prototype.slice()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice"
+        },
+        {
+          "title": "Template literals",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"
+        },
+        {
+          "title": "JSON grammar (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-2"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ended",
+      "title": "Tell a text that ends early from a wrong one",
+      "file": "src/json.js",
+      "description": "Give every `JsonError` an `ended`: `true` when the text ends before its value is complete, `false` when the text is wrong.\n\n- a text that ends early has `ended: true`, `found: 'end of input'`, and `at` equal to the length of the text, the place just after its last character, with the line and column of that place\n- that covers an array or object that never closes, a text that never closes, and a number, a word or an escape that stops halfway, such as `[-`, `[1.`, `[tru` or `\"ab\\`\n- every other error has `ended: false`, even when it sits near the end, such as `[tru]` or a raw line break inside a text\n- the message says the text ended, not what was found\n\nThe check parses texts of its own that stop early and texts that are wrong, and reads `ended`, `found`, `at`, the line and the column.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error for the list cut off in the middle.",
+        "Find the throws that happen because the text ran out, in the parser and in the tokenizer.",
+        "Give those errors the length of the text as their at.",
+        "Set ended and found from that, in one place if you can."
+      ],
+      "hints": [
+        "A text that ends early runs out at its very end. So every such error can have the length of the text as its at, and ended is then just whether at is the length of the text.",
+        "Watch the tokenizer too. A word that stops halfway, `tru`, has run out, while `tru]` is wrong. Compare a word one character at a time, and the place where it goes wrong tells you which.",
+        "In the JsonError constructor: `this.ended = at >= text.length` and `this.found = this.ended ? 'end of input' : found`."
+      ],
+      "docs": [
+        {
+          "title": "String.length",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length"
+        },
+        {
+          "title": "Error, and errors of your own",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+        },
+        {
+          "title": "Conditional (ternary) operator",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

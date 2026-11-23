@@ -1,0 +1,122 @@
+{
+  "id": "values-inside-values",
+  "title": "Values inside values",
+  "files": [
+    "src/json.js",
+    "src/try.js",
+    "data/paper.json"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace where your parser reads the three supplier lists.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "arrays",
+      "title": "Read an array",
+      "file": "src/json.js",
+      "description": "Implement `parse(text)` for texts that hold an array, with `readValue` and `readArray` in `src/json.js`, or a shape of your own.\n\n- `parse(text)` returns the value the text holds; a text, a number, `true`, `false` and `null` give their JavaScript value\n- an array, `[` then values with one comma between each two, then `]`, gives a JavaScript array of those values, in order; `[]` is an empty array\n- an array may hold arrays, as deep as they go\n- a comma first, last or twice, two values with no comma, a bracket that never closes or the wrong closing bracket throw a `JsonError` whose `at` is the index of the token where the text goes wrong\n- reading past the last token never happens: when the tokens run out, that is a `JsonError` too\n\nThe check parses arrays of its own and compares the values with the built-in reader's, then gives `parse` arrays that are not JSON.",
+      "nextSteps": [
+        "Run `node src/try.js`: every piece says `Not implemented` for now.",
+        "In `parse`, tokenize the text and make a reader, `{ tokens, pos: 0 }`.",
+        "Write `readValue`: a token that is not a mark is a value by itself; a `[` means an array.",
+        "Write `readArray`: after the `[`, read a value, then expect a comma or a `]`, and go round."
+      ],
+      "hints": [
+        "readValue looks at the token at reader.pos and decides. readArray calls readValue for each item, and readValue calls readArray for an array inside it. That is what lets arrays nest as deep as they go.",
+        "After each value inside an array, exactly two tokens may come: a comma, and then another value must follow, or `]`, and the array is done. Anything else, the end of the tokens included, is an error.",
+        "In readArray: `list.push(readValue(reader))`, then look at `reader.tokens[reader.pos]`: when it is a `]`, move past it and return the list; when it is a `,`, move past it and go round; otherwise throw."
+      ],
+      "docs": [
+        {
+          "title": "Recursion",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Recursion"
+        },
+        {
+          "title": "JSON arrays (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-5"
+        },
+        {
+          "title": "Array.prototype.push()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Recursion, explained",
+          "url": "https://www.youtube.com/watch?v=Mv9NEXX1VHc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "objects",
+      "title": "Read an object",
+      "file": "src/json.js",
+      "description": "Implement `readObject(reader)`, or the object part of your own shape, so that `parse` reads objects.\n\n- an object, `{` then pairs of a key, a `:` and a value, with one comma between each two pairs, then `}`, gives a JavaScript object with those keys; `{}` is an empty object\n- a key is always a text in quotes; a number, a word, an array or anything else where a key goes throws a `JsonError`\n- objects and arrays may sit inside each other, as deep as they go\n- when a key comes twice, the last value wins\n- the key `__proto__` becomes an ordinary key of the object, like any other\n- a missing colon, a missing value, a comma first, last or twice, or an object that never closes throw a `JsonError` whose `at` is the index of the token where the text goes wrong\n\nThe check parses objects of its own and compares them with the built-in reader's values, then gives `parse` objects that are not JSON.",
+      "nextSteps": [
+        "Run `node src/try.js`: the supplier lists are objects, so now they read.",
+        "In `readValue`, send a `{` to `readObject`.",
+        "In `readObject`, after the `{`: a text token for the key, then a `:`, then `readValue` for the value.",
+        "Then expect a comma or a `}`, the same way an array does."
+      ],
+      "hints": [
+        "An object is an array of pairs with different marks: where an array reads a value, an object reads a key, a colon and a value.",
+        "Check the key's token type before you use it: only a `'string'` token is a key. And setting `object[key] = value` does the wrong thing for one key, `__proto__`, which sets the object's prototype instead of adding a key.",
+        "`Object.defineProperty(object, key, { value, enumerable: true, writable: true, configurable: true })` adds any key as an ordinary one, and on a key that is already there it replaces the value."
+      ],
+      "docs": [
+        {
+          "title": "Object.defineProperty()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"
+        },
+        {
+          "title": "Object.prototype.__proto__",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/proto"
+        },
+        {
+          "title": "JSON objects (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-4"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "whole",
+      "title": "One value, as deep as it goes",
+      "file": "src/json.js",
+      "description": "Make `parse(text)` read a whole JSON text, and nothing more.\n\n- the text holds exactly one value, of any kind, with only space before and after it\n- anything after that value, such as a second value or a stray `]`, throws a `JsonError` whose `at` is the index of the first token after it\n- a text with no value at all, empty or only space, throws a `JsonError`\n- values nested thousands of levels deep read without crashing, and brackets that never close throw a `JsonError` however deep they go\n\nThe check parses texts of its own, among them 120 it makes up and compares with the built-in reader and some 3000 levels deep, and texts with more after the value.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at the last piece, two objects one after the other.",
+        "After `parse` reads its one value, look at whether any tokens are left.",
+        "Make sure a text with no tokens at all ends in a JsonError, not in `undefined`."
+      ],
+      "hints": [
+        "Reading one value tells you where that value ends. Whether the text ends there too is a separate question, and `parse` is the place to ask it.",
+        "A text of only space has no tokens, so the very first readValue finds nothing: that must throw, not return undefined. Deep texts need nothing new if each read moves the position forward before it calls itself.",
+        "`if (reader.pos < reader.tokens.length)` after the value means there is more; throw a JsonError at the `at` of `reader.tokens[reader.pos]`."
+      ],
+      "docs": [
+        {
+          "title": "JSON grammar (RFC 8259)",
+          "url": "https://www.rfc-editor.org/rfc/rfc8259#section-2"
+        },
+        {
+          "title": "Recursion",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Recursion"
+        },
+        {
+          "title": "JSON.parse()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Parsing, explained",
+          "url": "https://www.youtube.com/watch?v=bxpc9Pp5pZM"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

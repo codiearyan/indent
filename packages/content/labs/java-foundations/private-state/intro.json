@@ -1,0 +1,37 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "Can anyone squeeze onto the Linnet?",
+      "note": "Twelve seats, and not one more."
+    },
+    {
+      "title": "The boat class",
+      "text": "Any line anywhere can change the count"
+    },
+    {
+      "title": "Your boat",
+      "file": "Manifest.java",
+      "mine": true,
+      "gap": "Nothing keeps the rule",
+      "tasks": ["Private fields", "Board and land", "Hand out a copy", "Print it plainly"]
+    },
+    {
+      "title": "The Linnet",
+      "text": "Full means full, whoever writes the code."
+    }
+  ],
+  "ticket": {
+    "label": "Thirteenth",
+    "wrong": "let aboard",
+    "why": "Rule broken",
+    "right": "kept off"
+  },
+  "captions": [
+    "The passenger list on each boat. Ossian wants to know nobody can overload one.",
+    "Today any line in any program can change the count, so the rule is only a hope.",
+    "You make the fields private and write the methods that keep the rule.",
+    "Now a full boat takes nobody more, and a copy of its list changes nothing.",
+    "private, a rule kept by methods, and toString. Next: what belongs to the class."
+  ]
+}

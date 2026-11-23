@@ -1,0 +1,26 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "Press wash at a tenth of its price?", "note": "The import read the ink list." },
+    { "title": "Old import", "text": "Reads digits and dots, stops at any quote.", "note": "An exponent is lost." },
+    {
+      "title": "Your code",
+      "file": "json.js",
+      "mine": true,
+      "gap": "Numbers and names unread",
+      "tasks": ["Read a number", "Read a text", "Escapes and endings"]
+    },
+    {
+      "title": "Ink list",
+      "rows": [["Rubber-based black", "a tin"], ["Warm orange", "a tin"], ["Press wash, 5 l", "a can"]],
+      "mark": 2
+    }
+  ],
+  "ticket": { "label": "Press wash", "wrong": "too cheap", "why": "Cut short", "right": "right price" },
+  "captions": [
+    "At Ashgrove Press, Sefton finds press wash priced at a tenth of what it costs.",
+    "The old import reads only digits and dots, so the exponent in the ink list is lost.",
+    "You write the readers for numbers and texts, escapes included, in three tasks.",
+    "Now the whole number is read by its rules, and the price comes out right.",
+    "Same ink list, same import, and every price and name reads as written."
+  ]
+}

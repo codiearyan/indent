@@ -1,0 +1,55 @@
+{
+  "stations": [
+    {
+      "title": "Agnieszka",
+      "say": "Why is Hettie still on lane 1?",
+      "note": "Front desk. BL-36."
+    },
+    {
+      "title": "Lane board",
+      "rows": [
+        [
+          "Lane 1",
+          "Hettie, Jonah"
+        ],
+        [
+          "Lane 2",
+          "Delphine"
+        ],
+        [
+          "Lane 3",
+          "Ifeoma, Kenji"
+        ]
+      ],
+      "mark": 0
+    },
+    {
+      "title": "Your fix",
+      "file": "LaneBoard.jsx",
+      "mine": true,
+      "gap": "Changes made in place",
+      "tasks": [
+        "Take off at once",
+        "Keep the bookings",
+        "Leave the rest alone"
+      ]
+    },
+    {
+      "title": "New session",
+      "text": "Puts the board back to the morning bookings."
+    }
+  ],
+  "ticket": {
+    "label": "Hettie",
+    "wrong": "still on lane 1",
+    "why": "Not drawn",
+    "right": "off the board"
+  },
+  "captions": [
+    "Next, Agnieszka takes Hettie off lane 1, and Hettie stays on the board.",
+    "She goes only when a letter is typed, and New session brings back the wrong names.",
+    "Take off and Add show at once, the bookings stay as they came, and the rest stays put.",
+    "Hettie leaves the board at once, and the morning's bookings still have her.",
+    "Same board, same buttons. Every change draws at once and touches one lane."
+  ]
+}

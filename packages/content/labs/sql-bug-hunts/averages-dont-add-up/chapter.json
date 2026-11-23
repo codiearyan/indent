@@ -1,0 +1,84 @@
+{
+  "id": "averages-dont-add-up",
+  "title": "Averages that do not add up",
+  "files": [
+    "queries/1-hand-count.sql",
+    "queries/2-averages.sql",
+    "queries/3-trade-price.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of Mallowfield's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/2-averages.sql"
+  },
+  "tasks": [
+    {
+      "id": "prove-it",
+      "title": "Count the orders and takings Clemency added up",
+      "file": "queries/1-hand-count.sql",
+      "description": "Clemency worked out each average by hand: what the orders on a channel came to, divided by how many orders there were. Give her both numbers from the database, so she can see the report's average is neither.\n\nIn `queries/1-hand-count.sql`, return three columns, in this order:\n\n- `channel`\n- `orders`: how many orders came in on that channel\n- `takings_pence`: what those orders came to, every line of every order added up\n\nOne row per channel. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run `2-averages.sql` and note what it says for each channel.",
+        "Count each channel's orders, each order once.",
+        "Add up every line of those orders, and divide one number by the other in your head."
+      ],
+      "hints": [
+        "An order is one row in `orders` and several rows once its lines are joined.",
+        "`COUNT(*)` after joining the lines counts lines. Count the order's id once each with `COUNT(DISTINCT o.id)`, or add the lines up per order first.",
+        "The query has the shape `SELECT o.channel, COUNT(DISTINCT o.id) AS orders, SUM(l.packets * l.price_pence) AS takings_pence FROM orders AS o JOIN order_lines AS l ON ... GROUP BY o.channel`."
+      ],
+      "docs": [
+        { "title": "count() and DISTINCT", "url": "https://www.sqlite.org/lang_aggfunc.html#count" },
+        { "title": "sum() and total()", "url": "https://www.sqlite.org/lang_aggfunc.html#sumunc" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix-average",
+      "title": "Make the average order mean one order",
+      "file": "queries/2-averages.sql",
+      "description": "Fix the average order in `queries/2-averages.sql` at the cause.\n\nIt returns one row per channel, with two columns, in this order:\n\n- `channel`\n- `average_pounds`: what one order on that channel comes to on average, in pounds, rounded to two places with `ROUND`\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data, where the averages do not come out in whole pence.",
+      "nextSteps": [
+        "Run the file. Look at the market's row: can an average of real orders be a whole number of pounds?",
+        "Find each division in the query, and say whether both of its numbers are whole.",
+        "Find what is averaged: orders, or something else. Work out each order's total first, then average those."
+      ],
+      "hints": [
+        "Two things are wrong. Read the lesson's parts \"Whole numbers divide whole\" and \"An average of averages\".",
+        "The inner query averages per customer, so a customer with one order weighs as much as one with five. And `pence / count / 100` with whole numbers throws away every fraction. Average the order totals themselves, and divide by `100.0`.",
+        "The query has the shape `SELECT o.channel, ROUND(AVG(t.total) / 100.0, 2) AS average_pounds FROM orders AS o JOIN (SELECT order_id, SUM(packets * price_pence) AS total FROM order_lines GROUP BY order_id) AS t ON t.order_id = o.id GROUP BY o.channel`."
+      ],
+      "docs": [
+        { "title": "avg()", "url": "https://www.sqlite.org/lang_aggfunc.html#avg" },
+        { "title": "Operators: division", "url": "https://www.sqlite.org/lang_expr.html#operators_and_parse_affecting_attributes" },
+        { "title": "round()", "url": "https://www.sqlite.org/lang_corefunc.html#round" }
+      ],
+      "videos": [
+        { "title": "Why an average of averages is wrong", "url": "https://www.youtube.com/watch?v=AOwWvGxTtyo" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trade-price",
+      "title": "Find the customers who earned the trade price",
+      "file": "queries/3-trade-price.sql",
+      "description": "Next year, a customer whose orders this year come to more than £40 pays the trade price. The list in `queries/3-trade-price.sql` decides who. Nobody has complained yet.\n\nFix it so it returns one row for each customer whose orders placed on or after `2026-01-01` come to more than 4000 pence, with two columns, in this order:\n\n- `customer`: the customer's name\n- `spent_pence`: what their orders placed on or after `2026-01-01` came to\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data, which has a customer at exactly £40 and a big order from 2025.",
+      "nextSteps": [
+        "Run the file and compare the Garden's total with its 2026 orders in `seed.sql`.",
+        "For each condition, say whether it tests one row or a whole customer.",
+        "Put each test where it runs on what it tests."
+      ],
+      "hints": [
+        "Read the lesson's part \"A test on a total\". One condition is in the right place and one is not.",
+        "`l.packets * l.price_pence > 4000` looks at one line at a time, before the rows are grouped. The test on what a customer spent goes in `HAVING`; the date, a test on single rows, stays in `WHERE`.",
+        "The query ends with the shape `WHERE o.placed_at >= '2026-01-01' GROUP BY c.id, c.name HAVING SUM(l.packets * l.price_pence) > 4000`."
+      ],
+      "docs": [
+        { "title": "GROUP BY and HAVING", "url": "https://www.sqlite.org/lang_select.html#resultset" },
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" }
+      ],
+      "points": 10
+    }
+  ]
+}

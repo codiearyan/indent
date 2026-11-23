@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Where is last night's log?", "note": "The pads keep going missing." },
+    { "title": "Radio desk", "text": "Each night on a page torn out of a pad." },
+    {
+      "title": "Your functions",
+      "file": "night_log.py",
+      "mine": true,
+      "gap": "A log that lasts one night",
+      "tasks": ["Read a log file", "Entry by entry", "Start and add to it", "Find one night's log"]
+    },
+    { "title": "logs folder", "rows": [["2026-12-01.txt"], ["2026-12-02.txt"]] }
+  ],
+  "ticket": { "label": "Last night", "wrong": "page lost", "why": "Paper only", "right": "on the laptop" },
+  "captions": [
+    "At the base, Ailsa wants last night's radio log, and it was written on a pad.",
+    "Today each night is a torn-out page, and last night's page is gone.",
+    "You write functions that read a log file, start one, add to it and find any night's.",
+    "Now last night's log is a file in the logs folder, read back in a moment.",
+    "Every night's log is a file on the laptop, read back, started fresh and added to."
+  ]
+}

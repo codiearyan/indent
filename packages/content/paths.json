@@ -24,7 +24,8 @@
           "js-foundations",
           "browser-js",
           "async-js",
-          "js-bug-hunts"
+          "js-bug-hunts",
+          "build-a-json-parser"
         ]
       },
       {
@@ -55,7 +56,8 @@
           "react-foundations",
           "react-screens",
           "react-with-an-api",
-          "build-a-state-store"
+          "build-a-state-store",
+          "react-bug-hunts"
         ]
       },
       {
@@ -80,7 +82,8 @@
         "title": "SQL",
         "labs": [
           "sql-foundations",
-          "sql-basics"
+          "sql-basics",
+          "sql-bug-hunts"
         ]
       },
       {
@@ -149,7 +152,8 @@
         "title": "JavaScript",
         "labs": [
           "js-foundations",
-          "async-js"
+          "async-js",
+          "build-a-json-parser"
         ]
       },
       {
@@ -189,7 +193,8 @@
         "title": "Data",
         "labs": [
           "sql-foundations",
-          "sql-basics"
+          "sql-basics",
+          "sql-bug-hunts"
         ]
       },
       {
@@ -239,7 +244,8 @@
           "react-foundations",
           "react-screens",
           "react-with-an-api",
-          "build-a-state-store"
+          "build-a-state-store",
+          "react-bug-hunts"
         ]
       }
     ]
@@ -259,7 +265,8 @@
           "build-a-test-runner",
           "build-a-promise",
           "build-a-router",
-          "build-a-state-store"
+          "build-a-state-store",
+          "build-a-json-parser"
         ]
       },
       {
@@ -267,7 +274,9 @@
         "labs": [
           "js-bug-hunts",
           "llm-bug-hunts-ts",
-          "security-bug-hunts"
+          "security-bug-hunts",
+          "sql-bug-hunts",
+          "react-bug-hunts"
         ]
       }
     ]

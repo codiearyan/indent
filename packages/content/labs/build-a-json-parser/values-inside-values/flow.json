@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "tokenize", "label": "tokenize()", "kind": "function" },
+      { "id": "parse", "label": "parse()", "kind": "function", "mine": true, "fn": "parse" },
+      { "id": "value", "label": "readValue()", "kind": "function", "mine": true, "fn": "readValue" },
+      { "id": "array", "label": "readArray()", "kind": "function", "mine": true, "fn": "readArray" },
+      { "id": "object", "label": "readObject()", "kind": "function", "mine": true, "fn": "readObject" },
+      { "id": "list", "label": "Price list", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "tokenize", "to": "parse", "label": "tokens" },
+      { "from": "parse", "to": "value", "label": "reader" },
+      { "from": "value", "to": "array", "label": "a [" },
+      { "from": "value", "to": "object", "label": "a {" },
+      { "from": "parse", "to": "list", "label": "one value" }
+    ],
+    "note": "A parser turns the tokens into the values Idris works with: arrays and objects inside each other, read by functions that call each other."
+  },
+  "tasks": {
+    "arrays": {
+      "steps": [
+        {
+          "active": ["tokenize", "tokenize->parse", "parse"],
+          "note": "parse gets the tokens of a list of paper prices and makes a reader that starts at the first one."
+        },
+        {
+          "active": ["parse", "parse->value", "value", "value->array", "array"],
+          "note": "The first token is an opening bracket, so readValue hands the reader to readArray."
+        },
+        {
+          "active": ["array", "value"],
+          "value": { "kind": "array", "label": "tokens in turn", "values": ["[", "value", ",", "value", ",", "value", "]"] },
+          "note": "readArray asks readValue for each price, and after each one expects a comma or the closing bracket, nothing else."
+        },
+        {
+          "active": ["parse", "parse->list", "list"],
+          "note": "The prices come back as one JavaScript array, in the order the supplier wrote them."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "parse", "args": ["[0.42, 0.95, 0.18]"] }
+    },
+    "objects": {
+      "steps": [
+        {
+          "active": ["tokenize", "tokenize->parse", "parse", "parse->value", "value"],
+          "note": "An item from the paper list begins with an opening brace."
+        },
+        {
+          "active": ["value", "value->object", "object"],
+          "value": { "kind": "array", "label": "one pair", "values": ["key, a text", ":", "value"] },
+          "note": "readObject reads a key, which must be a text, then a colon, then asks readValue for the value."
+        },
+        {
+          "active": ["object", "value"],
+          "note": "A value can be an array of sizes or another object; readValue reads it however deep it goes."
+        },
+        {
+          "active": ["parse", "parse->list", "list"],
+          "value": { "kind": "map", "label": "an item", "entries": [{ "key": "code", "value": "a text" }, { "key": "price", "value": "a number" }, { "key": "inStock", "value": "true or false" }] },
+          "note": "The item comes back as an object Idris can ask for its price."
+        }
+      ],
+      "trace": { "file": "src/json.js", "call": "parse", "args": ["{\"code\": \"LD-120\", \"sizes\": [\"A4\"], \"inStock\": false}"] }
+    },
+    "whole": {
+      "steps": [
+        {
+          "active": ["tokenize", "tokenize->parse", "parse"],
+          "note": "A whole supplier list comes in: one object, with space and line breaks around it."
+        },
+        {
+          "active": ["parse", "parse->value", "value", "value->object", "object", "value->array", "array"],
+          "note": "readValue reads the one value, however many levels of objects and arrays it holds."
+        },
+        {
+          "active": ["parse"],
+          "note": "parse checks that no tokens are left. A second value, or a stray bracket after the first, is refused."
+        },
+        {
+          "active": ["parse", "parse->list", "list"],
+          "note": "Only then does the price list come back, whole."
+        }
+      ]
+    }
+  }
+}

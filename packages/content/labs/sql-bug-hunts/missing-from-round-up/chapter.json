@@ -1,0 +1,83 @@
+{
+  "id": "missing-from-round-up",
+  "title": "Customers missing from the round-up",
+  "files": [
+    "queries/1-left-out.sql",
+    "queries/2-round-up.sql",
+    "queries/3-november-packets.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs the query in that file against a fresh copy of Mallowfield's database and prints the rows.",
+    "suggestedCommand": "node run.mjs queries/2-round-up.sql"
+  },
+  "tasks": [
+    {
+      "id": "prove-it",
+      "title": "List the customers the round-up leaves out",
+      "file": "queries/1-left-out.sql",
+      "description": "Show Dunstan who is missing from his round-up.\n\nIn `queries/1-left-out.sql`, return two columns, in this order:\n\n- `id`\n- `customer`: the customer's name\n\nOne row for every customer with no order placed on or after `2026-01-01`, those who never ordered at all included. Any order of rows. Check compares the columns and the rows on the data you can see and on hidden data.",
+      "nextSteps": [
+        "Run `2-round-up.sql` and compare its names with `customers` in `seed.sql`.",
+        "Pair each customer with their orders from 2026 only, keeping every customer.",
+        "Keep the customers who found no partner."
+      ],
+      "hints": [
+        "A customer with only old orders is as missing as one with none. Read the lesson's part \"See it for yourself\".",
+        "Put the date test in the `ON` of a `LEFT JOIN` to orders, then keep the rows where the order's id is `NULL`. If you use `NOT IN` instead, remember the empty win-back list.",
+        "The query has the shape `SELECT c.id, c.name AS customer FROM customers AS c LEFT JOIN orders AS o ON o.customer_id = c.id AND o.placed_at >= '2026-01-01' WHERE o.id IS NULL`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "IS and IS NOT", "url": "https://www.sqlite.org/lang_expr.html#isisnot" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fix-round-up",
+      "title": "Give every customer a line on the round-up",
+      "file": "queries/2-round-up.sql",
+      "description": "Fix the round-up in `queries/2-round-up.sql` at the cause.\n\nIt returns one row for every customer, with two columns, in this order:\n\n- `customer`: the customer's name\n- `spent_pence`: what their orders placed on or after `2026-01-01` came to, `0` when none\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data, where customers have other mixes of old and new orders.",
+      "nextSteps": [
+        "Run the file and count the rows. Find Agata Kowalczyk in `seed.sql` and look at her orders.",
+        "Say what the `WHERE` does to a customer the `LEFT JOIN` kept with no partner, and to one whose orders are all old.",
+        "Move the date test to where it chooses partners, and run the file again."
+      ],
+      "hints": [
+        "Read the lesson's part \"How it happens\". The `LEFT JOIN` keeps Agata; something after it removes her.",
+        "A test in `WHERE` runs on the joined rows and throws away whole customers. A test in the `ON` of the join to orders only decides which orders count as partners. Adding `OR o.placed_at IS NULL` mends only the customers with no orders at all.",
+        "The join to orders has the shape `LEFT JOIN orders AS o ON o.customer_id = c.id AND o.placed_at >= '2026-01-01'`, and the query has no `WHERE`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "The WHERE clause", "url": "https://www.sqlite.org/lang_select.html#whereclause" }
+      ],
+      "videos": [
+        { "title": "Why a LEFT JOIN can act like a plain JOIN", "url": "https://www.youtube.com/watch?v=RFFR3AJU3RE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "november-packets",
+      "title": "Put every seed on the re-order list",
+      "file": "queries/3-november-packets.sql",
+      "description": "Dunstan orders seed from the growers with the list in `queries/3-november-packets.sql`. Nobody has complained yet.\n\nFix it so it returns one row for every seed, with two columns, in this order:\n\n- `product`: the seed's name\n- `packets`: how many packets of it were in orders placed in November 2026, `0` when none\n\nAny order of rows. Check compares the rows on the data you can see and on hidden data, which has seeds sold only in October and a seed never sold.",
+      "nextSteps": [
+        "Run the file and count the seeds. Which are missing?",
+        "Try moving the test on the date into the `ON` of orders. Run it and look at Scarlet runner bean: are October's packets still counted?",
+        "Make the test decide which lines reach the seed, not only which orders."
+      ],
+      "hints": [
+        "The test is on orders, but the packets are on the lines. Read the lesson's part \"When the test is two tables away\".",
+        "A line whose order is not from November still pairs with its seed, so moving the test into the `ON` of orders still adds its packets. Total November's packets per seed in a query in brackets, then join that to every seed.",
+        "The FROM part has the shape `FROM products AS p LEFT JOIN (SELECT l.product_id, SUM(l.packets) AS packets FROM order_lines AS l JOIN orders AS o ON o.id = l.order_id WHERE o.placed_at LIKE '2026-11%' GROUP BY l.product_id) AS n ON n.product_id = p.id`, with `COALESCE(n.packets, 0)`."
+      ],
+      "docs": [
+        { "title": "The FROM clause and joins", "url": "https://www.sqlite.org/lang_select.html#fromclause" },
+        { "title": "coalesce()", "url": "https://www.sqlite.org/lang_corefunc.html#coalesce" }
+      ],
+      "points": 10
+    }
+  ]
+}
