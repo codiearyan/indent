@@ -1,0 +1,124 @@
+{
+  "id": "numbers-and-chance",
+  "title": "Numbers and chance",
+  "files": ["callout_numbers.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to count radio legs and search squares, sum up the hours and draw the rota.",
+    "suggestedCommand": "python3 callout_numbers.py"
+  },
+  "tasks": [
+    {
+      "id": "legs",
+      "title": "How many radio legs",
+      "file": "callout_numbers.py",
+      "description": "Under `# Task 1` in `callout_numbers.py`, write the line that imports `math`. Then write a function called `radio_legs` that takes two positions, each a tuple `(east, north)` in metres, and how far a hand radio reaches, in metres, and gives back how many people it takes, standing in a line, to pass a message from one position to the other: the straight distance between the two divided by the reach, rounded up to a whole number. For `base`, `team` and `1500` it gives back `2`. Print what it gives back for `base`, `team` and `1500`.\n\nCheck calls `radio_legs` with positions and reaches of its own, one exactly a whole number of reaches apart, and looks at the whole number it gives back.",
+      "nextSteps": [
+        "Read the parts of the lesson on square roots and on rounding up and down.",
+        "Work out how far apart the two positions are east, and north.",
+        "Work out the straight distance from those two, and print it for base and team.",
+        "Divide by the reach, round up, and give back what you get."
+      ],
+      "hints": [
+        "The straight line between two positions is the long side of a triangle whose other sides go east and north. `round()` goes to the nearest whole number, which is sometimes down.",
+        "The straight distance is the square root of east squared plus north squared, and `math` has a function for each of a square root and rounding up.",
+        "The shape is `distance = math.sqrt(east ** 2 + north ** 2)`, then `return math.ceil(distance / reach)`."
+      ],
+      "docs": [
+        { "title": "math.ceil()", "url": "https://docs.python.org/3/library/math.html#math.ceil" },
+        { "title": "math.sqrt()", "url": "https://docs.python.org/3/library/math.html#math.sqrt" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "square",
+      "title": "Which search square",
+      "file": "callout_numbers.py",
+      "description": "Under `# Task 2`, write a function called `square_of` that takes a position, a tuple `(east, north)` in metres from the base, and the size of a search square, in metres, and gives back the square the position is in, as a tuple `(east, north)`: each part of the position divided by the size, rounded down to a whole number. West and south of the base are below 0, so rounded down goes to the smaller number there too. For `team` and `1000` it gives back `(2, -2)`. Print what it gives back for `team` and `1000`.\n\nCheck calls `square_of` with positions and sizes of its own, some west or south of the base, and looks at the tuple it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on rounding up and down.",
+        "Divide each part of the position by the size, and print what you get for team.",
+        "Round each one down with math, and compare with what int() gives for the part below 0.",
+        "Give back the two as a tuple."
+      ],
+      "hints": [
+        "`int()` cuts off what is after the point, so it goes towards 0: below 0, that is up, not down.",
+        "`math` has a function that rounds down to the next whole number below, below 0 too. One of Python's operators divides and rounds down in one step.",
+        "The shape is `return (math.floor(position[0] / size), math.floor(position[1] / size))`."
+      ],
+      "docs": [
+        { "title": "math.floor()", "url": "https://docs.python.org/3/library/math.html#math.floor" },
+        { "title": "int()", "url": "https://docs.python.org/3/library/functions.html#int" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "summary",
+      "title": "Average and middle hours",
+      "file": "callout_numbers.py",
+      "description": "Under `# Task 3`, write the line that imports `statistics`. Then write a function called `hours_summary` that takes a list of the hours of callouts, numbers in any order, and gives back a tuple of two numbers: their mean, then their median. Leave the list it is given as it was. For `hours` it gives back `(5.333333333333333, 4.5)`. Print what it gives back for `hours`.\n\nCheck calls `hours_summary` with lists of its own, some not in order, some with an even number of hours, and looks at the tuple it gives back and at whether the list is as it was. A whole number may come back as `3` or `3.0`.",
+      "nextSteps": [
+        "Read the part of the lesson on the statistics module.",
+        "Write the import line, then the def line.",
+        "Work out the mean and the median with statistics, and print each for hours.",
+        "Give them back as a tuple, the mean first."
+      ],
+      "hints": [
+        "The mean adds them all and divides by how many there are; the median is the one in the middle once they are in order, or halfway between the two middle ones.",
+        "`statistics` has a function for each, and each takes the list. Neither changes the list.",
+        "The shape is `return (statistics.mean(hours), statistics.median(hours))`."
+      ],
+      "docs": [
+        { "title": "statistics.mean()", "url": "https://docs.python.org/3/library/statistics.html#statistics.mean" },
+        { "title": "statistics.median()", "url": "https://docs.python.org/3/library/statistics.html#statistics.median" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rota",
+      "title": "The duty rota",
+      "file": "callout_numbers.py",
+      "description": "Under `# Task 4`, write the line that imports `random`. Then write a function called `duty_rota` that takes a list of volunteers and a seed, a whole number, and gives back a new list of the same volunteers, each once, in a shuffled order. Set the random module to the seed first, so the same seed always gives the same rota. Leave the list it is given as it was. Print what it gives back for `volunteers` and `7`.\n\nCheck calls `duty_rota` with volunteers and seeds of its own, each seed twice with the random module in another state before each call, and looks at whether every volunteer is on the rota once, the same rota comes back for the same seed, other seeds give other rotas, and the list it was given is as it was.",
+      "nextSteps": [
+        "Read the parts of the lesson on a seed and on shuffling.",
+        "Set the random module to the seed.",
+        "Make a copy of the list, and shuffle the copy.",
+        "Give back the copy, and run the file twice to see the same rota."
+      ],
+      "hints": [
+        "Drawing each place of the rota by chance can draw the same person twice. Shuffling a list moves what is already in it, so each one is there once.",
+        "One function of `random` sets where the run of chance starts. Another shuffles a list itself and gives back `None`, so shuffle a copy, and give back the copy.",
+        "The shape is `random.seed(seed)`, `rota = volunteers.copy()`, `random.shuffle(rota)`, then `return rota`."
+      ],
+      "docs": [
+        { "title": "random.seed()", "url": "https://docs.python.org/3/library/random.html#random.seed" },
+        { "title": "random.shuffle()", "url": "https://docs.python.org/3/library/random.html#random.shuffle" }
+      ],
+      "videos": [
+        { "title": "The random module: seeding and shuffling", "url": "https://www.youtube.com/watch?v=nfw0biODLL4" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "drivers",
+      "title": "Drivers for the week",
+      "file": "callout_numbers.py",
+      "description": "Under `# Task 5`, write a function called `drivers` that takes a list of volunteers, a number of nights and a seed, and gives back a list of one volunteer for each night, each drawn by chance from the whole list, so the same volunteer may drive on more than one night. Set the random module to the seed once, before the first draw, so the same seed always gives the same drivers. Print what it gives back for `volunteers`, `7` and `3`.\n\nCheck calls `drivers` with volunteers, nights and seeds of its own, more nights than volunteers among them, each seed twice with the random module in another state before each call, and looks at whether there is one volunteer from the list for each night, the same seed gives the same drivers, and other seeds give other drivers.",
+      "nextSteps": [
+        "Read the parts of the lesson on a seed and on drawing one by chance.",
+        "Set the random module to the seed, above the loop.",
+        "Draw one volunteer for each night, and add each to a list.",
+        "Give back the list, and print it for volunteers, 7 and 3."
+      ],
+      "hints": [
+        "Setting the seed starts the run of chance again from the same place. Set it once, or every draw is the first draw.",
+        "`random` has a function that draws one item from a list. A loop over `range(nights)` draws one for each night.",
+        "The shape is `random.seed(seed)`, `drawn = []`, then `for night in range(nights):` with `drawn.append(random.choice(volunteers))`, then `return drawn`."
+      ],
+      "docs": [
+        { "title": "random.choice()", "url": "https://docs.python.org/3/library/random.html#random.choice" },
+        { "title": "Notes on reproducibility", "url": "https://docs.python.org/3/library/random.html#notes-on-reproducibility" }
+      ],
+      "points": 10
+    }
+  ]
+}

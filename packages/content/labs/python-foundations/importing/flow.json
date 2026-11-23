@@ -1,0 +1,42 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "library", "label": "Python's own modules", "kind": "data" },
+      { "id": "pager", "label": "pager.py", "kind": "file", "mine": true },
+      { "id": "pagers", "label": "Team pagers", "kind": "story" },
+      { "id": "report", "label": "Rhona's report", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ailsa", "to": "pager", "label": "pages, hills" },
+      { "from": "library", "to": "pager", "label": "imported tools" },
+      { "from": "pager", "to": "pagers", "label": "short lines" },
+      { "from": "pager", "to": "report", "label": "one-line summary" }
+    ],
+    "note": "Instead of writing every tool by hand, the pager file imports the ones Python already has."
+  },
+  "tasks": {
+    "wrap": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->pager", "pager"], "value": { "kind": "array", "label": "what goes in", "values": ["a page", "a width"] }, "note": "A long page and the width of a pager line go in." },
+        { "active": ["library", "library->pager", "pager"], "note": "The file imports a module that already knows how to break text into lines." },
+        { "active": ["pager", "pager->pagers", "pagers"], "value": { "kind": "array", "label": "what comes out", "values": ["line", "line", "..."] }, "note": "The page comes out as a list of lines, none wider than the pager." }
+      ]
+    },
+    "closest": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->pager", "pager"], "value": { "kind": "array", "label": "what goes in", "values": ["a hill as typed", "the list of hills"] }, "note": "A hill typed wrong in the log goes in, with the hills the team knows." },
+        { "active": ["library"], "note": "The right tool is found by reading a module's page in the documentation." },
+        { "active": ["library", "library->pager", "pager"], "note": "Only that one function is imported, by its own name." },
+        { "active": ["pager"], "note": "Out comes the hill that was meant, or nothing when no hill is close." }
+      ]
+    },
+    "summary": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->pager", "pager"], "value": { "kind": "array", "label": "what goes in", "values": ["a page", "a width"] }, "note": "A page and the width of one line in the report go in." },
+        { "active": ["library", "library->pager", "pager"], "note": "A tool is imported under a name the file does not already use, so Ailsa's own tool keeps its name." },
+        { "active": ["pager", "pager->report", "report"], "note": "Rhona's report gets the page cut down to one line." }
+      ]
+    }
+  }
+}
