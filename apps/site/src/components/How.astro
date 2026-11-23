@@ -1,4 +1,5 @@
 ---
+import ArrowDown from '@lucide/astro/icons/arrow-down'
 import type { Repo } from '../lib/content'
 import { MAX_HINTS } from '../../../desktop/src/shared/rules'
 import BuildStrip from './BuildStrip.astro'
@@ -24,15 +25,23 @@ const kinds = [
 ].map((k) => ({ ...k, value: repos.filter((r) => r.kind === k.kind).length }))
 ---
 
-<section id="how" aria-labelledby="how-title" class="scroll-mt-8 py-28 sm:py-40">
+<section id="how" aria-labelledby="how-title" class="scroll-mt-8 pt-24 pb-28 sm:pt-32 sm:pb-40">
   <div class="wrap">
-    <h2 id="how-title" class="display max-w-[1100px] text-[44px] text-balance sm:text-[72px] lg:text-[96px]">
-      <span class="text-muted-foreground">Everyone says learn with AI.</span>{' '}
-      <span>Nobody says how.</span>
+    <h2
+      id="how-title"
+      class="headline mx-auto max-w-[900px] text-center text-[38px] text-balance sm:text-[48px] lg:text-[60px]"
+    >
+      <span class="block text-muted-foreground">Everyone says learn with AI.</span>
+      <span class="block">Nobody says how.</span>
     </h2>
-    <p class="headline mt-8 text-[28px] text-brand sm:text-[36px]">Here's how.</p>
+    <p
+      class="headline mt-6 flex items-center justify-center gap-2 text-[24px] text-brand sm:text-[30px]"
+    >
+      Here's how.
+      <ArrowDown class="size-6 sm:size-7" stroke-width={2} aria-hidden="true" />
+    </p>
 
-    <ol class="mt-16 border-t border-rule sm:mt-24">
+    <ol class="mt-14 border-t border-rule sm:mt-20">
       <li class="grid items-center gap-10 border-b border-rule py-16 sm:py-24 lg:grid-cols-12 lg:gap-16">
         <div class="lg:col-span-5">
           <span class="font-mono text-[13px] text-muted-foreground">01 Real problems</span>
