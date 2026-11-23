@@ -1,0 +1,103 @@
+{
+  "id": "generators",
+  "title": "Generators",
+  "files": ["log_reader.py", "winter_log.txt"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to read the radio log one line at a time, pick out a team's calls and find the first mention of a word.",
+    "suggestedCommand": "python3 log_reader.py"
+  },
+  "tasks": [
+    {
+      "id": "lines",
+      "title": "One line at a time",
+      "file": "log_reader.py",
+      "description": "Under `# Task 1` in `log_reader.py`, write a generator function called `log_lines` that takes the path of a log file, opens it with `encoding=\"utf-8\"`, and gives its lines one at a time, each without the line end at its end. It reads a line of the file only when it is asked for the next one. `next(log_lines(\"winter_log.txt\"))` gives `'19:05 Alpha: leaving base'`.\n\nCheck writes log files of its own and watches how they are read. It asks for the first line, counts how many lines of the file were read by then, asks for the rest, then loops over the generator once more, and looks at whether the file was closed at the end.",
+      "nextSteps": [
+        "Read the parts of the lesson on yield and on reading a big file.",
+        "Open the file on a with line inside the function.",
+        "Go through the file line by line, and give each line without its line end with yield.",
+        "Call next on what log_lines gives back, in the try-out lines."
+      ],
+      "hints": [
+        "A function that builds a list of every line and gives it back has read the whole file before the first line comes out.",
+        "`yield` gives one value and pauses the function until the next one is asked for, so a loop over the file with `yield` inside reads one line each time. `rstrip(\"\\n\")` takes the line end off.",
+        "The shape is `with open(path, encoding=\"utf-8\") as log:`, then `for line in log:` and `yield line.rstrip(\"\\n\")` moved in under it."
+      ],
+      "docs": [
+        { "title": "Generators", "url": "https://docs.python.org/3/tutorial/classes.html#generators" },
+        { "title": "The yield statement", "url": "https://docs.python.org/3/reference/simple_stmts.html#the-yield-statement" },
+        { "title": "Methods of file objects", "url": "https://docs.python.org/3/tutorial/inputoutput.html#methods-of-file-objects" }
+      ],
+      "videos": [
+        { "title": "Generators, and what they save", "url": "https://www.youtube.com/watch?v=bD05uGo_sVI" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "team",
+      "title": "Only one team's lines",
+      "file": "log_reader.py",
+      "description": "Under `# Task 2`, write a generator function called `from_team` that takes lines of a log, a list or a generator such as `log_lines` gives, and a call sign, and gives one at a time only the lines whose call sign is that one. A line's call sign is the word after the time, with a colon after it: `20:15 Alpha: at the bridge` is from Alpha, and `22:35 Alpha: meeting Bravo at the car park` is not from Bravo. `from_team(log_lines(\"winter_log.txt\"), \"Bravo\")` gives Bravo's three lines.\n\nCheck hands `from_team` lines of its own one at a time, counting each, asks for the first line from a team and counts how many lines were read by then, asks for the rest, then loops over the generator once more.",
+      "nextSteps": [
+        "Read the parts of the lesson on generator expressions and on joining generators.",
+        "Go through the lines, and find the call sign of each.",
+        "Give the line with yield when its call sign is the one asked for.",
+        "Join it to log_lines in the try-out lines and print Bravo's lines."
+      ],
+      "hints": [
+        "Asking whether the call sign is anywhere in the line also finds lines where another team only mentions it.",
+        "`split()` cuts a line into its words, and the second word is the call sign with its colon. A generator expression, a comprehension in round brackets, is a generator too.",
+        "The shape is `for line in lines:`, then `if line.split()[1] == call_sign + \":\":` and `yield line` moved in under it."
+      ],
+      "docs": [
+        { "title": "Generator expressions", "url": "https://docs.python.org/3/tutorial/classes.html#generator-expressions" },
+        { "title": "str.split", "url": "https://docs.python.org/3/library/stdtypes.html#str.split" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "mention",
+      "title": "The first mention",
+      "file": "log_reader.py",
+      "description": "Under `# Task 3`, write a function called `first_mention` that takes lines of a log and a word, and gives back the first line that has the word in it, or `None` when no line has. It reads no line after that one. `first_mention(log_lines(\"winter_log.txt\"), \"stretcher\")` gives back `'22:10 Bravo: stretcher needed at the car park'`.\n\nCheck hands `first_mention` lines of its own one at a time, counting each, and looks at the line it gives back and at how many lines it read. Then it asks for a word that is in no line.",
+      "nextSteps": [
+        "Read the part of the lesson on next.",
+        "Find the lines that have the word, without reading them all first.",
+        "Ask for the first of them, with None when there is none.",
+        "Try a word that is in the log and one that is not."
+      ],
+      "hints": [
+        "A list of every line with the word reads the whole log, and `[0]` on an empty list stops with an `IndexError`.",
+        "`next()` takes a second value to give back when there is nothing left, instead of stopping with `StopIteration`. A loop that gives back the line as soon as it finds it stops reading there too.",
+        "The shape is `return next((line for line in lines if word in line), None)`."
+      ],
+      "docs": [
+        { "title": "next()", "url": "https://docs.python.org/3/library/functions.html#next" },
+        { "title": "StopIteration", "url": "https://docs.python.org/3/library/exceptions.html#StopIteration" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "total",
+      "title": "The longest and the total",
+      "file": "log_reader.py",
+      "description": "Under `# Task 4`, write a function called `longest_and_total` that takes numbers of hours, a list or a generator, with at least one number in it, and gives back a tuple of the largest number and the total. `longest_and_total(n for n in [3, 7, 2])` gives back `(7, 12)`.\n\nCheck calls `longest_and_total` with lists and with generators of its own, one with a single number in it, and looks at the tuple it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on a generator that is used up.",
+        "Find the largest number and the total.",
+        "Try it with a list, then with a generator, in the try-out lines.",
+        "If the generator gives a total of 0, find out why before you change anything."
+      ],
+      "hints": [
+        "`max` loops over what it is given, and so does `sum`. A list can be looped over twice; a generator gives its items only once.",
+        "Turn what you are given into a list first, or find both numbers in one loop.",
+        "The shape is `hours = list(hours)`, then `return max(hours), sum(hours)`."
+      ],
+      "docs": [
+        { "title": "Iterators", "url": "https://docs.python.org/3/tutorial/classes.html#iterators" },
+        { "title": "sum()", "url": "https://docs.python.org/3/library/functions.html#sum" }
+      ],
+      "points": 10
+    }
+  ]
+}
