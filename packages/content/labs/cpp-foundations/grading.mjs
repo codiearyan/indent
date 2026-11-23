@@ -2224,6 +2224,10 @@ export async function buildTypes(t, spec) {
       }
     }
   }
+  if (spec.swap) {
+    const swapped = swapType(cuts[spec.files[0]], spec.files[0], spec.swap)
+    if (swapped) return { problem: [swapped] }
+  }
   const taskCode = Object.values(cuts).map(cutCode).join('\n')
   const balanced = Object.values(cuts).every((c) => !unbalanced(cutCode(c)))
 
@@ -2231,7 +2235,7 @@ export async function buildTypes(t, spec) {
   const params = spec.params ?? []
   const appended = (spec.provides ?? []).filter((p) => p.task === undefined).flatMap((p) => p.lines)
   const blocks = spec.cases.map((c, i) => {
-    if (!fn) return `  if (indent_case_ == ${i}) { ${c.code} }`
+    if (!fn || spec.ownCode) return `  if (indent_case_ == ${i}) { ${c.code} }`
     const decls = params.map((p, k) => `${p.const ? 'const ' : ''}${bareType(p.type)} indent_a${k}_ = ${valueCpp(c.args[k], p.type, types)};`)
     const args = params.map((_, k) => `, indent_a${k}_`).join('')
     const after = params.map((p, k) => (p.after ? `indent_::put_("arg${k}", indent_a${k}_); ` : '')).join('')
@@ -3034,3 +3038,434 @@ export const onLeftovers = (cls, args, name, use) =>
 /** A value Check wrote with put_, as a number, or undefined. */
 export const num = (got, key) => (got[key] === undefined || got[key] === '' ? undefined : Number(got[key]))
 export const LEFTOVER = 1515870810
+
+// ---------- Part 6: memory, pointers and owners ----------
+//
+// A program that uses a value after it ended, or deletes one twice, has no promised behaviour: it
+// may seem to work, crash, or print nonsense, differently on each run. So Check never judges
+// memory by what such a program prints. It builds each task with a class Repair of its own in
+// place of the starter's (spec.swap), with the same public functions, that counts:
+// - each constructor and destructor writes to a table outside the object, keyed by its address,
+//   so Check knows how many repairs were made, how many ended, and which ended twice;
+// - each member function looks itself up first, so a call on a repair that has ended, or through
+//   nullptr, is counted, and answered from the table without reading the object's memory;
+// - its own operator new and operator delete hand out memory and never give it back, so a second
+//   delete of one repair, or a delete of one that new did not make, is counted and changes
+//   nothing, and no address is handed out twice.
+// After the learner's function returns and Check's own owners end, the counts say what happened.
+
+const REPAIR_LINES = String.raw`
+namespace indent_mem_ {
+struct slot_ { const void* at; int state; int ticket; int minutes; const std::string* item; };
+inline slot_ objs_[4096];
+inline int nobjs_ = 0;
+inline const void* blocks_[4096];
+inline bool freed_[4096];
+inline int nblocks_ = 0;
+inline int made_ = 0, ended_ = 0, twice_ = 0, dead_ = 0, nulls_ = 0, freedTwice_ = 0, notNew_ = 0, news_ = 0, deletes_ = 0, strange_ = 0;
+inline slot_ none_ = {nullptr, 0, 0, 0, new std::string()};
+inline int at_(const void* p) { for (int i = nobjs_ - 1; i >= 0; i--) if (objs_[i].at == p) return i; return -1; }
+inline int block_(const void* p) { for (int i = 0; i < nblocks_; i++) if (blocks_[i] == p) return i; return -1; }
+}
+class Repair {
+    int ticket_;
+    int minutes_;
+    const std::string* item_;
+    indent_mem_::slot_* gone_() const {
+        const void* volatile self = this;
+        if (!self) { indent_mem_::nulls_++; return &indent_mem_::none_; }
+        int i = indent_mem_::at_(this);
+        if (i == -1) { indent_mem_::strange_++; return &indent_mem_::none_; }
+        if (indent_mem_::objs_[i].state != 1) { indent_mem_::dead_++; return &indent_mem_::objs_[i]; }
+        return nullptr;
+    }
+    void born_() {
+        if (indent_mem_::nobjs_ < 4096) indent_mem_::objs_[indent_mem_::nobjs_++] = {this, 1, ticket_, minutes_, item_};
+        indent_mem_::made_++;
+    }
+public:
+    Repair(int number, const std::string& name) : ticket_(number), minutes_(0), item_(new std::string(name)) { born_(); }
+    Repair(const Repair& o) : ticket_(o.getTicket()), minutes_(o.getMinutes()), item_(new std::string(o.getItem())) { born_(); }
+    Repair& operator=(const Repair& o) {
+        int t = o.getTicket();
+        int m = o.getMinutes();
+        const std::string* s = new std::string(o.getItem());
+        if (indent_mem_::slot_* g = gone_()) { if (g != &indent_mem_::none_) { g->ticket = t; g->minutes = m; g->item = s; } return *this; }
+        ticket_ = t; minutes_ = m; item_ = s;
+        indent_mem_::objs_[indent_mem_::at_(this)].ticket = t;
+        return *this;
+    }
+    ~Repair() {
+        int i = indent_mem_::at_(this);
+        if (i == -1) { indent_mem_::strange_++; return; }
+        indent_mem_::slot_& d = indent_mem_::objs_[i];
+        if (d.state != 1) { indent_mem_::twice_++; return; }
+        d.state = 2; d.ticket = ticket_; d.minutes = minutes_; d.item = item_;
+        indent_mem_::ended_++;
+    }
+    int getTicket() const { if (indent_mem_::slot_* g = gone_()) return g->ticket; return ticket_; }
+    const std::string& getItem() const { if (indent_mem_::slot_* g = gone_()) return *g->item; return *item_; }
+    int getMinutes() const { if (indent_mem_::slot_* g = gone_()) return g->minutes; return minutes_; }
+    void addMinutes(int extra) { if (indent_mem_::slot_* g = gone_()) { if (g != &indent_mem_::none_) g->minutes += extra; return; } minutes_ += extra; }
+    static void* operator new(decltype(sizeof 0) n) {
+        void* p = ::operator new(n);
+        if (indent_mem_::nblocks_ < 4096) { indent_mem_::blocks_[indent_mem_::nblocks_] = p; indent_mem_::freed_[indent_mem_::nblocks_++] = false; }
+        indent_mem_::news_++;
+        return p;
+    }
+    static void operator delete(void* p) {
+        if (!p) return;
+        int b = indent_mem_::block_(p);
+        if (b == -1) { indent_mem_::notNew_++; return; }
+        if (indent_mem_::freed_[b]) { indent_mem_::freedTwice_++; return; }
+        indent_mem_::freed_[b] = true;
+        indent_mem_::deletes_++;
+    }
+};
+`
+  .trim()
+  .split('\n')
+  .map((l) => l.trim())
+  .join(' ')
+
+const MEMORY_HELPERS = [
+  '#include <memory>',
+  String.raw`namespace indent_ {
+template <class T> struct uptr_ : std::false_type {};
+template <class E, class D> struct uptr_<std::unique_ptr<E, D>> : std::true_type { using elem = E; };
+template <class T> struct sptr_ : std::false_type {};
+template <class E> struct sptr_<std::shared_ptr<E>> : std::true_type { using elem = E; };
+template <class T> void mt_() {
+  using N = std::remove_reference_t<T>;
+  using B = std::remove_cv_t<N>;
+  if constexpr (std::is_const_v<N> && !std::is_pointer_v<B>) std::cerr << "const ";
+  if constexpr (std::is_pointer_v<B>) { mt_<std::remove_pointer_t<B>>(); std::cerr << "*"; if constexpr (std::is_const_v<N>) std::cerr << " const"; }
+  else if constexpr (std::is_same_v<B, Repair>) std::cerr << "Repair";
+  else if constexpr (uptr_<B>::value) { std::cerr << "std::unique_ptr<"; mt_<typename uptr_<B>::elem>(); std::cerr << ">"; }
+  else if constexpr (sptr_<B>::value) { std::cerr << "std::shared_ptr<"; mt_<typename sptr_<B>::elem>(); std::cerr << ">"; }
+  else if constexpr (vec_<B>::value) { std::cerr << "std::vector<"; mt_<typename vec_<B>::elem>(); std::cerr << ">"; }
+  else type_<B>();
+  if constexpr (std::is_lvalue_reference_v<T>) std::cerr << "&";
+  else if constexpr (std::is_rvalue_reference_v<T>) std::cerr << "&&";
+}
+template <class F, class R, class... A> constexpr bool fits_() {
+  if constexpr (std::is_invocable_v<F, A...>) return std::is_same_v<std::invoke_result_t<F, A...>, R>;
+  else return false;
+}
+template <class T> struct fsig_ { static void say(const char* n) { std::cerr << "\036" << n << "\037overloaded\036"; } };
+template <class R, class... A> struct fsig_<R (*)(A...)> {
+  static void say(const char* n) { std::cerr << "\036" << n << "\037"; mt_<R>(); ((std::cerr << "\037", mt_<A>()), ...); std::cerr << "\036"; }
+};
+template <class R, class... A> struct fsig_<R (*)(A...) noexcept> : fsig_<R (*)(A...)> {};
+}
+namespace indent_mem_ {
+inline void report_() {
+  indent_::put_("made", made_); indent_::put_("ended", ended_); indent_::put_("twice", twice_); indent_::put_("dead", dead_);
+  indent_::put_("nulls", nulls_); indent_::put_("freedTwice", freedTwice_); indent_::put_("notNew", notNew_);
+  indent_::put_("news", news_); indent_::put_("deletes", deletes_); indent_::put_("strange", strange_);
+  std::string left;
+  for (int i = 0; i < nobjs_; i++) if (objs_[i].state == 1) left += (left.empty() ? "" : ", ") + std::to_string(objs_[i].ticket);
+  indent_::put_("left", left);
+}
+}`
+]
+
+/** Puts Check's own Repair in place of the class `swap.name` that the starter gives above Task 1. */
+function swapType(cut, file, swap) {
+  const head = new RegExp(`^\\s*class\\s+${swap.name}\\b[^;]*$`)
+  const at = cut.codeLines.findIndex((l, i) => i < cut.first && head.test(l))
+  const whole = cut.codeLines.join('\n')
+  const open = at === -1 ? -1 : cut.codeLines.slice(0, at).join('\n').length + (at ? 1 : 0) + cut.codeLines[at].indexOf('class')
+  const brace = open === -1 ? -1 : whole.indexOf('{', open)
+  const end = brace === -1 ? -1 : closing(whole, brace)
+  const endLine = end === -1 ? -1 : lineAt(whole, end)
+  if (at === -1 || endLine === -1 || endLine >= cut.first) {
+    return fail(
+      `${file} keeps class ${swap.name}`,
+      `Check cannot find class ${swap.name} above // Task 1 in ${file}, whole, with its closing }; as the starter gives it. Every task uses it: put it back as it was, or Reset the issue to get the starter back.`
+    )
+  }
+  for (let i = at; i <= endLine; i++) {
+    cut.kept[i] = i === at ? swap.lines : ''
+    cut.providedAt.add(i)
+  }
+  return null
+}
+
+const spaced = (text) => text.replace(/\s+\*/g, '*').replace(/\s+&/g, '&')
+
+/** The causes of an error that part 6 teaches, tried before those of parts 1 to 5. */
+function memoryCause(errors, ctx, spec) {
+  const label = ctx.label
+  const fn = spec.fn
+  const stderr = ctx.stderr ?? ''
+  const fromCheck = ctx.where === 'added' || ctx.where === 'provided'
+  const all = spaced(errors.length ? errors.map((e) => e.text).join('\n') : stderr)
+  const source = ctx.source ?? ''
+  const copied = /call to (?:implicitly-)?deleted copy constructor of '(?:const )?std::(?:__1::)?unique_ptr|call to deleted constructor of '(?:const )?std::(?:__1::)?unique_ptr|use of deleted function '[^']*unique_ptr<[^']*>::unique_ptr\(const [^']*unique_ptr|copy assignment operator is implicitly deleted[^\n]*unique_ptr|object of type '[^']*unique_ptr[^']*' cannot be assigned|use of deleted function '[^']*unique_ptr<[^']*>::operator=\(const/.test(all)
+  if (copied) {
+    const words = 'The compiler says it in a long message; the line that matters says something like "call to implicitly-deleted copy constructor" or "use of deleted function".'
+    if (fromCheck) {
+      return `Check gives ${fn} a std::unique_ptr, and ${fn} takes it in a way that needs a copy, which a unique_ptr cannot be. ${words} Compare what ${fn} takes with the task.`
+    }
+    return `A line of ${label} copies a std::unique_ptr, and a unique_ptr cannot be copied: it is the one owner of its object. To hand the object on to a new owner, the line moves it, with std::move around the name; a function that only needs to look takes a reference or a plain pointer. ${words}`
+  }
+  if (!fromCheck && /no matching member function for call to 'push_back'|no matching function for call to '[^']*push_back/.test(all) && /unique_ptr/.test(ctx.code ?? '') && /shared_ptr/.test(ctx.code ?? '')) {
+    return `A line puts a std::unique_ptr on a list of shared_ptrs by copying it, and a unique_ptr cannot be copied: it is the only owner of its repair. A repair that two lists share is made with std::make_shared, and each list gets a copy of that shared_ptr.`
+  }
+  if (fromCheck && fn && new RegExp(`(?:undeclared identifier|was not declared in this scope)[^\\n]*'${fn}'|'${fn}' was not declared`).test(all)) {
+    return `Check cannot find a function called ${fn} under // ${label}. Write it there, above main, with exactly that name: capital letters count.`
+  }
+  if (fromCheck && fn && /overloaded|address of overloaded function|reference to overloaded function|unresolved overloaded function/.test(all)) {
+    return `${fn} is written more than once, with different round brackets, so Check cannot tell which one the task means. Keep one ${fn}.`
+  }
+  if (/member reference type '[^']*\*' is a pointer; (?:did you mean|maybe you meant) to use '->'|which is of pointer type '[^']*' \(maybe you meant to use '->' \?\)/.test(all)) {
+    const star = /\*\s*\w+\s*\.\s*\w+\s*\(/.test(source)
+    return star
+      ? `A line puts * in front of a pointer and then a dot, like *p.getMinutes(). The dot is read first, on the pointer, so it fails: write p->getMinutes(), or (*p).getMinutes() with the round brackets.`
+      : `A line uses a dot on a pointer. A pointer holds an address, not the repair: reach a member of the repair it points at with ->, like p->getMinutes().`
+  }
+  if (/member reference type '[^']*' is not a pointer; (?:did you mean|maybe you meant) to use '\.'|base operand of '->' has non-pointer type/.test(all)) {
+    return `A line uses -> on something that is not a pointer: a repair itself, or a reference to one. -> follows a pointer to the repair it points at; on the repair or a reference, a member is reached with a dot.`
+  }
+  const smart = /no member named '(\w+)' in '(?:const )?std::(?:__1::)?(unique_ptr|shared_ptr)|'(?:const )?class std::(unique_ptr|shared_ptr)<[^']*>' has no member named '(\w+)'/.exec(all)
+  if (smart) {
+    const member = smart[1] ?? smart[4]
+    const kind = smart[2] ?? smart[3]
+    return `A line uses a dot on a std::${kind}, so the compiler looks for ${member} in the ${kind} itself. A smart pointer reaches the members of its repair with ->, like a plain pointer; a dot is for the ${kind}'s own functions, such as get() or reset().`
+  }
+  if (/cannot delete expression of type|argument given to 'delete', expected pointer/.test(all)) {
+    return `delete takes a pointer that new gave, and this line gives it something else, such as a repair itself. delete ends what new made: the line names the pointer.`
+  }
+  if (/comparison between pointer and integer|ISO C\+\+ forbids comparison between pointer and integer/.test(all)) {
+    return `A line compares a pointer with a number. A pointer holds an address: to compare the value it points at, put * in front of it, or reach the member with ->. To ask whether it points anywhere, compare it with nullptr.`
+  }
+  const fixedPointer = /cannot assign to variable '(\w+)' with const-qualified type '[^']*\*\s*const'|assignment of read-only variable '(\w+)'/.exec(all)
+  const fixedName = fixedPointer && (fixedPointer[1] ?? fixedPointer[2])
+  if (fixedName && (fixedPointer[1] || new RegExp(`\\*\\s*const\\s+${fixedName}\\b`).test(ctx.code ?? ''))) {
+    return `${fixedName} is a pointer with const on the right of the star, so the pointer itself can never move to another repair. To point at repairs that must not change and still move on from one to the next, const goes on the left of the star: const Repair*.`
+  }
+  const constGone = /cannot initialize [^\n]*?of type '(?:[\w:<>]+)\*' with an [lr]value of type '[^']*\*'(?: \(aka '(?:const [\w:<>]+\*)'\))?|invalid conversion from 'const [\w:<>]+\*' to '[\w:<>]+\*'|assigning to '[\w:<>]+\*' from (?:incompatible type )?'const [\w:<>]+\*'|cannot initialize [^\n]*?of type '[\w:<>]+\*' with an [lr]value of type 'const /.exec(all)
+  if (constGone && /const/.test(constGone[0])) {
+    return `A line turns a pointer to a const repair into a pointer that could change it. What the bench lets you only read stays read-only through every pointer to it: const goes on the left of the star, as in const Repair*, which reads as "a pointer to a repair that must not change". const on the right, Repair* const, only stops the pointer itself from moving.`
+  }
+  const discarded = /'this' argument to member function '(\w+)' has type 'const Repair', but function is not marked const|passing 'const Repair' as 'this' argument discards qualifiers/.exec(all)
+  if (discarded && !fromCheck) {
+    return `A line calls ${discarded[1] ?? 'a function that changes the repair'} on a repair it may only read: through a const Repair* or a const reference. A function that changes the repair is called through a pointer or reference without const.`
+  }
+  if (/binding reference of type 'Repair&' to value of type 'const Repair' drops 'const' qualifier|binding reference of type 'Repair&' to 'const Repair' discards qualifiers|binding reference of type '[^']*' to value of type 'const value_type' \(aka 'const Repair'\) drops 'const'/.test(all)) {
+    return `A line hands out a reference that could change a repair that is only there to read, such as one in a vector taken as a const reference. A reference that lets the caller change the repair needs the vector itself without const.`
+  }
+  const toValue = /cannot initialize [^\n]*?of type '(int|bool|long|Repair)' with an [lr]value of type '([\w:<>]+\*)'|invalid conversion from '([\w:<>]+\*)' to '(int|bool|long)'|no viable conversion from (?:returned value of type )?'(?:[\w:<>]+\*)' to (?:function return type )?'(Repair)'|conversion from '[\w:<>]+\*' to non-scalar type 'Repair'|cannot convert '[\w:<>]+\*' to '(int|long|Repair)'/.exec(all)
+  if (toValue) {
+    return `A line uses a pointer where a value goes. A pointer holds an address: * in front of it reaches the value it points at, and -> a member of the repair.`
+  }
+  const toPointer = /cannot initialize [^\n]*?of type '([\w:<>]+)\*' with an [lr]value of type '(\1|int)'|no viable conversion from (?:returned value of type )?'(?:Repair|value_type)' to (?:function return type )?'Repair\*'|cannot convert '(?:Repair|int)' to '(?:Repair|int)\*'|invalid conversion from 'int' to 'int\*'/.exec(all)
+  if (toPointer) {
+    return `A line gives a value where a pointer goes. A pointer holds an address: & in front of a variable gives its address, as in &bench[i].`
+  }
+  const rawToOwner = /no viable conversion from (?:returned value of type )?'Repair\*' to (?:function return type )?'std::(?:__1::)?(unique_ptr|shared_ptr)<Repair>'|conversion from 'Repair\*' to non-scalar type 'std::(unique_ptr|shared_ptr)<Repair>' requested|could not convert '[^']*' from 'Repair\*' to 'std::(unique_ptr|shared_ptr)<Repair>'/.exec(all)
+  if (rawToOwner) {
+    const kind = rawToOwner[1] ?? rawToOwner[2] ?? rawToOwner[3]
+    return `A plain pointer stands where a std::${kind} goes. The compiler never turns a plain pointer into an owner by itself, so that no owner is made by accident: make the repair with std::make_${kind === 'unique_ptr' ? 'unique' : 'shared'}<Repair>(...) instead of new.`
+  }
+  const ownerToRaw = /cannot initialize [^\n]*?of type 'Repair\*' with an [lr]value of type '(?:const )?std::(?:__1::)?(unique_ptr|shared_ptr)|no viable conversion from (?:returned value of type )?'(?:const )?std::(?:__1::)?(unique_ptr|shared_ptr)<Repair>' to (?:function return type )?'Repair\*'|cannot convert '(?:const )?std::(unique_ptr|shared_ptr)<Repair>' to 'Repair\*'/.exec(all)
+  if (ownerToRaw) {
+    const kind = ownerToRaw[1] ?? ownerToRaw[2] ?? ownerToRaw[3]
+    return `A std::${kind} stands where a plain Repair* goes. A ${kind} does not turn into a plain pointer by itself: its get() gives the address of its repair, to lend without handing on who owns it.`
+  }
+  if (!fromCheck) {
+    const missing = /no member named '(\w+)' in 'Repair'|'class Repair' has no member named '(\w+)'|'(?:const )?class Repair' has no member named '(\w+)'/.exec(all)
+    if (missing) {
+      const m = missing[1] ?? missing[2] ?? missing[3]
+      return `Repair has no member called ${m}. Check builds every task with a Repair of its own that has exactly the functions the starter gives: getTicket, getItem, getMinutes and addMinutes. Use those, with exactly those names.`
+    }
+    if (/is a private member of 'Repair'|is private within this context/.test(all)) {
+      return `A line reaches a private member of Repair. Its members are private, and Check builds every task with a Repair of its own: use its public functions, getTicket, getItem, getMinutes and addMinutes.`
+    }
+  }
+  return null
+}
+
+const LOCAL_RETURNED =
+  /(?:reference|address) (?:of|to) stack memory associated with (?:local variable|parameter) '(\w+)'|(?:reference|address) (?:to|of) local variable '(\w+)' returned|returning (?:address of|reference to) (?:local )?temporary|returning reference to local temporary/
+
+function memoryWarning(warnings) {
+  const warning = warnings.find((w) => LOCAL_RETURNED.test(w.text))
+  if (!warning) return null
+  const m = LOCAL_RETURNED.exec(warning.text)
+  const name = m[1] ?? m[2]
+  return {
+    warning,
+    message: `The compiler warns that a function gives back ${/address/.test(warning.text) ? 'the address of' : 'a reference to'} ${name ? `${name}, a variable of its own` : 'a value of its own'}. ${name ?? 'That value'} ends at the } of the function, so the caller gets a way to a repair that is gone, and what it reads there has no promised value. Give back the value itself, or a way to something that outlives the call, such as a repair in the caller's own vector.`
+  }
+}
+
+function memoryCrashed(r, label) {
+  const text = r.stderr ?? ''
+  const guard = `a [] with a position past the end of a vector, such as the first one of an empty vector. Check builds your code with the library's guard, which stops a program right there. Built without it, as in your terminal, it may seem to work`
+  if (/free\(\)|malloc|pointer being freed|double free|corruption/.test(text)) {
+    return `The program ended itself while the code of ${label} ran: the system found memory given back twice, or given back that new never handed out. Look for a delete that runs twice on the same memory, or on something new did not make.`
+  }
+  if (/Assertion '[^']*' failed|__glibcxx_assert|out of bounds|_M_range_check/.test(text)) {
+    return `The program stopped while the code of ${label} ran, at ${guard}.`
+  }
+  if (r.signal === 'SIGTRAP' || r.signal === 'SIGILL' || r.signal === 'SIGABRT') {
+    return `The program was stopped while the code of ${label} ran. Two mistakes stop it this way: a [] with a position past the end of a vector, which the library's guard Check builds with stops at once (built without it, as in your terminal, it may seem to work); and memory given back twice, or given back that new never handed out. Look for both.`
+  }
+  if (r.signal === 'SIGSEGV' || r.signal === 'SIGBUS') {
+    return `The system stopped the program while the code of ${label} ran: a line reached memory the program does not own. That happens through a pointer that is nullptr, that was never given an address, or that points at something that has ended; or when a function calls itself without end.`
+  }
+  if (r.signal) {
+    return `The system stopped the program while the code of ${label} ran, before it could finish. That happens when a line reaches memory through a pointer that does not point at a live value.`
+  }
+  return `The program stopped with an error while the code of ${label} ran, before the end of Check's code.`
+}
+
+/** Plain words for the shape of a part 6 type. */
+function memoryTypeWords(type) {
+  if (type === 'void') return 'nothing (void)'
+  if (type === 'overloaded') return 'more than one thing'
+  const plain = type.replace(/&$/, '')
+  const ref = type.endsWith('&') ? (type.startsWith('const ') ? 'a const reference to ' : 'a reference to ') : ''
+  const base = ref ? plain.replace(/^const /, '') : plain
+  return `${ref}${ref ? '' : article(base) + ' '}${base}`
+}
+
+/**
+ * A message when what `fn` takes or gives back is not what the task asks for, or null. want:
+ * { returns, params: [{ type, what }] }.
+ */
+export function pointerSig(got, fn, want) {
+  const text = got.msig
+  if (text === undefined) return `Check could not read what ${fn} takes and gives back.`
+  if (text === 'overloaded') return `${fn} is written more than once, so Check cannot tell which one the task means. Keep one ${fn}.`
+  const [returns, ...params] = text.split(SPLIT)
+  const shape = (got, want, what) => {
+    if (got === want) return null
+    const g = got.replace(/&$/, '')
+    const w = want.replace(/&$/, '')
+    if (w.endsWith('*') && got.endsWith('&') && g.replace(/^const /, '') === w.replace(/\*$/, '').replace(/^const /, '')) return `${what} as a reference, ${got}, and the task asks for a pointer, ${want}. A reference always refers to a repair; a pointer can also be nullptr, for when there is none.`
+    if (w.endsWith('*') && g === w.replace(/\*$/, '')) return `${what} as a copy of a repair, and the task asks for a pointer, ${want}.`
+    if (w.endsWith('*') && g === w.replace(/\*$/, '').replace(/^const /, '')) return `${what} as a repair, and the task asks for a pointer, ${want}.`
+    if (want === `const ${got}` && got.endsWith('*')) return `${what} as ${got}, a pointer that could change the repair it points at. The task asks for ${want}: const on the left of the star keeps the repair read-only through the pointer.`
+    if (got === `${w} const` || got === `${w.replace(/^const /, '')} const`) return `${what} as ${got}, with const on the right of the star: that only stops the pointer itself from moving. The task asks for ${want}, with const on the left, so the repair cannot change through it.`
+    if (want.endsWith('&') && !got.endsWith('&') && g === w.replace(/^const /, '')) {
+      return /^std::(vector|unique_ptr|shared_ptr)/.test(g) && /shared_ptr/.test(g)
+        ? `${what} as a copy. A copy of a shared_ptr is one more owner, so a copy of the list adds an owner to every repair on it while the function runs. The task asks for ${want}.`
+        : `${what} as a copy, and the task asks for ${want}${want.startsWith('const ') ? ', which reads the caller\'s own without copying it' : ', the caller\'s own'}.`
+    }
+    if (want.endsWith('&') && got === w) return `${what} as a reference that could change it, and the task asks for ${want}, which only reads it.`
+    if (!want.endsWith('&') && got.endsWith('&') && g.replace(/^const /, '') === want) {
+      return /unique_ptr/.test(want)
+        ? `${what} as a reference, so the caller still owns the repair after the call. The task asks for ${want} itself: the caller hands it on with std::move, and ${fn} becomes its owner.`
+        : `${what} as a reference, and the task asks for ${want} itself.`
+    }
+    if (w.endsWith('*') && /^std::(unique_ptr|shared_ptr)/.test(g)) return `${what} as ${memoryTypeWords(got)}, an owner. The task asks for a plain pointer, ${want}, which only lends the repair.`
+    if (/^std::(unique_ptr|shared_ptr)/.test(w) && g.endsWith('*')) return `${what} as a plain pointer, ${got}, which owns nothing, so nothing says who deletes the repair. The task asks for ${want}.`
+    return `${what} as ${memoryTypeWords(got)}, and the task asks for ${memoryTypeWords(want)}.`
+  }
+  const r = shape(returns, want.returns, `${fn} gives back`)
+  if (r) {
+    if (returns === 'void') return `${fn} gives nothing back: the type in front of its name is void. The task asks it to give back ${memoryTypeWords(want.returns)}.`
+    if (returns.endsWith('&') && returns.replace(/^const /, '').replace(/&$/, '') === want.returns && !want.returns.endsWith('*')) return `${fn} gives back a reference, ${returns}. The task asks for the repair itself, ${want.returns}: a reference leads back to a repair inside ${fn}, which ends at its closing }, while the value itself becomes the caller's own.`
+    if (returns === 'Repair' && want.returns === 'Repair&') return `${fn} gives back a copy of the repair, so what the caller changes on it never reaches the bench. The task asks for a reference, Repair&.`
+    return r.replace(`${fn} gives back as`, `${fn} gives back`)
+  }
+  if (params.length !== want.params.length) {
+    return `${fn} takes ${params.length} ${params.length === 1 ? 'value' : 'values'}, and the task gives it ${want.params.length}: ${want.params.map((p) => p.what).join(', ')}. Look at the list in its round brackets.`
+  }
+  for (const [k, p] of want.params.entries()) {
+    const problem = shape(params[k], p.type, `${fn} takes ${p.what}`)
+    if (problem) return problem
+  }
+  return null
+}
+
+/** The first fault the counts show, in plain words, or null. say: the words for a task. */
+export function memoryFault(got, say = {}) {
+  const n = (k) => Number(got[k] ?? 0)
+  const who = say.who ?? 'The code of this task'
+  if (n('notNew')) return say.notNew ?? `${who} deleted a repair that new did not make, such as a variable of its own or one in a vector. delete is only for what new made; anything else ends by itself at the end of its block.`
+  if (n('twice') || n('freedTwice')) return say.twice ?? `${who} ended the same repair twice: two deletes, or two owners that each delete it. Only one delete ends what one new made.`
+  if (n('dead')) return say.dead ?? `${who} used a repair after it had ended. What is read there has no promised value: in your terminal it may seem right, print nonsense or stop the program.`
+  if (n('nulls')) return say.nulls ?? `${who} reached a repair through nullptr, a pointer that points nowhere. Ask whether the pointer is nullptr before you follow it.`
+  if (n('strange')) return say.strange ?? `${who} used a repair through a pointer that was never given the address of one. Give every pointer a value: an address, or nullptr.`
+  const many = (got.left ?? '').includes(',')
+  if (got.left) return say.left ?? `When Check's code was done, the ${many ? 'repairs' : 'repair'} with ticket ${got.left} ${many ? 'were' : 'was'} still there: made with new, and never deleted. Every repair made with new needs one delete, or an owner that deletes it, once it is no longer needed.`
+  return null
+}
+
+/** What the counts show, as a person reads it. */
+export function counts(got) {
+  const n = (k) => Number(got[k] ?? 0)
+  const parts = [`Repairs made: ${n('made')}, ended: ${n('ended')}`]
+  if (got.left) parts.push(`Still there at the end: ${got.left}`)
+  if (n('twice') || n('freedTwice')) parts.push('A repair was ended twice')
+  if (n('dead')) parts.push(`Uses of a repair after it ended: ${n('dead')}`)
+  if (n('nulls')) parts.push(`Uses through nullptr: ${n('nulls')}`)
+  if (n('notNew')) parts.push('A delete of a repair that new did not make')
+  return parts.join('\n')
+}
+
+/**
+ * Judges a task of part 6. Spec, besides what buildTypes() takes:
+ * - fn: the function the task writes; sig: { returns, params: [{ type, what }] }; callWith: the
+ *   C++ types of the values Check passes, so its code still builds when fn takes something else
+ * - cases: [{ name, code, judge(got) => message or null, output(got) => text, say }] code calls fn
+ *   by its name and writes what it reads with indent_::put_; the counts of Check's Repair are
+ *   read after it, once every repair Check owns has ended. A fault in the counts fails the case
+ *   with memoryFault(got, { ...spec.say, ...case.say }) before judge runs.
+ */
+export async function judgeMemory(t, spec) {
+  const { fn, task } = spec
+  const file = spec.files[0]
+  const whole = (await readFile(join(t.workspace, file), 'utf8').catch(() => null))?.replace(/\r\n/g, '\n')
+  if (whole === null || whole === undefined) {
+    return [fail(`${file} is there`, `Check cannot find ${file}. Every file of this issue is in the starter; Reset brings it back.`)]
+  }
+  const starter = (await readFile(t.chapterPath(`starter/${file}`), 'utf8')).replace(/\r\n/g, '\n')
+  const includes = (text) => new Set(text.split('\n').filter((l) => /^\s*#\s*include/.test(l)).map((l) => l.replace(/\s+/g, '')))
+  const now = includes(whole)
+  const gone = [...includes(starter)].find((l) => !now.has(l))
+  if (gone) {
+    return [fail(`${file} keeps its #include lines`, `The line ${gone.replace('#include', '#include ')} is gone from the top of ${file}, and the file uses what it brings in. Put it back.`)]
+  }
+  const lines = whole.split('\n')
+  const { starts } = marks(lines)
+  if (starts.has(task)) {
+    const from = starts.get(task)
+    const next = Math.min(lines.length, ...[...starts.values()].filter((i) => i > from), ...lines.map((l, i) => (i > from && /\bint\s+main\s*\(/.test(l) ? i : Infinity)))
+    if (unbalanced(codeOnly(lines.slice(from, next).join('\n')))) return [fail(`${label(task)} builds`, PART2.braces(label(task)))]
+  }
+  const sigCase = { name: `${fn} takes and gives back what the task says`, code: `indent_::fsig_<decltype(&${fn})>::say("msig");`, sig: true }
+  const wrap = (c) => {
+    const body = `${c.code} indent_::put_("ran", 1);`
+    const guarded = spec.callWith === undefined ? `{ ${body} }` : `[&](auto ${fn}) { if constexpr (indent_::fits_<decltype(${fn}), ${spec.sig.returns}, ${spec.callWith}>()) { ${body} } }(&${fn});`
+    return `${guarded} indent_mem_::report_();`
+  }
+  const cases = [sigCase, ...spec.cases]
+  const built = await buildTypes(t, {
+    ...spec,
+    ownCode: true,
+    swap: { name: 'Repair', lines: REPAIR_LINES },
+    cases: cases.map((c) => ({ code: c.sig ? c.code : wrap(c) })),
+    helpers: [...MEMORY_HELPERS, ...(spec.helpers ?? [])],
+    classCause: (errors, ctx) => memoryCause(errors, ctx, spec) ?? classCause(errors, ctx, { ...spec, className: 'Repair', members: [], functions: ['getTicket', 'getItem', 'getMinutes', 'addMinutes'] }),
+    classLink: () => null,
+    classWarning: (warnings) => memoryWarning(warnings) ?? classWarning(warnings),
+    classCrashed: memoryCrashed
+  })
+  if (built.problem) return built.problem
+  const sigProblemText = pointerSig(built.runs[0].got, fn, spec.sig)
+  if (sigProblemText) return [fail(sigCase.name, sigProblemText)]
+  return spec.cases.map((c, k) => {
+    const { got, eof } = built.runs[k + 1]
+    let message = null
+    if (eof) message = `${fn} went on reading after the end of what Check typed. Nothing in this task reads what people type: in the terminal it would sit and wait.`
+    else if (got.ran !== '1') message = `Check could not call ${fn} with what ${label(task)} gives it. Compare the types in its round brackets with the task.`
+    else message = memoryFault(got, { who: fn, ...spec.say, ...c.say }) ?? c.judge(got)
+    const out = [c.output?.(got), message ? counts(got) : ''].filter(Boolean).join('\n')
+    return { name: c.name, passed: !message, message: message ?? undefined, output: out }
+  })
+}

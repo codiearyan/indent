@@ -1,0 +1,103 @@
+{
+  "id": "the-heap",
+  "title": "The heap by hand: new and delete",
+  "files": [
+    "src/waiting.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the waiting shelf here and run it, and watch which repairs end and when.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/waiting.cpp -o waiting && ./waiting"
+  },
+  "tasks": [
+    {
+      "id": "takein",
+      "title": "Take in a repair that has to wait",
+      "file": "src/waiting.cpp",
+      "description": "Under `// Task 1` in `src/waiting.cpp`, write a function called `takeIn` that takes a ticket as an `int` and an item as a reference to a `const std::string`. It makes a new `Repair` with that ticket and item with `new`, so that it lives on after the function ends, and gives back the pointer `new` gave, as a `Repair*`.\n\nCheck takes in three repairs of its own, reads each one through the pointer it got, logs minutes on one, and then deletes each repair itself. It counts, with a `Repair` of its own, how many repairs `new` made, that each is used only while it lives, and that none is left at the end.",
+      "nextSteps": [
+        "Write the first line, with `Repair*` in front of the name.",
+        "Make the repair with `new`, from the ticket and the item.",
+        "Give back the pointer `new` gave you.",
+        "In `main`, take in two repairs, print their items through the pointers, then delete both."
+      ],
+      "hints": [
+        "A local variable ends at the function's closing `}`, whatever pointer is kept to it. A repair that has to wait for days must live somewhere that does not end with the function.",
+        "`new` makes the repair on the heap, where it stays until a `delete` ends it, and gives back its address. Whoever holds that address is now the one who must delete it.",
+        "The shape is `return new Repair(ticket, item);`."
+      ],
+      "docs": [
+        {
+          "title": "new expression",
+          "url": "https://en.cppreference.com/w/cpp/language/new"
+        },
+        {
+          "title": "Storage duration",
+          "url": "https://en.cppreference.com/w/cpp/language/storage_duration"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Stack and heap memory",
+          "url": "https://www.youtube.com/watch?v=wJ1L2nSIV1s"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "close",
+      "title": "Close a repair and give back its minutes",
+      "file": "src/waiting.cpp",
+      "description": "Under `// Task 2`, write a function called `closeRepair` that takes a pointer to a repair made with `new`, as a `Repair*`, and gives back an `int`. It gives back the repair's minutes and deletes the repair, so nothing is left of it. When the pointer is `nullptr`, it deletes nothing and gives back `0`.\n\nCheck makes repairs of its own with `new`, logs minutes on them, and hands them to `closeRepair`, and once with `nullptr`. It counts, with a `Repair` of its own, that each repair it hands over ends exactly once, and is not used after it ended.",
+      "nextSteps": [
+        "Write the first line: `int`, the name, and the pointer.",
+        "Give back `0` straight away when the pointer is `nullptr`.",
+        "Keep the repair's minutes in a variable, then delete the repair.",
+        "Give back the variable. In `main`, close a repair you took in, and watch its destructor's line."
+      ],
+      "hints": [
+        "After `delete`, the repair is gone: anything read through the pointer afterwards has no promised value, even though the pointer still holds the same address.",
+        "Read what you need into a variable of your own first; the variable keeps its value after the repair ends. One `delete` per repair, never two.",
+        "The shape is `if (repair == nullptr) { return 0; } int minutes = repair->getMinutes(); delete repair; return minutes;`."
+      ],
+      "docs": [
+        {
+          "title": "delete expression",
+          "url": "https://en.cppreference.com/w/cpp/language/delete"
+        },
+        {
+          "title": "Lifetime",
+          "url": "https://en.cppreference.com/w/cpp/language/lifetime"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takeoff",
+      "title": "Take a repair off the shelf",
+      "file": "src/waiting.cpp",
+      "description": "Under `// Task 3`, write a function called `takeOff` that takes the shelf as a reference to a `std::vector<Repair*>`, whose pointers each point at a repair made with `new`, and a ticket as an `int`, and gives back a `bool`. It deletes the repair with that ticket, takes its pointer off the shelf, keeps the other pointers in their order, and gives back `true`. When no repair on the shelf has that ticket, it changes nothing and gives back `false`.\n\nCheck fills shelves of its own with repairs made with `new`, takes off the first, a middle and the last, a ticket that is not there, and one from an empty shelf. Then it reads every repair its shelf still points at, and deletes them. It counts, with a `Repair` of its own, which repairs ended during the call and that none is left at the end. Check builds this task with the library's guard, which stops a program that reads a vector past its end.",
+      "nextSteps": [
+        "Write the first line, with the shelf taken by reference.",
+        "Walk the shelf with a counted loop, and compare each repair's ticket through its pointer.",
+        "When it matches, delete the repair, then `erase` its pointer from the shelf, and give back `true`.",
+        "After the loop, give back `false`. In `main`, take a repair off and print what the shelf still holds."
+      ],
+      "hints": [
+        "The shelf holds pointers, not repairs. Taking a pointer off the shelf does not end the repair, and deleting the repair does not take its pointer off: both have to happen.",
+        "The order matters: the pointer at that position is the right one only until erase moves the others up one place, so end the repair before its place goes.",
+        "The shape is `for (std::size_t i = 0; i < shelf.size(); i++) { if (shelf[i]->getTicket() == ticket) { delete shelf[i]; shelf.erase(shelf.begin() + i); return true; } } return false;`."
+      ],
+      "docs": [
+        {
+          "title": "delete expression",
+          "url": "https://en.cppreference.com/w/cpp/language/delete"
+        },
+        {
+          "title": "std::vector::erase",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/erase"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

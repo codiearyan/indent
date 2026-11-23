@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Dorrit",
+      "say": "Who lets go of the carriage clock?"
+    },
+    {
+      "title": "Two lists",
+      "text": "Bench and waiting list hold it at once."
+    },
+    {
+      "title": "Your functions",
+      "file": "lists.cpp",
+      "mine": true,
+      "gap": "Nobody knows who ends it",
+      "tasks": [
+        "Put on both lists",
+        "Let go of one",
+        "Count the holders"
+      ]
+    },
+    {
+      "title": "The laptop",
+      "text": "The repair ends when the last list goes."
+    }
+  ],
+  "ticket": {
+    "label": "Carriage clock",
+    "wrong": "too early",
+    "why": "Too soon",
+    "right": "ends last"
+  },
+  "captions": [
+    "The carriage clock waits for a part, on Kasimir's bench and Dorrit's list at once.",
+    "When Dorrit takes it off her list, Kasimir's bench loses the repair as well.",
+    "You let both lists share one repair, and count who still holds it.",
+    "Now the carriage clock lasts until the last list lets go, and then it ends.",
+    "Repairs live exactly as long as someone needs them, whoever lets go last."
+  ]
+}

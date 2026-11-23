@@ -1,0 +1,103 @@
+{
+  "id": "where-values-live",
+  "title": "Where values live, and for how long",
+  "files": [
+    "src/bench.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Kasimir's bench here and run it, after you try your functions in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/bench.cpp -o bench && ./bench"
+  },
+  "tasks": [
+    {
+      "id": "open",
+      "title": "Open a repair and hand it over",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 1` in `src/bench.cpp`, write a function called `openRepair` that takes a ticket as an `int`, an item as a reference to a `const std::string` and a number of minutes as an `int`. It makes a `Repair` with that ticket and item, logs the minutes on it, and gives the repair back as a `Repair`.\n\nCheck opens three repairs of its own one after the other, keeps each in a variable, and reads all three afterwards. It counts, with a `Repair` of its own, that no repair is used after it has ended.",
+      "nextSteps": [
+        "Write the first line: `Repair`, the name, and the three parameters.",
+        "Inside, make a `Repair` variable from the ticket and the item.",
+        "Log the minutes on it with the function the class gives for that.",
+        "Give it back. In `main`, open a repair and print its ticket, item and minutes."
+      ],
+      "hints": [
+        "The repair you make inside the function is a local variable: it ends at the function's closing `}`. What the caller receives must not depend on it still being there.",
+        "A function whose type is `Repair` hands back the value itself: the caller gets a repair of its own, whole, that lives as long as the caller keeps it. A `Repair&` would hand back a way to the local, which is gone.",
+        "The shape is `Repair repair(ticket, item); repair.addMinutes(minutes); return repair;` inside `Repair openRepair(int ticket, const std::string& item, int minutes) { ... }`."
+      ],
+      "docs": [
+        {
+          "title": "Storage duration",
+          "url": "https://en.cppreference.com/w/cpp/language/storage_duration"
+        },
+        {
+          "title": "The return statement",
+          "url": "https://en.cppreference.com/w/cpp/language/return"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How long a local value lives",
+          "url": "https://www.youtube.com/watch?v=iNuTwvD6ciI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Hand over the next repair where it sits",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 2`, write a function called `nextUp` that takes the bench as a reference to a `std::vector<Repair>`, which is never empty. It gives back a reference to the repair with the fewest minutes, as a `Repair&`, so the caller can log time on that very repair. When two have the fewest, it is the one nearer the front.\n\nCheck fills benches of its own, calls `nextUp`, logs 25 minutes through the reference it gets back, and then looks at its bench: the minutes must be on the right repair, where it sits.",
+      "nextSteps": [
+        "Write the first line, with `Repair&` in front of the name and the bench taken by reference.",
+        "Keep the position of the repair with the fewest minutes so far, starting at the first.",
+        "Walk the bench, and move the position on only when a repair has fewer minutes.",
+        "Give back the repair at that position on the bench. In `main`, log time on it and print the bench."
+      ],
+      "hints": [
+        "The reference you give back must lead to a repair that is still there after the call: one in the caller's own vector, not a copy the function made for itself.",
+        "Keep a position, a `std::size_t`, rather than a copy of the repair: a copy is a new local repair, and a reference to it would end with the function. Moving on only for fewer, not for as few, keeps the one nearer the front.",
+        "The shape is `std::size_t at = 0; for (std::size_t i = 1; i < bench.size(); i++) { if (bench[i].getMinutes() < bench[at].getMinutes()) { at = i; } } return bench[at];`."
+      ],
+      "docs": [
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        },
+        {
+          "title": "Lifetime",
+          "url": "https://en.cppreference.com/w/cpp/language/lifetime"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "checkups",
+      "title": "Add a check-up for every long repair",
+      "file": "src/bench.cpp",
+      "description": "Under `// Task 3`, write a function called `addCheckUps` that takes the bench as a reference to a `std::vector<Repair>` and gives nothing back. For every repair on the bench with more than 480 minutes, it puts a new repair at the end of the bench: its ticket is the long repair's ticket plus 1000, its item is the same, and it has no minutes. The check-ups go on in the order of the repairs they are for, and are not looked at themselves.\n\nCheck's benches have no room to spare, so the first repair added moves every repair on them to new memory. Check reads each bench afterwards, and counts, with a `Repair` of its own, that no repair is used after it has ended.",
+      "nextSteps": [
+        "Write the first line: `void`, the name, and the bench taken by reference.",
+        "Before the loop, keep how many repairs the bench has at the start.",
+        "Loop over those positions, and for a long repair, `push_back` a new `Repair` made from its ticket plus 1000 and its item.",
+        "In `main`, print how many repairs the bench has afterwards, and the last ticket."
+      ],
+      "hints": [
+        "When a vector grows past its room, it moves every value to new memory and ends the old ones. A reference or a loop over the old places then leads to values that are gone.",
+        "A position is still good after the vector moves: `bench[i]` finds the repair wherever it now is. Looping up to the size at the start also keeps the new check-ups out of the loop.",
+        "The shape is `std::size_t count = bench.size(); for (std::size_t i = 0; i < count; i++) { if (bench[i].getMinutes() > 480) { bench.push_back(Repair(bench[i].getTicket() + 1000, bench[i].getItem())); } }`."
+      ],
+      "docs": [
+        {
+          "title": "std::vector::push_back",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/push_back"
+        },
+        {
+          "title": "std::vector::capacity",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/capacity"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "id": "pointers",
+  "title": "Pointers: the way to a repair",
+  "files": [
+    "src/lookup.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build Dorrit's look-up here and run it, after you try your functions in main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/lookup.cpp -o lookup && ./lookup"
+  },
+  "tasks": [
+    {
+      "id": "find",
+      "title": "Find a repair by its ticket",
+      "file": "src/lookup.cpp",
+      "description": "Under `// Task 1` in `src/lookup.cpp`, write a function called `findRepair` that takes the bench as a reference to a `std::vector<Repair>` and a ticket as an `int`. It gives back a pointer to the repair on the caller's bench with that ticket, as a `Repair*`, or `nullptr` when no repair has it.\n\nCheck fills benches of its own, asks for tickets that are at the front, in the middle, at the end and not there at all, and on an empty bench, and looks at where each pointer it gets back leads: to which repair on its bench, or to none.",
+      "nextSteps": [
+        "Write the first line, with `Repair*` in front of the name.",
+        "Walk the bench with a loop that reaches each repair where it sits, not a copy of it.",
+        "When the ticket matches, give back the address of that repair, with `&`.",
+        "After the loop, give back `nullptr`. In `main`, find a ticket and print its item through the pointer."
+      ],
+      "hints": [
+        "A pointer holds an address. The address you give back must be one in the caller's vector, so the loop has to reach each repair itself: with `Repair&`, or with a position.",
+        "`&` in front of a variable gives its address. A loop variable without `&` in its type is a copy, a local, and its address is gone after the round. nullptr only when every repair was looked at.",
+        "The shape is `for (Repair& repair : bench) { if (repair.getTicket() == ticket) { return &repair; } } return nullptr;`."
+      ],
+      "docs": [
+        {
+          "title": "Pointer declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/pointer"
+        },
+        {
+          "title": "nullptr",
+          "url": "https://en.cppreference.com/w/cpp/language/nullptr"
+        },
+        {
+          "title": "Address-of operator",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_member_access"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Pointers in C++",
+          "url": "https://www.youtube.com/watch?v=DTxHyVn0ODg"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "log",
+      "title": "Log a call through what was found",
+      "file": "src/lookup.cpp",
+      "description": "Under `// Task 2`, write a function called `logCall` that takes a pointer to a repair as a `Repair*` and a number of minutes as an `int`, and gives back a `bool`. When the pointer points at a repair, it adds the minutes to that repair and gives back `true`. When it is `nullptr`, it changes nothing and gives back `false`.\n\nCheck passes the address of a repair of its own and looks at that repair afterwards, and passes `nullptr`. It counts, with a `Repair` of its own, every time a repair is reached through `nullptr`.",
+      "nextSteps": [
+        "Write the first line, with the pointer as the first parameter.",
+        "First ask whether the pointer is `nullptr`, and give back `false` if it is.",
+        "Otherwise add the minutes to the repair it points at, through `->`, and give back `true`.",
+        "In `main`, log a call through what `findRepair` gave back, for a ticket that is there and one that is not."
+      ],
+      "hints": [
+        "A pointer parameter can be `nullptr`, which a reference never is: that is why this function takes a pointer. Following `nullptr` to a repair has no promised result.",
+        "Compare the pointer itself with `nullptr`, before anything follows it. Then `->` reaches a member of the repair it points at.",
+        "The shape is `if (repair == nullptr) { return false; } repair->addMinutes(minutes); return true;`."
+      ],
+      "docs": [
+        {
+          "title": "Member access operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_member_access"
+        },
+        {
+          "title": "nullptr",
+          "url": "https://en.cppreference.com/w/cpp/language/nullptr"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "longest",
+      "title": "Point at the longest repair",
+      "file": "src/lookup.cpp",
+      "description": "Under `// Task 3`, write a function called `longestOf` that takes the bench as a reference to a `const std::vector<Repair>`. It gives back a pointer to the repair with the most minutes, as a `const Repair*`, or `nullptr` when the bench is empty. When two have the most, it is the one nearer the front.\n\nCheck passes benches of its own that it may only read, an empty one included, and looks at where each pointer it gets back leads. Check builds this task with the library's guard, which stops a program that reads a vector past its end.",
+      "nextSteps": [
+        "Write the first line, with `const Repair*` in front of the name.",
+        "Start a pointer at `nullptr`: no longest yet.",
+        "Walk the bench and point at a repair when the pointer is still `nullptr` or the repair has more minutes than the one it points at.",
+        "Give the pointer back. In `main`, print the longest repair's ticket when it is not `nullptr`."
+      ],
+      "hints": [
+        "The bench is `const`, so every repair on it is read-only, and a pointer to one must keep it so. Starting at `nullptr` also gives the right answer for an empty bench, with no special case.",
+        "`const` on the left of the star, `const Repair*`, means the repair cannot change through the pointer; the pointer itself can still move on to another repair, which is what the loop needs.",
+        "The shape is `const Repair* longest = nullptr; for (const Repair& repair : bench) { if (longest == nullptr || repair.getMinutes() > longest->getMinutes()) { longest = &repair; } } return longest;`."
+      ],
+      "docs": [
+        {
+          "title": "cv (const) and pointers",
+          "url": "https://en.cppreference.com/w/cpp/language/pointer"
+        },
+        {
+          "title": "cv type qualifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/cv"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

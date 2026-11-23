@@ -1,0 +1,36 @@
+{
+  "stations": [
+    {
+      "title": "Kasimir",
+      "say": "Why does 3104 show nonsense?"
+    },
+    {
+      "title": "Old function",
+      "text": "Shows different minutes each run."
+    },
+    {
+      "title": "Your functions",
+      "file": "bench.cpp",
+      "mine": true,
+      "gap": "Ways to repairs that ended",
+      "tasks": ["Hand over a repair", "Point at the next", "Add check-ups"]
+    },
+    {
+      "title": "Bench screen",
+      "text": "Reads only repairs that still exist."
+    }
+  ],
+  "ticket": {
+    "label": "Ticket 3104",
+    "wrong": "nonsense",
+    "why": "Unreliable",
+    "right": "shown right"
+  },
+  "captions": [
+    "Kasimir's bench screen shows ticket 3104 with minutes that make no sense.",
+    "Run it again and the same ticket shows different minutes, so nobody trusts it.",
+    "You hand repairs over so they last, and point only at ones that still exist.",
+    "Now ticket 3104 shows its real minutes, every time the screen runs.",
+    "Every repair on the screen still exists when it is read. Next, pointers to them."
+  ]
+}
