@@ -34,6 +34,9 @@ import traceback
 
 MARK = '@@indent '
 MAX_PRINTED = 200000
+# With blocks, what one part or call printed is sent back cut to this, so several parts that
+# print without end stay within what Check reads. Every task needs far less.
+MAX_SENT = 20000
 TASK_LINE = re.compile(r'\s*#\s*Task\s+(\d+)\b')
 
 channel = sys.stdout
@@ -281,7 +284,7 @@ def called(watchdog, task, call, ns):
     kwargs = call.get('kwargs') or {}
     result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
     record.update({
-        'printed': printed.text(),
+        'printed': printed.text()[:MAX_SENT],
         'error': error,
         'stopped': stopped,
         'returned': None if error or stopped else value_of(result)
@@ -375,7 +378,7 @@ def main():
             emit({
                 'kind': 'part',
                 'task': task,
-                'printed': printed.text(),
+                'printed': printed.text()[:MAX_SENT],
                 'error': error,
                 'stopped': stopped,
                 'values': {name: value_of(ns[name]) for name in wanted if name in ns},

@@ -123,7 +123,7 @@ export const checks = {
         if (near) return near
         const searched = out.filter((line) => line.startsWith('Searching square'))
         if (found <= squares && searched.length > found) {
-          return 'The search goes on after the walker is found. Stop the loop as soon as the square is found_in: break leaves a loop at once.'
+          return 'The search goes on after the walker is found. Leave the loop as soon as the square is found_in: a loop can be left at once from inside an if.'
         }
         if (found > squares && searched.length > squares) {
           return `The search goes past the last square. There are ${squares} squares here, and the walker is not in any of them.`
@@ -165,10 +165,10 @@ export const checks = {
         const near = wording(out, want)
         if (near) return near
         if (out.includes(`Calling on channel ${team}`)) {
-          return 'The team channel is called too, and the team is already listening there. Skip that round: continue goes straight to the next round.'
+          return 'The team channel is called too, and the team is already listening there. Skip the rest of that round, straight on to the next channel.'
         }
         if (team <= channels && same(out, want.slice(0, team - 1))) {
-          return 'The calls stop at the team channel, and the channels after it are never called. break leaves the whole loop; continue skips only the rest of this round.'
+          return 'The calls stop at the team channel, and the channels after it are never called. break leaves the whole loop, not only this round.'
         }
         if (out.includes('Calling on channel 0')) {
           return 'The calls start at channel 0, and the first channel is 1.'

@@ -1,0 +1,131 @@
+{
+  "id": "arguments-and-defaults",
+  "title": "Arguments and defaults",
+  "files": [
+    "pager.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see tonight's pages, the rota and the rope count.",
+    "suggestedCommand": "python3 pager.py"
+  },
+  "tasks": [
+    {
+      "id": "message",
+      "title": "Routine unless it says so",
+      "file": "pager.py",
+      "description": "Under `# Task 1` in `pager.py`, write a function called `pager_message` with two parameters, `text` and `priority`, in that order. It gives back the priority in capitals, a colon, a space and the text:\n\n```\nURGENT: Walker overdue\n```\n\nWhen it is called without a priority, the priority is `routine`, so `pager_message(\"Hall open\")` gives back `ROUTINE: Hall open`. Print what it gives back for one message with a priority and one without, to see it.\n\nCheck calls `pager_message` with a text alone, with a priority given in order and with a priority given by name, and looks at what it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on default values.",
+        "Write the `def` line with both parameters, and give `priority` its default there.",
+        "Give back the message, built from both parameters.",
+        "Print it once with a priority and once without, and run the file."
+      ],
+      "hints": [
+        "A default is a value a parameter takes when the call gives it none. It is written in the `def` line itself.",
+        "A parameter with a default is written with `=` and the value after its name, and it comes after the parameters without one. Inside the function, use `priority` itself, so a priority that is given wins over the default.",
+        "The shape is `def pager_message(text, priority=\"routine\"):` with `return f\"{priority.upper()}: {text}\"` under it."
+      ],
+      "docs": [
+        {
+          "title": "Default argument values",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#default-argument-values"
+        },
+        {
+          "title": "Function definitions",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#function-definitions"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Parameters, default values and named arguments",
+          "url": "https://www.youtube.com/watch?v=9Os0o3wzS_I"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "exercise",
+      "title": "Page the Sunday exercise",
+      "file": "pager.py",
+      "description": "Under `# Task 2`, Ailsa's `callout_page` takes a hill, a crew, a meeting place that is `the base` by default, and a priority that is `urgent` by default. Leave it as it is. Make a variable called `exercise_page` by calling it for Sunday's exercise: the hill `exercise_hill`, the crew `exercise_crew`, the default meeting place, and the priority `routine`. Print it to see it.\n\nCheck runs your file with other hills and crews and reads `exercise_page` after the lines under `# Task 2`. It also checks that your call leaves the meeting place to its default.",
+      "nextSteps": [
+        "Read the `def` line of `callout_page`: the order of its parameters and their defaults.",
+        "Give the hill and the crew in order.",
+        "Skip the meeting place, and give the priority by naming it.",
+        "Print `exercise_page` and read the whole page."
+      ],
+      "hints": [
+        "Values in a call fill the parameters in order, so the third value always goes to the meeting place.",
+        "A value can be given by its parameter's name, with `=`, and then its place in the order no longer matters. Values given in order come first.",
+        "The shape is `exercise_page = callout_page(exercise_hill, exercise_crew, priority=\"routine\")`."
+      ],
+      "docs": [
+        {
+          "title": "Keyword arguments",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#keyword-arguments"
+        },
+        {
+          "title": "Calls",
+          "url": "https://docs.python.org/3/reference/expressions.html#calls"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "leader",
+      "title": "Tonight's leader",
+      "file": "pager.py",
+      "description": "Under `# Task 3`, Rhona says the rota prints her name every night, even when Kirsty leads. Fix `leader_line` so that it gives back `Team leader tonight: ` and the leader it is given, such as `Team leader tonight: Kirsty` for `leader_line(\"Kirsty\")`.\n\nCheck calls `leader_line` with other leaders, while `leader_on_call` at the top holds someone else, and looks at what it gives back.",
+      "nextSteps": [
+        "Run the file: the line looks right for tonight. Ask why.",
+        "Read the part of the lesson on where a name lives.",
+        "Find the name inside `leader_line` that comes from outside it.",
+        "Use the function's own parameter instead, and call it with another leader to see."
+      ],
+      "hints": [
+        "Call it yourself with another name, such as `print(leader_line(\"Kirsty\"))`, and see what comes back.",
+        "A function can read names from the top of the file, and here it reads the wrong one. The leader it is given lives in its parameter, the name in its `def` line.",
+        "The return line should end with `+ leader`, the parameter, instead of `+ leader_on_call`."
+      ],
+      "docs": [
+        {
+          "title": "Naming and binding",
+          "url": "https://docs.python.org/3/reference/executionmodel.html#naming-and-binding"
+        },
+        {
+          "title": "Defining functions",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ropes",
+      "title": "Ropes back in the store",
+      "file": "pager.py",
+      "description": "Under `# Task 4`, Dougie's `take_ropes` stops with an `UnboundLocalError`. Change it so that it takes two values, the ropes in the store and the ropes taken out, in that order, and gives back how many are left. Then store what it gives back in `ropes_in_store`, so that the print line below it shows the new count.\n\nCheck calls `take_ropes` with numbers of its own, then runs your file with other counts at the top and reads `ropes_in_store` and the print line after the lines under `# Task 4`.",
+      "nextSteps": [
+        "Run the file and read the error at the bottom of the traceback.",
+        "Read the part of the lesson on changing a name inside a function.",
+        "Give `take_ropes` both values as parameters, and make it give back what is left.",
+        "Replace the call so that what it gives back is stored in `ropes_in_store`."
+      ],
+      "hints": [
+        "Inside a function, a name that gets a value with `=` belongs to the function. So `ropes_in_store` inside `take_ropes` is not the one at the top, and it has no value yet when the line reads it.",
+        "Let the function take the count in as a parameter and give the new count back with `return`. Then the line that calls it stores the result outside, with `=`.",
+        "The shape is `def take_ropes(in_store, taken):` with `return in_store - taken`, and `ropes_in_store = take_ropes(ropes_in_store, ropes_taken)` in place of the old call."
+      ],
+      "docs": [
+        {
+          "title": "Why an UnboundLocalError",
+          "url": "https://docs.python.org/3/faq/programming.html#why-am-i-getting-an-unboundlocalerror-when-the-variable-has-a-value"
+        },
+        {
+          "title": "UnboundLocalError",
+          "url": "https://docs.python.org/3/builtins/exceptions.html#UnboundLocalError"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

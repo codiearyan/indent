@@ -166,6 +166,9 @@ const BLOCK_LINE = /^\s*(if|elif|else|for|while|def)\b/
 function blockSyntaxCause(s) {
   const m = s.message
   const text = s.text ?? ''
+  if (/^\s*(If|Elif|Else|For|While|Def|Return|Break|Continue)\b/.test(text)) {
+    return "Python's own words, such as if, else, for, while, def and return, are written in small letters, and capitals count"
+  }
   if (/expected an indented block/.test(m)) {
     return 'the line before it ends with a colon, so at least one line under it must be moved in by a few spaces, to show it belongs to that if, else, loop or def'
   }
@@ -317,7 +320,7 @@ function blockRunCause(error, blocks) {
     (found = /name '(\w+)' is not defined/.exec(m)) &&
     blocks.made?.includes(found[1])
   ) {
-    return `Python does not know the name ${found[1]} at that point. A line in the file gives it a value, but that line has not run: it may be under an if or else whose condition was not met, or in a loop that ran no rounds${blocks.defs ? ', or inside a function, where a name lives only while the function runs' : ''}`
+    return `Python does not know the name ${found[1]} at that point. A line in the file gives it a value, but that line has not run yet: it may come further down the file, sit under an if or else whose condition was not met, or in a loop that ran no rounds${blocks.defs ? ', or be inside a function, where a name lives only while the function runs' : ''}`
   }
   if (error.type === 'UnboundLocalError') {
     const name = /local variable '(\w+)'/.exec(m)?.[1] ?? 'a name'
@@ -333,7 +336,7 @@ function blockRunCause(error, blocks) {
   if (
     (found = /(\w+)\(\) takes (.+?) positional arguments? but (\d+) (?:was|were) given/.exec(m))
   ) {
-    return `${found[1]} was called with ${found[3]} values in order, and its def line takes ${found[2]}. The call and the def line must agree on how many values there are`
+    return `${found[1]} was called with ${found[3]} ${found[3] === '1' ? 'value' : 'values'} in order, and its def line takes ${found[2]}. The call and the def line must agree on how many values there are`
   }
   if ((found = /(\w+)\(\) got an unexpected keyword argument '(\w+)'/.exec(m))) {
     return `${found[1]} has no parameter called ${found[2]}. A name used with = in a call must be one of the names in its def line`
@@ -735,6 +738,12 @@ function shared(r, file, task) {
   return p && !p.name.startsWith(`The Task ${task} lines`) ? p : null
 }
 
+/** The problem of each case, or only the first, under its own name, when all are the same. */
+const once = (details, problems) =>
+  details.length > 1 && problems.every((p) => p.message === problems[0].message)
+    ? [{ ...details[0], name: problems[0].name }]
+    : details
+
 const withGiven = (c) => {
   const values = { ...c.given, ...c.inject }
   return Object.keys(values).length ? `With ${givenText(values)}\n` : ''
@@ -770,9 +779,13 @@ export async function outputCases(t, { file, task, list, judge, nothing }) {
       )
     ]
   }
+  const problems = runs.map((r) => problem(r, file, task))
+  const ends = problems.map(
+    (p, i) => p && { ...p, name: list[i].name, output: `${withGiven(list[i])}${p.output ?? ''}`.trim() }
+  )
+  if (problems.every(Boolean)) return once(ends, problems)
   return list.map((c, i) => {
-    const p = problem(runs[i], file, task)
-    if (p) return { ...p, name: c.name, output: `${withGiven(c)}${p.output ?? ''}`.trim() }
+    if (ends[i]) return ends[i]
     const out = runs[i].parts.get(task).lines
     const message = judge(out, c)
     const output = printed({ ...c.given, ...c.inject }, out)
@@ -847,6 +860,8 @@ export async function callCases(t, { file, task, fn, list, mistakes = [], typed,
     }
     return null
   })
+  const problems = runs.map((r) => problem(r, file, task))
+  if (problems.every(Boolean)) return once(ends, problems)
   const first = runs.find((r, i) => !ends[i])?.call
   if (first?.missing) return [missingFunction(first, fn, task)]
   if (first?.type) {
@@ -873,7 +888,7 @@ export async function callCases(t, { file, task, fn, list, mistakes = [], typed,
     const shown = callText(fn, c)
     const said = `${withGiven(c)}Check called ${shown}`
     const out = call.lines
-    const told = `It printed:\n${out.length ? firstLines(out).join('\n') : '(nothing)'}`
+    const told = out.length ? `It printed:\n${firstLines(out).join('\n')}` : 'It printed nothing'
     if (call.stopped) {
       return fail(c.name, stoppedText(call.stopped, shown, 'it'), `${said}\n${told}`)
     }
