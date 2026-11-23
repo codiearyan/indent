@@ -87,7 +87,7 @@ function collect(child, timeoutMs, onOutput) {
   })
 }
 
-// A script handed settings may print its whole environment, so it gets only what Node needs to
+// A script may print its whole environment, so every run gets only what Node needs to
 // run from this computer's, never the rest of what the app or the learner's shell holds.
 const KEPT = /^(PATH|SYSTEMROOT|WINDIR|TEMP|TMP|TMPDIR|HOME|USERPROFILE|LANG|NO_COLOR|FORCE_COLOR|NODE_NO_WARNINGS)$/i
 const settingsEnv = (env) => Object.fromEntries(Object.entries(childEnv(env)).filter(([k]) => k in env || KEPT.test(k)))
@@ -95,7 +95,7 @@ const settingsEnv = (env) => Object.fromEntries(Object.entries(childEnv(env)).fi
 const spawnNode = (args, cwd, { env, input = false } = {}) =>
   spawn(process.execPath, args, {
     cwd,
-    env: env ? settingsEnv(env) : childEnv(),
+    env: settingsEnv(env ?? {}),
     stdio: [input ? 'pipe' : 'ignore', 'pipe', 'pipe']
   })
 
