@@ -17,15 +17,15 @@
 // becomes 0. With 12 in the drawer and 3 used, the caller's count is 9 afterwards.
 
 // Task 2: Split the minutes into hours
-// Write a function called splitMinutes that takes a number of minutes as an int and two
-// references to an int, hours and minutes, and gives nothing back. It puts the whole hours in
-// the caller's hours and the minutes left over in the caller's minutes: 135 minutes is 2 hours
-// and 15 minutes.
+// Write a function called splitMinutes that takes the total minutes as an int called total,
+// and two references to an int, hours and minutes, and gives nothing back. It puts the whole
+// hours in the caller's hours and the minutes left over in the caller's minutes: 135 minutes is
+// 2 hours and 15 minutes.
 
 // Task 3: Write the drawer's label
 // Write a function called drawerLabel that takes the part's name as a reference to a const
 // std::string and the count as an int, and gives back the label as a std::string: the name,
-// " x " and the count, like this:
+// " x " and the count, and prints nothing. Like this:
 //   mainspring x 12
 
 // Task 4: Add a note to the bench log

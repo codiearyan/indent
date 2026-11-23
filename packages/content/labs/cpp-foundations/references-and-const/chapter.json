@@ -47,7 +47,7 @@
       "id": "split",
       "title": "Split the minutes into hours",
       "file": "src/drawer.cpp",
-      "description": "Under `// Task 2`, write a function called `splitMinutes` that takes a number of minutes as an `int` and two references to an `int`, `hours` and `minutes`, and gives nothing back. It puts the whole hours in the caller's `hours` and the minutes left over in the caller's `minutes`: 135 minutes is 2 hours and 15 minutes.\n\nCheck calls `splitMinutes` with its own variables and reads all three after the call.",
+      "description": "Under `// Task 2`, write a function called `splitMinutes` that takes the total minutes as an `int` called `total` and two references to an `int`, `hours` and `minutes`, and gives nothing back. It puts the whole hours in the caller's `hours` and the minutes left over in the caller's `minutes`: 135 minutes is 2 hours and 15 minutes.\n\nCheck calls `splitMinutes` with its own variables and reads all three after the call.",
       "nextSteps": [
         "Write the first line: one `int` in, then two references to an `int`.",
         "Inside, give the hours their value from the total.",
@@ -75,7 +75,7 @@
       "id": "label",
       "title": "Write the drawer's label",
       "file": "src/drawer.cpp",
-      "description": "Under `// Task 3`, write a function called `drawerLabel` that takes the part's name as a reference to a `const std::string` and the count as an `int`, and gives back the label as a `std::string`: the name, ` x ` and the count:\n\n```\nmainspring x 12\n```\n\nCheck calls `drawerLabel` with a part name that is `const`, so it must not change, and reads what it gives back.",
+      "description": "Under `// Task 3`, write a function called `drawerLabel` that takes the part's name as a reference to a `const std::string` and the count as an `int`, and gives back the label as a `std::string`: the name, ` x ` and the count:\n\n```\nmainspring x 12\n```\n\nCheck calls `drawerLabel` with a part name that is `const`, so it must not change, and reads what it gives back and what it prints. It gives the label back; it prints nothing.",
       "nextSteps": [
         "Write the first line: `const std::string&` for the name, `int` for the count, `std::string` back.",
         "Inside, join the name, the ` x ` and the count.",

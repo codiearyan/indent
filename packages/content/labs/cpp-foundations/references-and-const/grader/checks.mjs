@@ -20,7 +20,7 @@ export const checks = {
       returns: 'void',
       params: [
         { name: 'count', what: 'the count in the drawer', type: 'int', after: true },
-        { name: 'used', what: 'the parts used', type: 'int', after: true }
+        { name: 'used', what: 'the parts used', type: 'int', after: true, want: 'int' }
       ],
       cases: cases.map(([inDrawer, used]) => {
         const want = Math.max(0, inDrawer - used)
@@ -51,7 +51,7 @@ export const checks = {
       fn: 'splitMinutes',
       returns: 'void',
       params: [
-        { name: 'total', what: 'the minutes', type: 'int', after: true },
+        { name: 'total', what: 'the minutes', type: 'int', after: true, want: 'int' },
         { name: 'hours', what: 'the hours', type: 'int', after: true },
         { name: 'minutes', what: 'the minutes left over', type: 'int', after: true }
       ],

@@ -75,7 +75,7 @@
       "id": "total",
       "title": "Add up a repair",
       "file": "src/bill.cpp",
-      "description": "Under `// Task 3`, write a function called `repairTotal` that takes the minutes worked as an `int` and the cost of the parts as a `double`, and gives back the whole price as a `double`: the labour plus the parts. Work out the labour by calling `labourCost`.\n\nCheck calls `repairTotal` with other minutes and parts, and reads what it gives back and whether it called `labourCost`. Check gives it a `labourCost` of its own, so this task does not depend on Task 1.",
+      "description": "Under `// Task 3`, write a function called `repairTotal` that takes the minutes worked as an `int` and the cost of the parts as a `double`, and gives back the whole price as a `double`: the labour plus the parts. Work out the labour by calling `labourCost`.\n\nCheck calls `repairTotal` with other minutes and parts, and reads what it gives back, what it prints and whether it called `labourCost`. It gives the price back; it prints nothing. Check gives it a `labourCost` of its own, so this task does not depend on Task 1.",
       "nextSteps": [
         "Write the first line, with its two parameters.",
         "Inside, call `labourCost` with the minutes.",
@@ -103,7 +103,7 @@
       "id": "quarter",
       "title": "Round the minutes up to a quarter hour",
       "file": "src/bill.cpp",
-      "description": "Ambrose bills whole quarter hours. Under `// Task 4`, write a function called `minutesToBill` that takes the minutes worked as an `int` and gives back, as an `int`, the minutes rounded up to the next quarter hour: 50 gives 60, 60 stays 60, and 61 gives 75.\n\nCheck calls `minutesToBill` with other minutes, and reads what it gives back and its own minutes after the call: they must stay as they were.",
+      "description": "Ambrose bills whole quarter hours. Under `// Task 4`, write a function called `minutesToBill` that takes the minutes worked as an `int` and gives back, as an `int`, the minutes rounded up to the next quarter hour: 50 gives 60, 60 stays 60, and 61 gives 75.\n\nCheck calls `minutesToBill` with other minutes, and reads what it gives back, what it prints and its own minutes after the call: they must stay as they were. It gives the minutes back; it prints nothing.",
       "nextSteps": [
         "Write the first line: an `int` in, an `int` back.",
         "Decide how to tell whether the minutes are already a whole number of quarter hours.",

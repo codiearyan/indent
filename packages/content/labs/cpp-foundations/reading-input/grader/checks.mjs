@@ -61,7 +61,7 @@ export const checks = {
         input,
         expect: { result: want, printed: asked(q) },
         hint: (r) =>
-          r.result === want.split(' ')[0]
+          r.result !== want && r.result === want.split(' ')[0]
             ? 'askLine gives back only the first word. >> stops at the first space; a whole line, spaces included, is read another way.'
             : r.result !== want
               ? 'askLine does not give back the whole line that was typed.'
@@ -99,11 +99,11 @@ export const checks = {
               ? 'The clocks afterwards are not the number that was typed first.'
               : r.args[1] === ''
                 ? 'The item came back empty. After the number, the Enter that followed it is still waiting, and a read of a whole line stops at the first line end it meets.'
-                : r.args[1] === item.split(' ')[0]
+                : r.args[1] !== item && r.args[1] === item.split(' ')[0]
                   ? 'The item is only its first word. >> stops at the first space; a whole line, spaces included, is read another way.'
                   : r.args[1] !== item
                     ? 'The item afterwards is not the line that was typed after the number.'
-                    : 'askRepair does not print Clocks: before it reads the number and Item: before it reads the item.'
+                    : 'askRepair does not print the two questions as the task writes them: "Clocks: " before it reads the number and "Item: " before it reads the item, each with a space after the colon and no line end, so Dorrit types on the same line.'
       }))
     })
   },

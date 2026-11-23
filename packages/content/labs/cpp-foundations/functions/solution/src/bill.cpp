@@ -13,7 +13,7 @@
 // Task 1: Price the labour
 // Ambrose charges 48 an hour, counted by the minute. Write a function called labourCost that
 // takes the minutes worked as an int and gives back what they cost as a double. 90 minutes
-// cost 72.
+// cost 72. It gives the cost back and prints nothing.
 double labourCost(int minutes) {
     return minutes * 48.0 / 60;
 }
@@ -29,7 +29,8 @@ void printBillLine(std::string what, double amount) {
 // Task 3: Add up a repair
 // Write a function called repairTotal that takes the minutes worked as an int and the cost of
 // the parts as a double, and gives back the whole price as a double: the labour plus the
-// parts. Work out the labour by calling labourCost.
+// parts. Work out the labour by calling labourCost. It gives the price back and prints
+// nothing.
 double repairTotal(int minutes, double parts) {
     return labourCost(minutes) + parts;
 }
@@ -37,7 +38,7 @@ double repairTotal(int minutes, double parts) {
 // Task 4: Round the minutes up to a quarter hour
 // Ambrose bills whole quarter hours. Write a function called minutesToBill that takes the
 // minutes worked as an int and gives back, as an int, the minutes rounded up to the next
-// quarter hour: 50 gives 60, 60 stays 60, and 61 gives 75.
+// quarter hour: 50 gives 60, 60 stays 60, and 61 gives 75. It prints nothing.
 int minutesToBill(int minutes) {
     while (minutes % 15 != 0) {
         minutes++;

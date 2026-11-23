@@ -10,7 +10,7 @@ export const checks = {
       task: 1,
       fn: 'labourCost',
       returns: 'double',
-      params: [{ name: 'minutes', what: 'the minutes', type: 'int' }],
+      params: [{ name: 'minutes', what: 'the minutes', type: 'int', want: 'int' }],
       typed:
         'Check called labourCost with other minutes and got the same back each time. Work the cost out from the minutes it is given, not from the clock in the task.',
       cases: [75, 20, 61, 0].map((minutes) => ({
@@ -40,7 +40,7 @@ export const checks = {
       returns: 'void',
       params: [
         { name: 'what', what: 'what the line is for', type: 'std::string' },
-        { name: 'amount', what: 'the amount', type: 'double' }
+        { name: 'amount', what: 'the amount', type: 'double', want: 'double' }
       ],
       cases: cases.map(([what, amount]) => {
         const shape = new RegExp(`^${what}: (-?\\d+(?:\\.\\d+)?)\\n$`)
@@ -65,38 +65,49 @@ export const checks = {
   },
 
   total(t) {
+    // At SHIFTED minutes Check's labourCost gives back SHIFTED_COST, so a repairTotal that calls it
+    // and then works the labour out again is found out.
+    const SHIFTED = 7
+    const SHIFTED_COST = 100
     const cases = [
       [75, 18.5],
       [30, 0],
-      [125, 9.75]
+      [125, 9.75],
+      [SHIFTED, 2.5]
     ]
+    const given = (minutes) => (minutes === SHIFTED ? SHIFTED_COST : labour(minutes))
     return judgeCall(t, {
       file: FILE,
       task: 3,
       fn: 'repairTotal',
       returns: 'double',
       params: [
-        { name: 'minutes', what: 'the minutes', type: 'int' },
-        { name: 'parts', what: 'the cost of the parts', type: 'double' }
+        { name: 'minutes', what: 'the minutes', type: 'int', want: 'int' },
+        { name: 'parts', what: 'the cost of the parts', type: 'double', want: 'double' }
       ],
       provides: [
         {
           name: 'labourCost',
-          code: 'double labourCost(int minutes) { indent_::calls_++; return minutes * 48.0 / 60; }'
+          code: `double labourCost(int minutes) { indent_::calls_++; return minutes == ${SHIFTED} ? ${SHIFTED_COST}.0 : minutes * 48.0 / 60; }`
         }
       ],
       typed:
         'Check called repairTotal with other minutes and parts and got the same back each time. Work the price out from what it is given.',
       cases: cases.map(([minutes, parts]) => ({
-        name: `${minutes} minutes and ${parts} of parts`,
+        name:
+          minutes === SHIFTED
+            ? `${minutes} minutes, with Check's labourCost giving back ${SHIFTED_COST} for them`
+            : `${minutes} minutes and ${parts} of parts`,
         args: [minutes, parts],
-        expect: { result: labour(minutes) + parts, printed: '' },
+        expect: { result: given(minutes) + parts, printed: '' },
         hint: (r) =>
-          r.result === labour(minutes)
+          r.result === given(minutes)
             ? 'repairTotal gives back the labour only. The whole price is the labour plus the parts.'
             : r.result === parts
               ? 'repairTotal gives back the parts only. The whole price is the labour plus the parts.'
-              : 'repairTotal does not give back the labour of those minutes plus the parts.'
+              : minutes === SHIFTED
+                ? `Here Check's own labourCost gives back ${SHIFTED_COST} for ${SHIFTED} minutes, on purpose, and repairTotal did not use what it gave back. Put the value of the call to labourCost in the price, not a sum of its own.`
+                : 'repairTotal does not give back the labour of those minutes plus the parts.'
       })),
       rule: (runs) =>
         runs.some((r) => r.calls === 0)

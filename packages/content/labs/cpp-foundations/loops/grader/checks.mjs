@@ -25,7 +25,9 @@ const usesLoop = (label, keywords, words) => (section) =>
     ? null
     : fail(
         `${label} uses a loop`,
-        `${label} asks you to work it out with ${words}, so it works for any numbers Check gives. Write the loop under // ${label}.`
+        /\bfor\s*\(/.test(section.code)
+          ? `${label} asks for ${words}, and this one is a for loop. Write it with while: its round brackets hold only the condition, so the start goes before it and the change goes inside it.`
+          : `${label} asks you to work it out with ${words}, so it works for any numbers Check gives. Write the loop under // ${label}.`
       )
 
 export const checks = {

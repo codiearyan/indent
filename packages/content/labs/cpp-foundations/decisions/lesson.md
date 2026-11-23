@@ -66,6 +66,8 @@ bool closeEarly = isSunday || cupsLeft == 0;
 
 Read them aloud: "kettle on and cups left", "Sunday or sold out". `!` turns true into false and back: `!kettleOn` is true when the kettle is off.
 
+A number between two others takes two comparisons joined with `&&`: `cupsLeft >= 1 && cupsLeft <= 5`. Written the way maths writes it, `1 <= cupsLeft <= 5` does not ask that question. C++ works out `1 <= cupsLeft` first, gets true or false, and compares that with 5, so the compiler warns about it or refuses it.
+
 ## Three ways a decision goes wrong
 
 **One equals sign.** `==` compares. A single `=` gives a variable a new value, and in a condition it does that quietly: `if (cupsLeft = 0)` sets `cupsLeft` to 0 and never runs its lines. With `-Wall`, both compilers warn about an assignment used as a condition and suggest parentheses. Do not add them. The fix is `==`.

@@ -344,7 +344,12 @@ export async function build(t, { file, task, vars = {}, cases = [{}], causes, st
     end,
     lines: lines.slice(start, end),
     text: lines.slice(start, end).join('\n'),
-    code: code.slice(start, end).join('\n')
+    code: code.slice(start, end).join('\n'),
+    // The task's code without main's closing brace, for counting braces in the last task.
+    body: [
+      ...code.slice(start, Math.min(end, closeLine)),
+      ...(closeLine >= start && closeLine < end ? [code[closeLine].slice(0, code[closeLine].lastIndexOf('}'))] : [])
+    ].join('\n')
   }
 
   const quoted = section.lines
@@ -467,7 +472,7 @@ export async function build(t, { file, task, vars = {}, cases = [{}], causes, st
             `${label} makes ${name}`,
             !declared
               ? `Check cannot find a variable called ${name} under // ${label}. Make it there, with exactly that name. Capital letters count.`
-              : seg?.kind === 'type'
+              : seg?.kind === 'type' && !/undeclared|not declared/.test(addedErrors[0].text)
                 ? `${name} is made with a different type than the task asks. ${label} asks for ${name} to be ${/^[aeiou]/.test(vars[name]) ? 'an' : 'a'} ${vars[name]}: look at the type in front of its name.`
                 : `Check cannot read ${name} after the lines of ${label}. Make it on a line of its own under // ${label}, not inside { }, so it is still there after them.`
           )
@@ -732,6 +737,8 @@ const PART2 = {
     `The { and } of ${label} do not pair up. Every { needs a } of its own, and a missing one makes the compiler read the rest of the file wrong, so the line it names can be far below the mistake. Count them in each if, loop and function.`,
   block: (name) =>
     `${name} is made inside { } and used after the }. A variable made inside { } exists only until that }. Make it before the { with a first value, and give it its new value inside.`,
+  chained:
+    'A comparison is chained, like a <= b <= c. C++ does not read it as in maths: it works out a <= b first, gets true or false, and compares that with c. Write two comparisons and join them with &&.',
   orphanElse:
     'An else has no if just before it. A semicolon right after the round brackets of if ends the if there, so the else that follows belongs to nothing.'
 }
@@ -742,6 +749,7 @@ function warned(warnings, code) {
   const empty = emptyBody(code)
   if (empty) return PART2.empty(empty.keyword)
   if (/misleading indentation|does not guard/.test(text)) return PART2.indent
+  if (/chained comparison|comparisons like/.test(text)) return PART2.chained
   return null
 }
 
@@ -752,6 +760,10 @@ function part2Cause(errors, lines, code, { label, fns = [], provided = [] } = {}
   if (unbalanced(code) || /expected '\}'|extraneous closing brace|at end of input/.test(text)) return PART2.braces(label)
   if (/'else' without a previous 'if'/.test(text) || (/expected expression/.test(text) && /\belse\b/.test(source))) {
     return PART2.orphanElse
+  }
+  if (/chained comparison|comparisons like/.test(text)) return PART2.chained
+  if (/redefinition of parameter|multiple parameters named/.test(text)) {
+    return 'Two parameters of the function have the same name. Each parameter is a variable of its own, so each needs a name of its own.'
   }
   if (/function.definition is not allowed here/.test(text)) {
     return 'A function is written inside another function, here inside main. Each function is written on its own: move it above main.'
@@ -801,6 +813,21 @@ function printedLines(stdout, header) {
   return header !== undefined && kept[0] === header ? kept.slice(1) : kept
 }
 
+/** A message when the printed lines differ from the task's only in capitals, spaces or quote marks. */
+function nearMiss(got, want) {
+  const k = want.findIndex((w, i) => !w.test(got[i]))
+  if (k === -1) return null
+  const squash = (l) => l.replace(/["\s]/g, '').toLowerCase()
+  const [g, w] = [got[k], want[k].text]
+  if (squash(g) !== squash(w)) return null
+  const what = /"/.test(g) && !/"/.test(w)
+    ? 'it has quote marks around it. The quotes in the task only show where the text starts and ends, so print what is between them'
+    : g.replace(/\s/g, '') === w.replace(/\s/g, '')
+      ? 'only its spaces differ. Look where the task puts a space, and where it puts none'
+      : 'only its capital letters differ'
+  return `The line ${/"/.test(g) ? g : `"${g}"`} is close to the task's, but ${what}. Check compares the lines exactly, letter by letter.`
+}
+
 const linesMatch = (got, want) => got.length === want.length && want.every((w, i) => w.test(got[i]))
 
 /**
@@ -816,7 +843,7 @@ export async function judgeLines(t, spec) {
     return found ? PART2.empty(found.keyword) : message
   }
   const built = await build(t, {
-    causes: (errors, lines, section) => part2Cause(errors, lines, section.code, { label }),
+    causes: (errors, lines, section) => part2Cause(errors, lines, section.body, { label }),
     ...spec,
     stuck: empty(spec.stuck),
     flood: empty(spec.flood)
@@ -855,10 +882,16 @@ export async function judgeLines(t, spec) {
       .join('\n')
     let message
     if (!passed) {
-      const joined = c.printed.some((w) => !outs[i].some((l) => w.test(l)) && r.stdout.includes(w.text))
+      const want = [...(spec.header !== undefined ? [spec.header] : []), ...c.printed.map((w) => w.text)]
+      const flat = (text) => text.split('\n').map((l) => l.trimEnd()).join('')
+      const joined = linesOk
+        ? !r.stdout.endsWith('\n')
+        : flat(r.stdout) === want.join('') && r.stdout.split('\n').filter((l) => l.trim()).length < want.length
+      const near = valuesOk && outs[i].length === c.printed.length && nearMiss(outs[i], c.printed)
       if (named) message = named
       else if ((typedOut || typedVar) && !usesGiven && spec.typed) message = spec.typed
-      else if (valuesOk && (joined || linesOk)) message = JOINED
+      else if (valuesOk && joined) message = JOINED
+      else if (near) message = near
       else message = typeof c.hint === 'function' ? c.hint({ ...r, given: c.given, section, lines: outs[i] }) : c.hint
     }
     return { name: c.name, passed, message, output: out }
@@ -1085,6 +1118,16 @@ export async function buildCall(t, spec) {
         fail(
           `${file} builds`,
           `${PART2.braces(where)} Here a missing } makes the compiler read main as part of ${where}, so no task can build until it is back.`
+        )
+      ]
+    }
+  }
+  if (!main && /\bint\s+main\s*\(/.test(code)) {
+    return {
+      problem: [
+        fail(
+          `${file} builds`,
+          `${PART2.braces('main')} Here main has no closing } of its own, so no task can build until the braces of main pair up.`
         )
       ]
     }
@@ -1318,7 +1361,7 @@ export async function buildCall(t, spec) {
         : `The program stopped with an error while ${fn} ran.`
     return {
       problem: [
-        fail(`${fn} runs to the end`, why, `${typedText(spec.cases[broken])}${clip(r.stdout ?? '').trim() ? printedText(clip(r.stdout)) : ''}`.trim())
+        fail(`${fn} runs to the end`, why, `${typedText(spec.cases[broken])}${(r.stdout ?? '').trim() ? printedText(firstLines(clip(r.stdout))) : ''}`.trim())
       ]
     }
   }
@@ -1347,6 +1390,11 @@ export async function buildCall(t, spec) {
       }
     })
   }
+}
+
+const firstLines = (text, n = 12) => {
+  const all = text.split('\n')
+  return all.length > n ? [...all.slice(0, n), '...'].join('\n') : text
 }
 
 const describeCall = (fn, spec, c) =>
