@@ -2023,7 +2023,7 @@ function part4Cause(errors, ctx) {
     return `${ctx.file ?? 'The header'} has an #endif with no #ifndef above it. The include guard opens with #ifndef and #define at the top of the file, and closes with #endif on its last line.`
   }
   if (ctx.missingInclude) {
-    return `${ctx.file} does not include ${ctx.missingInclude}, so it knows nothing that ${ctx.missingInclude} declares, Repair and std::string included. Put #include "${ctx.missingInclude}" at its top, above its first // Task comment.`
+    return `${ctx.file} does not include ${ctx.missingInclude}, so it knows nothing that ${ctx.missingInclude} declares, Repair and std::string included. A .cpp file includes the header it uses at its top, above its first // Task comment, with the quotes the lesson uses for a header of your own.`
   }
   const stdType = /no type named '(\w+)' in namespace 'std'|'(\w+)' in namespace 'std' does not name a type/.exec(text)
   if (ctx.file && isHeader(ctx.file) && (stdType || /'std'/.test(text))) {
