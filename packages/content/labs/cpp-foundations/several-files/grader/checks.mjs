@@ -1,4 +1,4 @@
-import { judgeTypes } from '../../grading.mjs'
+import { fail, judgeTypes, stillWrites } from '../../grading.mjs'
 
 const HEADER = 'src/repair.h'
 const PRICE = 'src/price.cpp'
@@ -22,10 +22,29 @@ const price = (r) => (r.minutes * 48) / 60 + r.parts
 const SHIFTED = 77
 const SHIFTED_PRICE = 100
 
+/**
+ * Check builds each task with only the files it needs, so a function written in two .cpp files
+ * would pass here and fail the learner's own build: once the task passes, say so.
+ */
+async function writtenOnce(t, details, fn, home, others) {
+  if (!details.every((d) => d.passed)) return details
+  const also = []
+  for (const file of others) if (await stillWrites(t, file, fn)) also.push(file)
+  if (!also.length) return details
+  const where = also.join(' and ')
+  return [
+    ...details,
+    fail(
+      `${fn} is written in ${home} only`,
+      `${fn} is written out in ${where} as well as in ${home}. Built together, the program has it twice, and the linker refuses (something like "duplicate symbol" or "multiple definition of"). Its body lives in ${home}: take it out of ${where}.`
+    )
+  ]
+}
+
 export const checks = {
-  price(t) {
+  async price(t) {
     const cases = [repair(4417, 'carriage clock', 95, 12.5), repair(5020, 'pocket watch', 30, 0), repair(7, 'cuckoo clock', 0, 9.75), repair(61, 'wall clock', 50, 4)]
-    return judgeTypes(t, {
+    const details = await judgeTypes(t, {
       files: [HEADER, PRICE],
       task: 1,
       fn: 'repairPrice',
@@ -50,11 +69,12 @@ export const checks = {
                 : `repairPrice gives back ${run.result}, which is not 48 an hour, counted by the minute, plus the parts.`
       }))
     })
+    return writtenOnce(t, details, 'repairPrice', PRICE, [COUNTER, MAIN])
   },
 
-  pickup(t) {
+  async pickup(t) {
     const cases = [repair(4417, 'carriage clock', 95, 12.5), repair(52, 'pocket watch', 30, 0), repair(6180, 'wall clock', 0, 0)]
-    return judgeTypes(t, {
+    const details = await judgeTypes(t, {
       files: [HEADER, COUNTER],
       task: 2,
       fn: 'pickupLine',
@@ -80,13 +100,14 @@ export const checks = {
         }
       })
     })
+    return writtenOnce(t, details, 'pickupLine', COUNTER, [PRICE, MAIN])
   },
 
-  total(t) {
+  async total(t) {
     const day = [repair(4417, 'carriage clock', 95, 12.5), repair(5020, 'pocket watch', 30, 0)]
     const cases = [day, [repair(7, 'cuckoo clock', 0, 9.75)], [], [repair(SHIFTED, 'travel clock', 40, 2), repair(61, 'wall clock', 50, 4)]]
     const given = (r) => (r.ticket === SHIFTED ? SHIFTED_PRICE : price(r))
-    return judgeTypes(t, {
+    const details = await judgeTypes(t, {
       files: [MAIN],
       task: 3,
       fn: 'dayTotal',
@@ -127,5 +148,6 @@ export const checks = {
         }
       })
     })
+    return writtenOnce(t, details, 'dayTotal', MAIN, [PRICE, COUNTER])
   }
 }

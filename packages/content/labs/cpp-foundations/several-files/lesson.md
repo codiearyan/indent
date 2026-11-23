@@ -23,7 +23,7 @@ g++ -std=c++17 -Wall src/main.cpp src/menu.cpp src/till.cpp -o cafe
 
 This one command does two jobs. First the compiler reads each `.cpp` file on its own, with the headers it includes, and turns it into a piece of program. A call to a function from another file only needs its declaration at this step. Then the **linker** joins the pieces, and connects every call to the one body that answers it.
 
-Every `.cpp` file of the program goes on the command. A header never does: the files that include it bring it in. Put a `.h` on the command and the compiler tries to prepare it as a piece of its own and stops; clang says "cannot specify -o when generating multiple output files". Take the header off the command.
+Every `.cpp` file of the program goes on the command. A header never does: the files that include it bring it in. Put a `.h` on the command and the compiler tries to prepare it as a piece of its own and stops: clang says "cannot specify -o when generating multiple output files", GCC something like "cannot specify '-o' with '-c', '-S' or '-E' with multiple files". Take the header off the command.
 
 ## The linker's two errors
 

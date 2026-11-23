@@ -117,7 +117,7 @@ export const checks = {
     )
   },
 
-  over(t) {
+  async over(t) {
     const r = (ticket, minutes) => ({ ticket, item: 'wall clock', minutes })
     const cases = [
       [r(4417, 95), 60, 35],
@@ -125,7 +125,7 @@ export const checks = {
       [r(7, 50), 50, 0],
       [r(61, 121), 120, 1]
     ]
-    return judgeTypes(t, {
+    const details = await judgeTypes(t, {
       files: [HEADER, SOURCE],
       task: 3,
       fn: 'minutesOver',
@@ -153,5 +153,13 @@ export const checks = {
               : `minutesOver gives back ${run.result}, which is not how many minutes the repair went over the quote.`
       }))
     })
+    if (!details.every((d) => d.passed) || !(await stillWrites(t, MAIN, 'minutesOver'))) return details
+    return [
+      ...details,
+      fail(
+        'minutesOver is written in repair.cpp only',
+        'minutesOver is written out in main.cpp as well. Built with repair.cpp, the program has it twice, and the linker refuses (something like "duplicate symbol" or "multiple definition of"). Its body lives in repair.cpp: take it out of main.cpp.'
+      )
+    ]
   }
 }

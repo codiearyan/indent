@@ -2113,6 +2113,9 @@ function linkerSaid(stderr) {
   return null
 }
 
+// A Mac's linker writes main as _main; the person wrote main.
+const linkedName = (said) => (said.name === 'main' ? 'main' : said.symbol)
+
 const LINK_WORDS = {
   undefined: 'something like "Undefined symbols" or "undefined reference to"',
   duplicate: 'something like "duplicate symbol" or "multiple definition of"'
@@ -2387,7 +2390,7 @@ export async function buildTypes(t, spec) {
       }
     }
     const said = linkerSaid(made.stderr)
-    if (said) return { problem: [fail(`${label} links`, await linkMessage(said, { spec, cuts, read, header, fnFile, label }), `The linker: ${said.kind === 'undefined' ? 'cannot find' : 'finds twice'} ${said.symbol}`)] }
+    if (said) return { problem: [fail(`${label} links`, await linkMessage(said, { spec, cuts, read, header, fnFile, label }), said.kind === 'undefined' ? `The linker cannot find ${linkedName(said)}` : `The linker finds ${linkedName(said)} twice`)] }
     const inLibrary = part3Cause([], { lines: [], code: taskCode, stderr: made.stderr, label })
     return {
       problem: [
@@ -2459,8 +2462,8 @@ export async function buildTypes(t, spec) {
           : emptyBody(taskCode)
             ? PART2.empty(emptyBody(taskCode).keyword)
             : r.timedOut
-              ? `${who}, under ${label}, did not finish within ${RUN_SECONDS} seconds, so Check stopped it. A loop in it never ends: look at what changes each time round, and whether it moves toward the end.`
-              : `${who}, under ${label}, printed far more than the task asks for, so Check stopped it. Look for a loop that prints without end.`
+              ? `${fn ? `${who}, under ${label},` : `The code of ${label}`} did not finish within ${RUN_SECONDS} seconds, so Check stopped it. A loop in it never ends: look at what changes each time round, and whether it moves toward the end.`
+              : `${fn ? `${who}, under ${label},` : `The code of ${label}`} printed far more than the task asks for, so Check stopped it. Look for a loop that prints without end.`
         : crashedWhy(r, who, label)
     const call = fn ? `${describeCall(fn, spec, spec.cases[broken])}\n` : ''
     return { problem: [fail(`${who} runs to the end`, why, `${call}${(r.stdout ?? '').trim() ? printedText(firstLines(clip(r.stdout))) : ''}`.trim())] }

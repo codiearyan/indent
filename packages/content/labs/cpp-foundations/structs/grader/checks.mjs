@@ -46,6 +46,16 @@ export const checks = {
           output: (got) => REPAIR.map(([m]) => `${m}: ${got[`type_${m}`]}`).join('\n')
         },
         {
+          name: 'Repair writes ticket, owner, item and minutes in that order',
+          // Members of one struct sit in memory in the order they are written.
+          code: `Repair indent_o_; const char* indent_p_[] = {${REPAIR.map(([m]) => `reinterpret_cast<const char*>(&indent_o_.${m})`).join(', ')}}; indent_::put_("ordered", indent_p_[0] < indent_p_[1] && indent_p_[1] < indent_p_[2] && indent_p_[2] < indent_p_[3] ? 1 : 0);`,
+          judge: (got) =>
+            got.ordered === '1'
+              ? null
+              : 'The members of Repair are written in another order than the task gives. Write them in its order: ticket, owner, item, then minutes. Filled with braces, a struct takes its values in the order its members are written, and from Task 2 on Check uses a Repair in the task\'s order.',
+          output: () => `The task's order: ${REPAIR.map(([m]) => m).join(', ')}`
+        },
+        {
           name: 'A new Repair starts with its ticket and its minutes at 0, and empty texts',
           code: 'alignas(Repair) unsigned char indent_b_[sizeof(Repair)]; std::memset(indent_b_, 0x5A, sizeof indent_b_); Repair* indent_r_ = new (indent_b_) Repair; indent_::put_("value", *indent_r_); indent_r_->~Repair();',
           judge: (got) => {
@@ -65,11 +75,11 @@ export const checks = {
         },
         {
           name: 'Two repairs each keep the values Check puts in their members',
-          code: 'Repair a; a.ticket = 4417; a.owner = "Corwin Lusk"; a.item = "carriage clock"; a.minutes = 95; Repair b; b.ticket = 5020; b.owner = "Sabine Prowse"; b.item = "pocket watch"; b.minutes = 30; indent_::put_("a", a); indent_::put_("b", b);',
+          code: 'Repair a; a.ticket = 4417; a.owner = "Corwin Dace"; a.item = "carriage clock"; a.minutes = 95; Repair b; b.ticket = 5020; b.owner = "Sabine Prowse"; b.item = "pocket watch"; b.minutes = 30; indent_::put_("a", a); indent_::put_("b", b);',
           judge: (got) => {
             const a = parse(got, 'a')
             const b = parse(got, 'b')
-            const wantA = { ticket: 4417, owner: 'Corwin Lusk', item: 'carriage clock', minutes: 95 }
+            const wantA = { ticket: 4417, owner: 'Corwin Dace', item: 'carriage clock', minutes: 95 }
             const wantB = { ticket: 5020, owner: 'Sabine Prowse', item: 'pocket watch', minutes: 30 }
             const off = [
               [a, wantA],
@@ -86,7 +96,7 @@ export const checks = {
 
   takein(t) {
     const cases = [
-      [4417, 'Corwin Lusk', 'carriage clock'],
+      [4417, 'Corwin Dace', 'carriage clock'],
       [5020, 'Sabine Prowse', 'pocket watch'],
       [12, 'Anselm Vickery', 'cuckoo clock']
     ]
@@ -127,7 +137,7 @@ export const checks = {
 
   slip(t) {
     const cases = [
-      { ticket: 4417, owner: 'Corwin Lusk', item: 'carriage clock', minutes: 95 },
+      { ticket: 4417, owner: 'Corwin Dace', item: 'carriage clock', minutes: 95 },
       { ticket: 5020, owner: 'Sabine Prowse', item: 'pocket watch', minutes: 0 },
       { ticket: 7, owner: 'Anselm Vickery', item: 'cuckoo clock', minutes: 130 }
     ]
@@ -162,9 +172,9 @@ export const checks = {
 
   pickup(t) {
     const cases = [
-      { repair: { ticket: 4417, owner: 'Corwin Lusk', item: 'carriage clock', minutes: 95 }, customer: { name: 'Mirabel Stroud', phone: '01632 960447' } },
+      { repair: { ticket: 4417, owner: 'Corwin Dace', item: 'carriage clock', minutes: 95 }, customer: { name: 'Mirabel Stroud', phone: '01632 960447' } },
       { repair: { ticket: 52, owner: 'Sabine Prowse', item: 'pocket watch', minutes: 0 }, customer: { name: 'Sabine Prowse', phone: '01632 960903' } },
-      { repair: { ticket: 6180, owner: 'Gideon Rendle', item: 'wall clock', minutes: 40 }, customer: { name: 'Petronel Orrey', phone: '01632 960265' } }
+      { repair: { ticket: 6180, owner: 'Lazlo Rendle', item: 'wall clock', minutes: 40 }, customer: { name: 'Ondine Marrick', phone: '01632 960265' } }
     ]
     return judgeTypes(t, {
       files: [FILE],

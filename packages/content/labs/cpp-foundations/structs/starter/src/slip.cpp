@@ -12,8 +12,8 @@
 #include <string>
 
 // Task 1: Write the repair's struct
-// Write a struct called Repair with four members: ticket, an int that starts at 0; owner, a
-// std::string; item, a std::string; and minutes, an int that starts at 0.
+// Write a struct called Repair with four members, in this order: ticket, an int that starts at
+// 0; owner, a std::string; item, a std::string; and minutes, an int that starts at 0.
 
 // Task 2: Fill in a new repair
 // Write a function called takeIn that takes the ticket as an int, and the owner and the item each

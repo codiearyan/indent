@@ -13,7 +13,7 @@
       "id": "struct",
       "title": "Write the repair's struct",
       "file": "src/slip.cpp",
-      "description": "Under `// Task 1` in `src/slip.cpp`, write a struct called `Repair` with four members:\n\n- `ticket`, an `int` that starts at `0`\n- `owner`, a `std::string`\n- `item`, a `std::string`\n- `minutes`, an `int` that starts at `0`\n\nCheck makes repairs of its own from your struct: a new one with nothing put in it, to read where each member starts, and two with values of its own in every member, to read them back. It also asks the compiler for the type of each member.",
+      "description": "Under `// Task 1` in `src/slip.cpp`, write a struct called `Repair` with four members, in this order:\n\n- `ticket`, an `int` that starts at `0`\n- `owner`, a `std::string`\n- `item`, a `std::string`\n- `minutes`, an `int` that starts at `0`\n\nCheck makes repairs of its own from your struct: a new one with nothing put in it, to read where each member starts, and two with values of its own in every member, to read them back. It also asks the compiler for the type of each member, and reads the order they are written in: from Task 2 on, Check uses a `Repair` written in this order.",
       "nextSteps": [
         "Write `struct Repair`, then a `{` and a `}` with a semicolon after it.",
         "Inside, write each member on its own line: its type, its name and a semicolon.",

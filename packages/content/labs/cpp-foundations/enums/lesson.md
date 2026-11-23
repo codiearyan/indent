@@ -28,7 +28,7 @@ Size cup = Size::Medium;
 if (cup == Size::Large) { ... }
 ```
 
-Values are compared with `==` and `!=`. An `enum class` value is not a number, so `cup == 2` is refused: clang says "invalid operands to binary expression ('Size' and 'int')", GCC says "no match for 'operator=='" with "operand types are 'Size' and 'int'". That refusal is the point. You never have to remember what 2 meant.
+Values are compared with `==` and `!=`. An `enum class` value is not a number, so `cup == 2` is refused: clang says "invalid operands to binary expression ('Size' and 'int')", GCC says "no match for 'operator=='" with "operand types are 'Size' and 'int'". That refusal is the point. You never have to remember what 2 meant. For the same reason, `std::cout << cup` is refused too, with a long message that starts with "invalid operands to binary expression" in clang and "no match for 'operator<<'" in GCC: a value of an `enum class` is not printed by itself. Turn it into words first, with a `switch` like the one below.
 
 There is an older form without `class`, a plain `enum`. Its values turn into numbers by themselves and are written without the type's name, so `cup == 2` builds without a word. Prefer `enum class`.
 

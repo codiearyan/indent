@@ -38,12 +38,6 @@
           "url": "https://en.cppreference.com/w/cpp/language/definition"
         }
       ],
-      "videos": [
-        {
-          "title": "How the linker joins the files of a program",
-          "url": "https://www.youtube.com/watch?v=H4s55GgAg0I"
-        }
-      ],
       "points": 10
     },
     {
