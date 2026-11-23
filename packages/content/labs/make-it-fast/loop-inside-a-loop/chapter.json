@@ -1,0 +1,82 @@
+{
+  "id": "loop-inside-a-loop",
+  "title": "The loop inside the loop",
+  "files": ["src/report.js", "src/measure.js", "src/try.js", "src/old-report.js", "src/shop.js"],
+  "terminal": {
+    "description": "A shell in your workspace where Sefton's matching runs beside yours: the same answer, the time, and how the work grows.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "match",
+      "title": "Match orders without searching",
+      "file": "src/report.js",
+      "description": "Make `matchOrders(orders, customers)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: a new list with one object per order, in the same order, holding all the order's fields and `customer`, the record of the customer whose `id` is the order's `customerId`\n- every customer has a different `id`, and every id a check asks about is in the list\n- it looks at each customer's `id` a few times at most, and at each order's `customerId` once or twice, not once for every customer\n\nThe check hands it shops of its own whose customer records count how often their `id` is read, on two sizes and with no orders, and compares your answer with Sefton's version on the same data. A few looks at each customer, plus one or two per order, is fine; one per order per customer is not.",
+      "nextSteps": [
+        "Run `node src/try.js` and look at how often old matchOrders reads a customer's id.",
+        "Read \"Build the lookup once\" in the lesson.",
+        "Before the loop over the orders, make something that finds a customer by id.",
+        "Use only that inside the loop, and run the script again: same answer, fewer reads."
+      ],
+      "hints": [
+        "`find` goes through the customer list from the start until it meets the right one. It does that for every order, so the whole list is gone through again and again.",
+        "A `Map` finds the value for a key without going through anything. Build it once, from the customer list, with each customer's id as the key. Building it inside the loop is the old work again.",
+        "`const byId = new Map(customers.map((customer) => [customer.id, customer]))`, then `customer: byId.get(order.customerId)` in place of the `find`."
+      ],
+      "docs": [
+        { "title": "Map", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" },
+        { "title": "Array.prototype.find()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find" },
+        { "title": "Map() constructor", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/Map" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trade",
+      "title": "Tell trade orders apart without searching",
+      "file": "src/report.js",
+      "description": "Make `tradeOrders(orders, tradeIds)` in `src/report.js` fast, without changing what it returns.\n\n- it returns what it returns now: the orders whose `customerId` is in the list `tradeIds`, in their own order\n- it reads each place of `tradeIds` about once in all, not once for every order\n- it does not search a list for every order: not `tradeIds`, and not a copy of it\n- it reads each order's `customerId` once or twice\n\nThe check hands it orders of its own and a trade list that counts how often its places are read, counts the searches (`includes`, `indexOf`, `some`, `find` and the like) run on any list while it works, on two sizes and with an empty trade list, and compares your answer with Sefton's version.",
+      "nextSteps": [
+        "Find the call in `tradeOrders` that goes through the whole trade list.",
+        "Decide what you can build once that answers \"is this id on the list?\" at once.",
+        "Build it before the filter and ask it inside.",
+        "Run `node src/try.js`: the answer should be the same, and the time far smaller."
+      ],
+      "hints": [
+        "`includes` looks at the places of the list one by one until it finds the id or reaches the end. Most customers are not trade, so most orders make it read to the end.",
+        "A `Set` holds values and answers whether it has one without going through them. You only need to know whether an id is there, not anything about it.",
+        "`const trade = new Set(tradeIds)` before the filter, then `trade.has(order.customerId)` inside it."
+      ],
+      "docs": [
+        { "title": "Set", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" },
+        { "title": "Set.prototype.has()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/has" },
+        { "title": "Array.prototype.includes()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "growth",
+      "title": "Say how the work grows",
+      "file": "src/measure.js",
+      "description": "Implement `growth(stepsFor, n)` in `src/measure.js`. `stepsFor` is a function that takes a size and returns how many steps some work takes at that size.\n\n- it calls `stepsFor` exactly twice: once with `n` and once with `2 * n`\n- it divides the steps at `2 * n` by the steps at `n`\n- under 1.5 it returns `'same'`, under 3 it returns `'twice'`, and otherwise `'four times'`\n\nThe check hands it step counts of its own whose growth it knows, some only close to doubling or to four times, and notes the sizes asked for.",
+      "nextSteps": [
+        "Read \"Doubling the orders\" in the lesson.",
+        "Ask `stepsFor` once for `n` and once for `2 * n`, and keep both answers.",
+        "Divide the second by the first and pick the word with the limits in the task.",
+        "Run `node src/try.js` and compare old matchOrders with yours."
+      ],
+      "hints": [
+        "Doubling the size tells you how work grows: the same, twice as much, or four times as much each time the shop doubles.",
+        "Real counts are rarely exactly 2 or 4 times: a little fixed work, or a sort, moves them. The limits in the task pick the nearest of the three.",
+        "`const ratio = stepsFor(2 * n) / stepsFor(n)`, then return `'same'` when `ratio < 1.5`, `'twice'` when `ratio < 3`, and `'four times'` otherwise."
+      ],
+      "docs": [
+        { "title": "Functions as values", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions" },
+        { "title": "if...else", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else" }
+      ],
+      "videos": [
+        { "title": "How work grows with the size of the input", "url": "https://www.youtube.com/watch?v=h7AIAexf2-Y" }
+      ],
+      "points": 10
+    }
+  ]
+}

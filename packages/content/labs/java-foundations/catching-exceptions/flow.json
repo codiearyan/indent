@@ -1,0 +1,182 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      },
+      {
+        "id": "typed",
+        "label": "What she types",
+        "kind": "data"
+      },
+      {
+        "id": "counts",
+        "label": "Counts",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "day",
+        "label": "Day",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "seats",
+        "label": "Seats",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "desk",
+        "label": "Hut desk",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bridie",
+        "to": "typed",
+        "label": "types"
+      },
+      {
+        "from": "typed",
+        "to": "counts",
+        "label": "a count"
+      },
+      {
+        "from": "typed",
+        "to": "day",
+        "label": "the day's counts"
+      },
+      {
+        "from": "typed",
+        "to": "seats",
+        "label": "a seat number"
+      },
+      {
+        "from": "counts",
+        "to": "desk",
+        "label": "a number"
+      },
+      {
+        "from": "day",
+        "to": "desk",
+        "label": "a summary"
+      },
+      {
+        "from": "seats",
+        "to": "desk",
+        "label": "a name or why not"
+      }
+    ],
+    "note": "A slip in what Bridie types gets an answer at the desk, and a mistake in the code still stops the program."
+  },
+  "tasks": {
+    "seats": {
+      "steps": [
+        {
+          "active": [
+            "bridie",
+            "bridie->typed",
+            "typed"
+          ],
+          "note": "Bridie types a count of seats, sometimes with spaces, sometimes a word."
+        },
+        {
+          "active": [
+            "typed",
+            "typed->counts",
+            "counts"
+          ],
+          "note": "The count is read as a whole number; a text that is not one gets an answer instead of a crash."
+        },
+        {
+          "active": [
+            "counts",
+            "counts->desk",
+            "desk"
+          ],
+          "note": "The desk shows the number, and a missing text from the code still reaches whoever called."
+        }
+      ]
+    },
+    "summary": {
+      "steps": [
+        {
+          "active": [
+            "typed",
+            "typed->day",
+            "day"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "the day's entries",
+            "values": [
+              "a count",
+              "a smudge",
+              "a count"
+            ]
+          },
+          "note": "The day's entries come in one after another, smudges among them."
+        },
+        {
+          "active": [
+            "day"
+          ],
+          "note": "Each entry is read on its own, so one smudge never stops the rest being added."
+        },
+        {
+          "active": [
+            "day",
+            "day->desk",
+            "desk"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "the summary",
+            "entries": [
+              {
+                "key": "seats",
+                "value": "added up"
+              },
+              {
+                "key": "not read",
+                "value": "counted"
+              }
+            ]
+          },
+          "note": "The desk shows the seats added up and how many entries could not be read."
+        }
+      ]
+    },
+    "holder": {
+      "steps": [
+        {
+          "active": [
+            "typed",
+            "typed->seats",
+            "seats"
+          ],
+          "note": "Bridie types a seat number for a boat."
+        },
+        {
+          "active": [
+            "seats"
+          ],
+          "note": "A word and a seat the boat does not have are two different slips, each with its own answer."
+        },
+        {
+          "active": [
+            "seats",
+            "seats->desk",
+            "desk"
+          ],
+          "note": "The desk shows who sits there, or why there is no answer, in Java's own words."
+        }
+      ]
+    }
+  }
+}

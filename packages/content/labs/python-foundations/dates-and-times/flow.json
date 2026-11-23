@@ -1,0 +1,48 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "book", "label": "Sign-out book", "kind": "data" },
+      { "id": "sheet", "label": "Kit sheet", "kind": "data" },
+      { "id": "dates", "label": "kit_dates.py", "kind": "file", "mine": true },
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "council", "label": "Council report", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "book", "to": "dates", "label": "time out" },
+      { "from": "sheet", "to": "dates", "label": "last check" },
+      { "from": "dates", "to": "dougie", "label": "days, due dates" },
+      { "from": "dates", "to": "council", "label": "report lines" }
+    ],
+    "note": "Dates written as text become dates the laptop can count with, and go out again written in full."
+  },
+  "tasks": {
+    "out": {
+      "steps": [
+        { "active": ["book", "book->dates", "dates"], "value": { "kind": "array", "label": "what goes in", "values": ["day/month/year hours:minutes"] }, "note": "A time from the sign-out book comes in as text." },
+        { "active": ["dates"], "note": "A format says which part of the text is the day, the month, the year, the hour and the minute." },
+        { "active": ["dates"], "value": { "kind": "map", "label": "what comes out", "entries": [{ "key": "type", "value": "datetime" }] }, "note": "Out comes a date with its time of day, ready to count with." }
+      ]
+    },
+    "since": {
+      "steps": [
+        { "active": ["sheet", "sheet->dates", "dates"], "value": { "kind": "array", "label": "what goes in", "values": ["last check, year-month-day", "today, a date"] }, "note": "The date of the last check comes from the kit sheet, and today is handed in." },
+        { "active": ["dates"], "note": "The text becomes a date, and one date is taken from the other." },
+        { "active": ["dates", "dates->dougie", "dougie"], "note": "Dougie gets the days since the check as a plain number." }
+      ]
+    },
+    "next": {
+      "steps": [
+        { "active": ["sheet", "sheet->dates", "dates"], "value": { "kind": "array", "label": "what goes in", "values": ["year", "month", "day", "days until the next"] }, "note": "The date of a check comes in as three numbers, with the days until the next one." },
+        { "active": ["dates"], "note": "The numbers make a date, and the days are added as a gap, months and leap years counted for you." },
+        { "active": ["dates", "dates->dougie", "dougie"], "note": "Dougie gets the date the next check is due." }
+      ]
+    },
+    "line": {
+      "steps": [
+        { "active": ["dates"], "value": { "kind": "array", "label": "what goes in", "values": ["a datetime"] }, "note": "A date with its time goes in." },
+        { "active": ["dates"], "note": "The day of the week and the month become names from the file's own lists." },
+        { "active": ["dates", "dates->council", "council"], "note": "The council gets one line written in full, the time in hours and minutes." }
+      ]
+    }
+  }
+}

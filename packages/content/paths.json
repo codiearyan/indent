@@ -27,7 +27,8 @@
           "async-js",
           "js-bug-hunts",
           "build-a-json-parser",
-          "data-bug-hunts"
+          "data-bug-hunts",
+          "make-it-fast"
         ]
       },
       {
@@ -157,7 +158,8 @@
           "js-foundations",
           "async-js",
           "build-a-json-parser",
-          "data-bug-hunts"
+          "data-bug-hunts",
+          "make-it-fast"
         ]
       },
       {
@@ -273,7 +275,8 @@
           "build-a-router",
           "build-a-state-store",
           "build-a-json-parser",
-          "build-a-key-value-database"
+          "build-a-key-value-database",
+          "make-it-fast"
         ]
       },
       {

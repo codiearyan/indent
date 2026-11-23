@@ -1,0 +1,105 @@
+{
+  "id": "stack-traces",
+  "title": "Stack traces: where it broke, where it went wrong",
+  "files": ["EveningReport.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the evening report here and read the stack trace it prints.",
+    "suggestedCommand": "java EveningReport.java"
+  },
+  "tasks": [
+    {
+      "id": "departures",
+      "title": "Mend the last departure",
+      "file": "EveningReport.java",
+      "description": "Under `// Task 1`, `Departures.last(int[] hours)` should give back the day's last crossing, as in `Crossing 6 leaves at 19:00`. It stops with an `ArrayIndexOutOfBoundsException`. Read the trace, and mend the one method of `Departures` that is wrong. Leave the other two exactly as they are: each does what its comment says with what it is handed.\n\nCheck calls `last` with days of its own, of one crossing and of several, and calls `line` with position 0. It also compares the two methods you leave alone with the starter's, comments, spaces and lines that only print aside.",
+      "nextSteps": [
+        "Run the file and read the first line of the trace to the end: which position was asked for, and how long was the array?",
+        "Go to the method on the top at line. Does it do what its comment says with the position it was handed?",
+        "Walk down the trace: who handed that position on, and who made it?",
+        "Mend the method that made the wrong value, and run the file again."
+      ],
+      "hints": [
+        "The top at line is where Java stopped. Read the comment of each method on the trace and ask whether it did its job with what it was handed.",
+        "Positions count from 0, so an array of 6 hours has positions 0 to 5. One method hands on a position that is not one of those, and the methods above it only pass it along.",
+        "`last` should hand `line` the position of the last hour: one less than `hours.length`."
+      ],
+      "docs": [
+        {
+          "title": "What is an exception?",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/definition.html"
+        },
+        {
+          "title": "ArrayIndexOutOfBoundsException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ArrayIndexOutOfBoundsException.html"
+        },
+        {
+          "title": "StackTraceElement",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/StackTraceElement.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Reading stack traces",
+          "url": "https://www.youtube.com/watch?v=DFp-4kIBvk0"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "skippers",
+      "title": "Mend the skippers' notice",
+      "file": "EveningReport.java",
+      "description": "Under `// Task 2`, `Skippers.notice` should give back a line for each boat sailing today, as in `Gannet: M.`, with the first letter of its skipper's name. Every boat sailing is on the rota. It stops with a `NullPointerException`: in its message, `\"<parameter1>\"` is the first parameter of the method on the top `at` line. Mend the one method of `Skippers` that is wrong, and leave the other three exactly as they are.\n\nCheck calls `notice` and `skipperOf` with rotas of its own, with the boat at every place on the rota, and compares the three methods you leave alone with the starter's, comments, spaces and lines that only print aside.",
+      "nextSteps": [
+        "Run the file, and read the first line of the trace: what was called on null, and which name held it?",
+        "Walk down the trace: where did that null come from?",
+        "Look for a method that is not on the trace at all: one that had already given back its answer.",
+        "Mend that method, and run the file again."
+      ],
+      "hints": [
+        "A method that made a bad value and gave it back has finished, so it is no longer on the stack, and its line is not in the trace.",
+        "notice gets each skipper from skipperOf. Try skipperOf in your head with the rota from main: which boats can it find?",
+        "The loop in `skipperOf` stops one place too early: it should go through every position, `i < rotaBoats.length`."
+      ],
+      "docs": [
+        {
+          "title": "NullPointerException",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NullPointerException.html"
+        },
+        {
+          "title": "Exceptions",
+          "url": "https://dev.java/learn/exceptions/"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "takings",
+      "title": "Mend the seats sold",
+      "file": "EveningReport.java",
+      "description": "Under `// Task 3`, `Takings.total` should give back the seats sold over the day, from ledger lines such as `09:00,Linnet,9`: the time, the boat and the seats. `line.split(\",\")` cuts a line at each comma and gives back the pieces as an array of `String`, in order. It stops with an `IllegalArgumentException` that has a `Caused by` part. `Ledger`, above the tasks, is right and stays as it is. Mend the one method of `Takings` that is wrong, and leave the other exactly as it is.\n\nCheck calls `total` and `seatsOn` with ledger lines of its own and compares the method you leave alone with the starter's, comments, spaces and lines that only print aside.",
+      "nextSteps": [
+        "Run the file, and read the top part of the trace, then the part after Caused by.",
+        "Which text was Integer.parseInt handed? Which part of the ledger line is that?",
+        "Skip the lines of Java's own methods, and find the first line of the Caused by part that names your file. Walk down from there.",
+        "Mend the method that hands Ledger the wrong part, and run the file again."
+      ],
+      "hints": [
+        "Caused by names the exception that started it all, and its first line says exactly which text could not be read as a number.",
+        "Ledger.seats reads a count of seats, and it is right. The text it was handed is not a count of seats: look at who chose that text.",
+        "A line split at its commas gives the time at position 0, the boat at 1 and the seats at 2: `seatsOn` should hand `Ledger.seats` `parts[2]`."
+      ],
+      "docs": [
+        {
+          "title": "Chained exceptions",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/chained.html"
+        },
+        {
+          "title": "Throwable",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

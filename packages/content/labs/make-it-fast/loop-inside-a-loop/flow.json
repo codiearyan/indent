@@ -1,0 +1,217 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "orders",
+        "label": "Orders",
+        "kind": "data"
+      },
+      {
+        "id": "customers",
+        "label": "Customer list",
+        "kind": "data"
+      },
+      {
+        "id": "match",
+        "label": "matchOrders()",
+        "kind": "function",
+        "mine": true,
+        "fn": "matchOrders"
+      },
+      {
+        "id": "trade",
+        "label": "tradeOrders()",
+        "kind": "function",
+        "mine": true,
+        "fn": "tradeOrders"
+      },
+      {
+        "id": "growth",
+        "label": "growth()",
+        "kind": "function",
+        "mine": true,
+        "fn": "growth"
+      },
+      {
+        "id": "money",
+        "label": "Money step",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "orders",
+        "to": "match",
+        "label": "every order"
+      },
+      {
+        "from": "customers",
+        "to": "match",
+        "label": "looked up by id"
+      },
+      {
+        "from": "match",
+        "to": "trade",
+        "label": "matched orders"
+      },
+      {
+        "from": "trade",
+        "to": "money",
+        "label": "trade orders"
+      },
+      {
+        "from": "match",
+        "to": "growth",
+        "label": "steps counted"
+      }
+    ],
+    "note": "The match step finds each order's customer and trade orders without going through a list for every order."
+  },
+  "tasks": {
+    "match": {
+      "steps": [
+        {
+          "active": [
+            "customers",
+            "customers->match",
+            "match"
+          ],
+          "note": "Before any order is looked at, the customer list is gone through once, so a customer can be found by id.",
+          "value": {
+            "kind": "map",
+            "label": "found by id",
+            "entries": [
+              {
+                "key": "an id",
+                "value": "that customer's record"
+              }
+            ]
+          }
+        },
+        {
+          "active": [
+            "orders",
+            "orders->match",
+            "match"
+          ],
+          "note": "Each order goes straight to its customer, without searching the list from the front."
+        },
+        {
+          "active": [
+            "match"
+          ],
+          "note": "Each order comes out with its customer beside it, in the same order as before.",
+          "value": {
+            "kind": "map",
+            "label": "one matched order",
+            "entries": [
+              {
+                "key": "the order's fields",
+                "value": "as they were"
+              },
+              {
+                "key": "customer",
+                "value": "its customer's record"
+              }
+            ]
+          }
+        }
+      ],
+      "trace": {
+        "file": "src/report.js",
+        "call": "matchOrders",
+        "args": [
+          [
+            {
+              "id": "A000101",
+              "customerId": "C00007",
+              "item": "invite",
+              "qty": 40,
+              "day": "2026-11-21",
+              "paid": true
+            },
+            {
+              "id": "A000102",
+              "customerId": "C00003",
+              "item": "menu",
+              "qty": 25,
+              "day": "2026-11-22",
+              "paid": false
+            }
+          ],
+          [
+            {
+              "id": "C00003",
+              "name": "Gormford Cafe",
+              "trade": true
+            },
+            {
+              "id": "C00007",
+              "name": "Kestwick Studio",
+              "trade": false
+            }
+          ]
+        ]
+      }
+    },
+    "trade": {
+      "steps": [
+        {
+          "active": [
+            "match",
+            "match->trade",
+            "trade"
+          ],
+          "note": "The matched orders come in, with the list of trade customers' ids."
+        },
+        {
+          "active": [
+            "trade"
+          ],
+          "note": "The trade list is gone through once, so asking whether an id is on it needs no search."
+        },
+        {
+          "active": [
+            "trade",
+            "trade->money",
+            "money"
+          ],
+          "note": "Only the trade customers' orders go on, in their own order."
+        }
+      ]
+    },
+    "growth": {
+      "steps": [
+        {
+          "active": [
+            "match",
+            "match->growth",
+            "growth"
+          ],
+          "note": "The work of a step is counted at one size of shop."
+        },
+        {
+          "active": [
+            "growth"
+          ],
+          "note": "Then at twice that size, and the second count is divided by the first."
+        },
+        {
+          "active": [
+            "growth"
+          ],
+          "note": "The answer says how the work grows each time the shop doubles.",
+          "value": {
+            "kind": "array",
+            "label": "the three answers",
+            "values": [
+              "same",
+              "twice",
+              "four times"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -337,6 +337,10 @@ const repos: { labId: string; expected: string[] }[] = [
     ]
   },
   {
+    labId: 'make-it-fast',
+    expected: ['loop-inside-a-loop/match', 'work-done-again/shares', 'knowing-when-to-stop/days']
+  },
+  {
     labId: 'testing-foundations',
     expected: ['choosing-cases/fix', 'test-first/free-code', 'test-first/large-code']
   },
