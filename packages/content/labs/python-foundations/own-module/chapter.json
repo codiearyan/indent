@@ -1,0 +1,80 @@
+{
+  "id": "own-module",
+  "title": "A module of your own",
+  "files": ["report.py", "callouts.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the report, and run callouts.py by itself to try its functions.",
+    "suggestedCommand": "python3 report.py"
+  },
+  "tasks": [
+    {
+      "id": "move",
+      "title": "Move the reading functions",
+      "file": "callouts.py",
+      "description": "Move `parts_of`, `hill_of` and `hours_of` from the top of `report.py` into `callouts.py`, so that they live in `callouts.py` only. Then, under `# Task 1` in `report.py`, import `hill_of` and `hours_of` from `callouts` with `from`. Running `python3 report.py` prints the same four lines as before.\n\nCheck imports `callouts.py` the way an import line does, calls its `hill_of` and `hours_of` with lines of its own, looks at whether `report.py` still has functions of its own by those names, and runs `report.py` to see where its `hill_of` and `hours_of` come from.",
+      "nextSteps": [
+        "Read the parts of the lesson on a module of your own and on a circle of imports.",
+        "Cut the three functions from report.py and paste them into callouts.py, above crew_of.",
+        "Write the import line under # Task 1 in report.py.",
+        "Run python3 report.py and compare the four lines with what it printed before."
+      ],
+      "hints": [
+        "A function takes with it everything it calls. Look at what `hill_of` and `hours_of` call before you choose what to move.",
+        "`callouts.py` must not import anything from `report.py`: `report.py` imports `callouts.py`, and an import back would go round in a circle. The import line names the module by its file name, without `.py`.",
+        "The shape is the three `def` blocks in `callouts.py`, and `from callouts import hill_of, hours_of` under `# Task 1` in `report.py`."
+      ],
+      "docs": [
+        { "title": "Modules", "url": "https://docs.python.org/3/tutorial/modules.html" },
+        { "title": "More on modules", "url": "https://docs.python.org/3/tutorial/modules.html#more-on-modules" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "guard",
+      "title": "Nothing runs on import",
+      "file": "callouts.py",
+      "description": "At the bottom of `callouts.py`, Ailsa's try-out lines print a line and what `crew_of` gives back for one line of the log. They run every time `report.py` imports `callouts`, in the middle of the report. Put them under a main guard, `if __name__ == \"__main__\":`, so that they run when `callouts.py` is run by itself and never when it is imported. Keep the lines as they are.\n\nCheck imports `callouts.py` and looks at what the import printed and which of your functions it called, then runs `python3 callouts.py` and looks for Ailsa's two lines.",
+      "nextSteps": [
+        "Read the part of the lesson on what runs when a file is imported.",
+        "Run python3 report.py and find Ailsa's lines in the middle of the report.",
+        "Write the guard above her try-out lines, and move both lines in under it.",
+        "Run python3 report.py, then python3 callouts.py, and compare what each prints."
+      ],
+      "hints": [
+        "Importing a file runs every line of it at the top, not inside a def, once. A function's def only makes the function; a call or a print at the top runs.",
+        "Python sets `__name__` in every file: `\"__main__\"` in the file you ran, and the module's own name in a file that was imported. An `if` on it decides which lines run in which case.",
+        "The shape is `if __name__ == \"__main__\":` with Ailsa's two print lines moved in under it, four spaces each."
+      ],
+      "docs": [
+        { "title": "__main__: top-level code", "url": "https://docs.python.org/3/library/__main__.html" },
+        { "title": "Executing modules as scripts", "url": "https://docs.python.org/3/tutorial/modules.html#executing-modules-as-scripts" }
+      ],
+      "videos": [
+        { "title": "if __name__ == \"__main__\" explained", "url": "https://www.youtube.com/watch?v=sugvnHA7ElY" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "hours",
+      "title": "Hours on one hill",
+      "file": "callouts.py",
+      "description": "In `callouts.py`, write a function called `hill_hours` that takes a list of lines of the callout log and a hill, and gives back the hours of every callout on that hill, added up, a whole number: `0` when there is none. Use `hill_of` and `hours_of`. Then, under `# Task 3` in `report.py`, import `hill_hours` from `callouts` and print what it gives back for `month` and `\"Scarth Fell\"`.\n\nCheck imports `callouts.py`, with its own `parts_of`, `hill_of` and `hours_of` set in it first so that this task does not wait on Task 1, and calls `hill_hours` with lines and hills of its own.",
+      "nextSteps": [
+        "Write the def line of hill_hours in callouts.py, above Ailsa's try-out lines.",
+        "Go through the lines, and add the hours of each line whose hill is the one asked for.",
+        "Give back the total.",
+        "Import it in report.py and print the hours on Scarth Fell."
+      ],
+      "hints": [
+        "Start a total at 0 before the loop, so a hill with no callouts gives back 0.",
+        "`hill_of(line)` gives the hill of one line, and `hours_of(line)` its hours as a number. They are in the same file, so `hill_hours` calls them by their names alone.",
+        "The shape is `total = 0`, then `for line in lines:` with `if hill_of(line) == hill:` and `total = total + hours_of(line)` under it, then `return total`."
+      ],
+      "docs": [
+        { "title": "Modules", "url": "https://docs.python.org/3/tutorial/modules.html" },
+        { "title": "Defining functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions" }
+      ],
+      "points": 10
+    }
+  ]
+}

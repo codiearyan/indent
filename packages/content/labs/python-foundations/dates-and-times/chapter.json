@@ -1,0 +1,102 @@
+{
+  "id": "dates-and-times",
+  "title": "Dates and times",
+  "files": ["kit_dates.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to read the sign-out book, count days since a check and write report lines.",
+    "suggestedCommand": "python3 kit_dates.py"
+  },
+  "tasks": [
+    {
+      "id": "out",
+      "title": "When it went out",
+      "file": "kit_dates.py",
+      "description": "Under `# Task 1` in `kit_dates.py`, write the line that imports what this file needs from the `datetime` module: Tasks 2 and 3 need more of it than this task does. Then write a function called `out_time` that takes a time from the sign-out book, as text written day/month/year hours:minutes, and gives back a `datetime` with that date and time. For `signed_out` it prints as `2026-03-14 22:40:00`. Print what it gives back for `signed_out`.\n\nCheck calls `out_time` with times of its own, one on a day after the 12th of a month, and looks at the `datetime` it gives back.",
+      "nextSteps": [
+        "Read the parts of the lesson on the datetime module and on reading a date from text.",
+        "Write the import line, then the def line of out_time.",
+        "Write the format that matches the sign-out book, one code for each part, with the / and : in their places.",
+        "Print what out_time gives back for signed_out, and compare it with the text."
+      ],
+      "hints": [
+        "The module is called `datetime`, and so is one of the types inside it. Which one a name stands for depends on how you imported it.",
+        "The type `datetime` has a method that reads a date and time from text, given a format where `%d`, `%m`, `%Y`, `%H` and `%M` stand for the day, month, four-digit year, hour and minute.",
+        "The shape is `from datetime import date, datetime, timedelta` at the top of Task 1, and `return datetime.strptime(text, \"%d/%m/%Y %H:%M\")` inside `out_time`."
+      ],
+      "docs": [
+        { "title": "datetime.strptime()", "url": "https://docs.python.org/3/library/datetime.html#datetime.datetime.strptime" },
+        { "title": "Format codes", "url": "https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "since",
+      "title": "Days since the last check",
+      "file": "kit_dates.py",
+      "description": "Under `# Task 2`, write a function called `days_since` that takes the date of a last check, as text written year-month-day, and today, a `date`, and gives back how many days have passed since the check, a whole number. Never read today from the computer's clock: use the date it is given. For `last_check` and `date(2026, 3, 14)` it gives back `64`. Print what it gives back for `last_check` and `date(2026, 3, 14)`.\n\nCheck calls `days_since` with dates of its own, far from today, across a new year and a leap day, and looks at what it gives back and whether it read the computer's clock.",
+      "nextSteps": [
+        "Read the parts of the lesson on reading a date from text and on the gap between two dates.",
+        "Turn the text of the check into a date.",
+        "Take the date of the check from today, and print what you get.",
+        "Give back the number of days in it."
+      ],
+      "hints": [
+        "Text and a date cannot be taken one from another. Text written year-month-day is the one form `date` can read by itself.",
+        "The type `date` has a method that reads text written year-month-day. One date taken from another gives a `timedelta`, which holds its whole number of days.",
+        "The shape is `return (today - date.fromisoformat(checked)).days`."
+      ],
+      "docs": [
+        { "title": "date.fromisoformat()", "url": "https://docs.python.org/3/library/datetime.html#datetime.date.fromisoformat" },
+        { "title": "timedelta objects", "url": "https://docs.python.org/3/library/datetime.html#timedelta-objects" }
+      ],
+      "videos": [
+        { "title": "Dates, datetimes and timedeltas", "url": "https://www.youtube.com/watch?v=eirjjyP2qcQ", "end": 600 }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "When the next check is due",
+      "file": "kit_dates.py",
+      "description": "Under `# Task 3`, write a function called `next_check` that takes the year, the month and the day of a check, three whole numbers, and how many days until the next check, and gives back the date of the next check, a `date`. For `2026, 1, 9` and `90` it gives back `date(2026, 4, 9)`. Print what it gives back for `2026, 1, 9` and `90`.\n\nCheck calls `next_check` with dates and days of its own, into a new year, a short month and across a leap day, and looks at the `date` it gives back.",
+      "nextSteps": [
+        "Read the parts of the lesson on making a date from its parts and on adding days.",
+        "Make the date of the check from the three numbers.",
+        "Add the days to it as a timedelta.",
+        "Give back the date you get, and print it."
+      ],
+      "hints": [
+        "Adding to the day of the month by hand makes days that do not exist, such as the 40th of January. Let the date do the counting.",
+        "A date is made from its parts, biggest first, and a gap of some days is a `timedelta`. A date plus a gap is a date.",
+        "The shape is `return date(year, month, day) + timedelta(days=every)`."
+      ],
+      "docs": [
+        { "title": "date objects", "url": "https://docs.python.org/3/library/datetime.html#date-objects" },
+        { "title": "timedelta", "url": "https://docs.python.org/3/library/datetime.html#datetime.timedelta" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "line",
+      "title": "A line for the report",
+      "file": "kit_dates.py",
+      "description": "Under `# Task 4`, write a function called `report_line` that takes a `datetime` and gives back a text such as `\"Saturday 14 March 2026, 22:40\"`: the day of the week from `DAYS`, a space, the day of the month with no 0 in front, a space, the month from `MONTHS`, a space, the year, a comma and a space, and the time as hours and minutes, each two digits, with a colon between. Print what it gives back for `out_time(signed_out)`.\n\nCheck calls `report_line` with datetimes of its own, early and late in a month and on different days of the week, and looks at the text it gives back.",
+      "nextSteps": [
+        "Read the parts of the lesson on the day of the week and on writing a date for a report.",
+        "Find the day of the week as a number, and use it to pick from DAYS.",
+        "Pick the month from MONTHS the same way, minding where each count starts.",
+        "Put the parts together in an f-string, and compare it with the example."
+      ],
+      "hints": [
+        "A datetime has `.day`, `.month`, `.year`, `.hour` and `.minute`, each a number, and a method that gives the day of the week as a number.",
+        "A datetime has a method that gives the day of the week counting Monday as 0, which matches the order of `DAYS`. `.month` counts January as 1, and a list counts from 0. In an f-string, a format after a colon writes the hours and minutes with two digits each.",
+        "The shape is `f\"{DAYS[when.weekday()]} {when.day} {MONTHS[when.month - 1]} {when.year}, {when:%H:%M}\"`."
+      ],
+      "docs": [
+        { "title": "date.weekday()", "url": "https://docs.python.org/3/library/datetime.html#datetime.date.weekday" },
+        { "title": "strftime() and strptime() behavior", "url": "https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior" }
+      ],
+      "points": 10
+    }
+  ]
+}
