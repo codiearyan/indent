@@ -151,6 +151,7 @@ const DECLARED = (pattern, name) =>
 
 /** The C++ text of a value, as the lesson would write it. */
 export function literal(value, type) {
+  if (Array.isArray(value)) return braced(value, type, literal)
   if (type === 'std::string') return JSON.stringify(value)
   if (type === 'char') return `'${value}'`
   if (type === 'bool') return value ? 'true' : 'false'
@@ -612,7 +613,11 @@ export const JOINED =
   'The line is printed, but not on a line of its own: std::cout does not end a line by itself. End it with "\\n" or std::endl, so what comes next starts on a new line.'
 
 const sameValue = (got, want) =>
-  typeof want === 'number' ? typeof got === 'number' && Math.abs(got - want) < 1e-9 : got === want
+  Array.isArray(want)
+    ? Array.isArray(got) && got.length === want.length && want.every((w, i) => sameValue(got[i], w))
+    : typeof want === 'number'
+      ? typeof got === 'number' && Math.abs(got - want) < 1e-9
+      : got === want
 
 export function printedText(stdout) {
   const text = stdout.replace(/\n$/, '')
@@ -670,6 +675,7 @@ export async function judge(t, spec) {
 
 /** How a value read back looks in the output: text in double quotes, like the code writes it. */
 export function show(value, type) {
+  if (Array.isArray(value)) return braced(value, type, show)
   if (type === 'std::string') return JSON.stringify(value)
   if (type === 'char') return `'${value}'`
   if (type === 'bool') return value ? 'true' : 'false'
@@ -945,13 +951,16 @@ export function functionsOf(source) {
 }
 
 const parseValue = (text, type) =>
-  /^(?:const )?(int|long|long long|short|unsigned|double|float)&?$/.test(type)
+  containerOf(type)
+    ? parseJson(text)
+    : /^(?:const )?(int|long|long long|short|unsigned|double|float)&?$/.test(type)
     ? Number(text)
     : /^(?:const )?bool&?$/.test(type)
       ? text === '1'
       : text
 
 function cppLiteral(value, type) {
+  if (Array.isArray(value)) return braced(value, type, cppLiteral)
   if (type === 'double' && Number.isInteger(value)) return `${value}.0`
   return literal(value, type)
 }
@@ -1028,15 +1037,21 @@ struct in_ : std::streambuf {
 
 function harness(spec) {
   const params = spec.params ?? []
+  // A vector Check passes keeps two marked values just past its end, so a read past the end gets
+  // a known wrong value and a write past the end is found out.
+  const padded = params.map((p, k) => (!p.const && containerOf(p.type)?.kind === 'vector' ? k : -1)).filter((k) => k !== -1)
+  const pads = padded.map((k) => `indent_::pad_(indent_a${k}_); const std::size_t indent_n${k}_ = indent_a${k}_.size(), indent_c${k}_ = indent_a${k}_.capacity(); `).join('')
+  const pasts = padded.map((k) => `indent_::put_("past${k}", indent_::past_(indent_a${k}_, indent_n${k}_, indent_c${k}_) ? 1 : 0); `).join('')
   const blocks = spec.cases.map((c, i) => {
     const decls = params.map((p, k) => `${p.const ? 'const ' : ''}${p.type} indent_a${k}_ = ${cppLiteral(c.args[k], p.type)};`)
     const args = params.map((_, k) => `, indent_a${k}_`).join('')
     const after = params.map((p, k) => (p.after ? `indent_::put_("arg${k}", indent_a${k}_); ` : '')).join('')
     const calls = spec.provides?.length ? 'indent_::put_("calls", indent_::calls_); ' : ''
-    return `  if (indent_case_ == ${i}) { ${decls.join(' ')} indent_::call_(&${spec.fn}${args}); ${after}${calls}}`
+    return `  if (indent_case_ == ${i}) { ${decls.join(' ')} ${pads}indent_::call_(&${spec.fn}${args}); ${after}${pasts}${calls}}`
   })
+  const containers = [spec.returns, ...params.map((p) => p.type)].some((type) => type && containerOf(type))
   return [
-    HARNESS,
+    containers ? withContainers(HARNESS) : HARNESS,
     'int main(int argc, char** argv) {',
     '  std::cerr.precision(17);',
     '  static indent_::in_ indent_in_(std::cin.rdbuf());',
@@ -1230,7 +1245,7 @@ export async function buildCall(t, spec) {
   await writeFile(join(dir, file), kept.join('\n') + (balanced ? '\n' + harness(spec) : '\n'))
   await mkdir(join(dir, '.check'), { recursive: true })
   const exe = join(dir, '.check', 'program')
-  const made = await output(cc, ['-std=c++17', '-Wall', ...(balanced ? [] : ['-fsyntax-only']), file, '-o', exe], {
+  const made = await output(cc, ['-std=c++17', '-Wall', ...(spec.flags ?? []), ...(balanced ? [] : ['-fsyntax-only']), file, '-o', exe], {
     cwd: dir,
     timeoutMs: 60000,
     env: { LC_ALL: 'C' }
@@ -1255,7 +1270,9 @@ export async function buildCall(t, spec) {
   })
   const errors = placed.filter((d) => d.kind === 'error')
   const warnings = placed.filter((d) => d.kind === 'warning' && (d.place === 'task' || d.place === 'other'))
+  const context = { lines, code: taskCode, stderr: made.stderr, label, file }
   const cause = (list) =>
+    spec.causes?.(list, context) ??
     part2Cause(list, lines, taskCode, { label, fns, provided }) ??
     causeOf(list.slice(0, 1), lines) ??
     `Build the file with ${COMMAND(file)}, read the first error for a line of ${label}, and fix what it points at.`
@@ -1293,6 +1310,10 @@ export async function buildCall(t, spec) {
           )
         ]
       }
+    }
+    const inLibrary = !errors.length && spec.causes?.([], context)
+    if (inLibrary) {
+      return { problem: [fail(`${label} builds`, `The compiler refuses a line of ${label}. ${inLibrary}`, requestedHere(made.stderr, file, lines))] }
     }
     return {
       problem: [
@@ -1358,10 +1379,10 @@ export async function buildCall(t, spec) {
             (r.timedOut
               ? `${fn} did not finish within ${RUN_SECONDS} seconds, so Check stopped it. A loop in it never ends: look at what changes each time round, and whether it moves toward the end.`
               : `${fn} printed far more than the task asks for, so Check stopped it. Look for a loop that prints without end.`))
-        : `The program stopped with an error while ${fn} ran.`
+        : (spec.crashed?.(r) ?? `The program stopped with an error while ${fn} ran.`)
     return {
       problem: [
-        fail(`${fn} runs to the end`, why, `${typedText(spec.cases[broken])}${(r.stdout ?? '').trim() ? printedText(firstLines(clip(r.stdout))) : ''}`.trim())
+        fail(`${fn} runs to the end`, why, `${spec.crashed ? `${describeCall(fn, spec, spec.cases[broken])}\n` : ''}${typedText(spec.cases[broken])}${(r.stdout ?? '').trim() ? printedText(firstLines(clip(r.stdout))) : ''}`.trim())
       ]
     }
   }
@@ -1386,6 +1407,7 @@ export async function buildCall(t, spec) {
         ),
         calls: 'calls' in r.got ? Number(r.got.calls) : undefined,
         eof: 'eof' in r.got,
+        got: r.got,
         typed: typedText(spec.cases[i])
       }
     })
@@ -1473,6 +1495,7 @@ export async function judgeCall(t, spec) {
     spec.returns !== 'void' &&
     runs.length > 1 &&
     results.every((v) => sameValue(v, results[0])) &&
+    !(Array.isArray(results[0]) && !results[0].length) &&
     !spec.cases.every((c) => sameValue(c.expect.result, spec.cases[0].expect.result))
   const usedNote = uses.length
     ? ` It uses ${uses.map((u) => `${u.name}${u.task ? ` from Task ${u.task}` : ''}`).join(' and ')}, so check that ${uses.length === 1 ? 'it passes' : 'they pass'} too.`
@@ -1511,4 +1534,283 @@ function printedEqual(stdout, want) {
   if (typeof want === 'function') return want(stdout)
   if (want === '') return stdout === ''
   return stdout === want || (want.endsWith('\n') ? false : stdout.replace(/\n$/, '') === want)
+}
+
+// ---------- Part 3: vectors, maps and the standard algorithms ----------
+
+/** { kind: 'vector', elem } or { kind: 'map', key, value } for a container type, else null. */
+function containerOf(type) {
+  const plain = type.replace(/^const\s+/, '').replace(/\s*&$/, '')
+  const vector = /^std::vector<(.+)>$/.exec(plain)
+  if (vector) return { kind: 'vector', elem: vector[1] }
+  const map = /^std::map<([^,]+),\s*(.+)>$/.exec(plain)
+  return map ? { kind: 'map', key: map[1], value: map[2] } : null
+}
+
+/** A vector or a map as C++ writes it in braces; a map's value in JS is a list of [key, value]. */
+function braced(value, type, each) {
+  const c = containerOf(type)
+  if (c?.kind === 'map') return `{${value.map(([k, v]) => `{${each(k, c.key)}, ${each(v, c.value)}}`).join(', ')}}`
+  return `{${value.map((v) => each(v, c?.elem ?? '')).join(', ')}}`
+}
+
+function parseJson(text) {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
+/** What Check's vectors hold just past their end: a read past the end gives back one of these. */
+export const PAST_END = { int: 7919, double: 7919.25, 'std::string': 'zz' }
+
+const CONTAINER_TRAITS = String.raw`
+template <class T> struct vec_ : std::false_type {};
+template <class E, class A> struct vec_<std::vector<E, A>> : std::true_type { using elem = E; };
+template <class T> struct map_ : std::false_type {};
+template <class K, class V, class C, class A> struct map_<std::map<K, V, C, A>> : std::true_type { using key = K; using mapped = V; };
+template <class T> void type_();
+`
+const CONTAINER_TYPES = String.raw`  else if constexpr (std::is_same_v<B, unsigned long>) std::cerr << "std::size_t";
+  else if constexpr (vec_<B>::value) { std::cerr << "std::vector<"; type_<typename vec_<B>::elem>(); std::cerr << ">"; }
+  else if constexpr (map_<B>::value) { std::cerr << "std::map<"; type_<typename map_<B>::key>(); std::cerr << ", "; type_<typename map_<B>::mapped>(); std::cerr << ">"; }
+`
+const CONTAINER_PUTS = String.raw`
+inline void json_(int v) { std::cerr << v; }
+inline void json_(double v) { std::cerr << v; }
+inline void json_(const std::string& s) {
+  std::cerr << '"';
+  for (char c : s) {
+    unsigned char u = static_cast<unsigned char>(c);
+    if (c == '"' || c == '\\') std::cerr << '\\' << c;
+    else if (u < 0x20) std::cerr << "\\u00" << "0123456789abcdef"[u >> 4] << "0123456789abcdef"[u & 15];
+    else std::cerr << c;
+  }
+  std::cerr << '"';
+}
+template <class E, class A> void json_(const std::vector<E, A>& v) {
+  std::cerr << '[';
+  const char* sep = "";
+  for (const auto& x : v) { std::cerr << sep; json_(x); sep = ","; }
+  std::cerr << ']';
+}
+template <class K, class V, class C, class A> void json_(const std::map<K, V, C, A>& m) {
+  std::cerr << '[';
+  const char* sep = "";
+  for (const auto& kv : m) { std::cerr << sep << '['; json_(kv.first); std::cerr << ','; json_(kv.second); std::cerr << ']'; sep = ","; }
+  std::cerr << ']';
+}
+template <class E, class A> void put_(const char* name, const std::vector<E, A>& v) { std::cerr << "\036" << name << "\037"; json_(v); std::cerr << "\036"; }
+template <class K, class V, class C, class A> void put_(const char* name, const std::map<K, V, C, A>& m) { std::cerr << "\036" << name << "\037"; json_(m); std::cerr << "\036"; }
+template <class E> E pad_value_() {
+  if constexpr (std::is_same_v<E, std::string>) return E("zz");
+  else return static_cast<E>(7919.25);
+}
+template <class E, class A> void pad_(std::vector<E, A>& v) {
+  v.reserve(v.size() + 2);
+  v.push_back(pad_value_<E>());
+  v.push_back(pad_value_<E>());
+  v.pop_back();
+  v.pop_back();
+}
+template <class E, class A> bool past_(const std::vector<E, A>& v, std::size_t n, std::size_t c) {
+  if constexpr (std::is_arithmetic_v<E>) {
+    if (v.size() != n || v.capacity() != c) return false;
+    return !(v.data()[n] == pad_value_<E>() && v.data()[n + 1] == pad_value_<E>());
+  } else {
+    return false;
+  }
+}
+`
+
+/** The harness, with what it needs to pass a vector or a map in and read one back. */
+function withContainers(text) {
+  const put = 'template <class T> void put_(const char* name, const T& v) { std::cerr << "\\036" << name << "\\037" << v << "\\036"; }\n'
+  const parts = [
+    ['#include <cstdlib>\n', '#include <cstdlib>\n#include <map>\n#include <vector>\n'],
+    ['namespace indent_ {\n', `namespace indent_ {${CONTAINER_TRAITS}`],
+    ['  else std::cerr << "something else";\n', `${CONTAINER_TYPES}  else std::cerr << "something else";\n`],
+    [put, put + CONTAINER_PUTS]
+  ]
+  return parts.reduce((all, [at, by]) => {
+    if (!all.includes(at)) throw new Error(`The harness has no ${JSON.stringify(at)}`)
+    return all.replace(at, by)
+  }, text)
+}
+
+/** The lines of the learner's file that a compiler error inside the library came from. */
+function requestedHere(stderr, file, lines) {
+  const at = new RegExp(`^${file.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}:(\\d+):\\d+:\\s+(?:note: )?.*(?:requested|required from) here`)
+  const found = [...new Set(stderr.split('\n').map((l) => at.exec(l)?.[1]).filter(Boolean).map(Number))]
+  const mine = found.filter((n) => n <= lines.length)
+  if (!mine.length) return undefined
+  return mine
+    .slice(0, 2)
+    .map((n) => `${file}:${n}: the error inside the library comes from this line\n  ${lines[n - 1].trim()}`)
+    .join('\n\n')
+}
+
+const ITERATOR_VALUE =
+  'std::max_element gives back the position of the largest value, not the value: put * in front of the call to read the value there, once you know the vector is not empty.'
+const ITERATOR_FOUND =
+  'find gives back a position in the list, not a number or true or false. Compare it with end() of the same list: equal means it was not found.'
+const MAP_INDEX =
+  '[] on a map adds the key, with a value of 0, when it is not there yet, so it is refused on a map that is const. A function that has to change the map takes it as a reference without const. One that only reads it asks whether the key is there with count or find, and reads its value with .at() once it knows.'
+const LOOP_CONST = (name) =>
+  `The loop's ${name} is const auto&: it reads each value where it is and cannot change it. To change them, the loop takes them with auto&, without const.`
+const CONST_CHANGE =
+  'A line changes a vector or a map that is a const reference. const promises that the function only reads it, so the compiler refuses the change: a parameter the function has to change is a reference without const.'
+const CHANGES = (name) =>
+  new RegExp(`\\b${name}\\s*(?:\\.\\s*(?:push_back|pop_back|clear|insert|erase|emplace_back|resize)\\b|\\[[^\\]]*\\]\\s*(?:[-+*/%]?=(?!=)|\\+\\+|--))`)
+
+/** The causes of an error that part 3 teaches, tried before those of part 1 and 2. */
+function part3Cause(errors, { lines, code, stderr, label }) {
+  const text = errors.map((e) => e.text).join('\n')
+  const source = errors.map((e) => lines[e.line - 1] ?? '').join('\n')
+  const constNames = [...code.matchAll(/\bconst\s+std::(?:vector|map)\s*<[^;{)]*?>\s*&\s*(\w+)/g)].map((m) => m[1])
+  const loopNames = [...code.matchAll(/\bfor\s*\(\s*const\s+auto\s*&\s*(\w+)\s*:/g)].map((m) => m[1])
+  if (!errors.length) {
+    if (!/\berror\b/.test(stderr)) return null
+    const sorts = [...code.matchAll(/\bstd::(sort|reverse)\s*\(\s*(\w+)\s*\.\s*begin/g)].find((m) => constNames.includes(m[2]))
+    const where = 'The error is reported inside the standard library\'s own files; the line of yours is the one marked "requested here" or "required from here".'
+    if (sorts) {
+      return `std::${sorts[1]} changes the order of the vector it is given, and ${sorts[2]} is a const reference here, so the compiler refuses it. ${where}`
+    }
+    return `${where} Compare what that line passes to the library with what it needs. It is under ${label}.`
+  }
+  if (/invalid operands[^\n]*char[^\n]*string|invalid operands[^\n]*string[^\n]*char|no match for 'operator[=!]='[^\n]*(?:char[^\n]*string|string[^\n]*char)/.test(text)) {
+    return 'A line compares one character with a text. A char holds one character, written in single quotes, and a std::string holds text, in double quotes: compare a char with a char, and a text with a text.'
+  }
+  if (/conver|invalid operands|no match for|no viable/.test(text) && /iter/i.test(text)) {
+    return /max_element|min_element/.test(source) ? ITERATOR_VALUE : ITERATOR_FOUND
+  }
+  if (/operator\[\][^\n]*const (?:std::)?map|const (?:std::)?map<[^\n]*discards qualifiers/.test(text)) return MAP_INDEX
+  if (constNames.some((n) => new RegExp(`\\b${n}\\s*\\[`).test(source) && /std::map\s*<[^;{)]*?>\s*&\s*$/.test(code.split(new RegExp(`\\b${n}\\b`))[0]))) {
+    return MAP_INDEX
+  }
+  const loopName = loopNames.find(
+    (n) =>
+      new RegExp(`\\b${n}\\s*(?:[-+*/%]?=(?!=)|\\+\\+|--)|(?:\\+\\+|--)\\s*${n}\\b`).test(source) ||
+      new RegExp(`'(?:const [^']*&\\s*)?${n}'|variable '${n}'|reference '${n}'`).test(text)
+  )
+  if (loopName && /const|read-only/.test(text)) return LOOP_CONST(loopName)
+  if (
+    constNames.some((n) => CHANGES(n).test(source)) ||
+    /no matching member function for call to '(?:push_back|pop_back|clear|insert|erase|emplace_back|resize)'|returns a const value|read-only location|discards qualifiers|drops 'const' qualifier/.test(text)
+  ) {
+    return CONST_CHANGE
+  }
+  return null
+}
+
+function crashedWhy(r, fn, label) {
+  const text = r.stderr ?? ''
+  if (/map::at|key not found/.test(text)) {
+    return `The program stopped because ${fn}, under ${label}, asked .at() of a map for a key that is not in it. .at() ends the program then, so ask first whether the key is there.`
+  }
+  if (/out_of_range/.test(text)) {
+    return `The program stopped because ${fn}, under ${label}, asked .at() for a position past the end of a vector. Positions count from 0, so the last one is one less than the size, and an empty vector has none.`
+  }
+  if (r.signal === 'SIGTRAP' || r.signal === 'SIGILL' || /Assertion '[^']*' failed/.test(text)) {
+    return `The program stopped while ${fn} ran, under ${label}, at a position past the end of a vector: a [] with a position that is not there, or the first or last value of an empty vector. Check builds your code with the library's guard, which stops a program right there. Built without it, as in your terminal, it may seem to work.`
+  }
+  return `The system stopped the program while ${fn} ran, under ${label}. That usually happens when a line reads or changes a vector far outside its positions: past its end, or any position of an empty vector.`
+}
+
+function containerSignature(spec, sig) {
+  for (const [k, p] of (spec.params ?? []).entries()) {
+    const c = p.want && containerOf(p.want)
+    if (!c || sig.params[k] === p.want) continue
+    const plain = p.want.replace(/^const /, '').replace(/&$/, '')
+    const got = sig.params[k]
+    const message =
+      got === `${plain}&`
+        ? `${spec.fn} takes ${p.what} as a reference it could change, though it only reads it. The task asks for a const reference, and then the compiler makes sure the caller's ${c.kind} stays as it was.`
+        : got === plain
+          ? `${spec.fn} takes ${p.what} as a copy. A ${c.kind} can hold thousands of values, and a copy of every one is made on each call: the task asks for a const reference, which reads the caller's own ${c.kind} without copying it.`
+          : `${spec.fn} takes ${p.what} as ${typeWords(got)}, and the task asks for ${typeWords(p.want)}.`
+    return fail(`${spec.fn} takes ${p.what} as the task asks`, message)
+  }
+  return null
+}
+
+function pastEnd(spec, runs) {
+  const k = (spec.params ?? []).findIndex((_, i) => runs.some((r) => r.got[`past${i}`] === '1'))
+  if (k === -1) return null
+  return `${spec.fn} changed a value past the end of ${spec.params[k].what}. The last position is one less than the size: a loop that runs while i <= size() goes one step too far, and a place counted from 1 is one more than its position.`
+}
+
+/**
+ * Like judgeCall(), for a function that takes or gives back a vector or a map. A param that is a
+ * vector or a map is written as its JS value (a map as a list of [key, value]) and read back the
+ * same way; `want` 'const std::vector<int>&' asks for a reference that only reads. Besides what
+ * judgeCall() checks: the causes of an error part 3 teaches, a program stopped by .at() or by the
+ * system, and a change past the end of a vector Check passed.
+ */
+export async function judgeContainers(t, spec) {
+  const label = `Task ${spec.task}`
+  const header = await includesHeaders(t, spec)
+  if (header) return [header]
+  return judgeCall(t, {
+    causes: (errors, context) => part3Cause(errors, context),
+    // The library's own checks, so [] past the end stops the program the same way on every run.
+    flags: ['-D_GLIBCXX_ASSERTIONS', '-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_FAST'],
+    crashed: (r) => crashedWhy(r, spec.fn, label),
+    ...spec,
+    signature: (sig) => containerSignature(spec, sig) ?? spec.signature?.(sig) ?? null,
+    rule: (runs) => pastEnd(spec, runs) ?? spec.rule?.(runs) ?? null
+  })
+}
+
+const label = (task) => `Task ${task}`
+
+// The algorithms whose whole answer is what they give back, unlike std::sort and std::reverse.
+const ANSWERS = ['accumulate', 'max_element', 'min_element', 'find', 'count']
+
+const HEADERS = [
+  ['vector', /\bstd::(vector)\s*</],
+  ['map', /\bstd::(map)\s*</],
+  ['algorithm', /\bstd::(sort|find|count|max_element|min_element|reverse)\s*\(/],
+  ['numeric', /\bstd::(accumulate)\s*\(/]
+]
+
+/**
+ * A failing detail when the function `fn` uses a name from <vector>, <map>, <algorithm> or
+ * <numeric> and the file does not include that header. Some compilers find those names through
+ * another header, others do not, so the line is asked for whichever compiler is here.
+ */
+async function includesHeaders(t, { file, fn, task, uses = [] }) {
+  const whole = (await readFile(join(t.workspace, file), 'utf8')).replace(/\r\n/g, '\n')
+  const code = codeOnly(whole)
+  const def = functionsOf(code).find((f) => f.name === fn && f.kind === 'def' && !f.nested)
+  if (!def) return null
+  const body = code.slice(def.start, def.end)
+  const missing = uses.find((name) => !new RegExp(`\\b${name}\\s*\\(`).test(body))
+  if (missing) {
+    return fail(
+      `${fn} uses std::${missing}`,
+      `${label(task)} asks ${fn} to use std::${missing}, and Check cannot find it in ${fn}. The point of this task is the tool the library already has: call std::${missing} instead of writing its work out yourself.`
+    )
+  }
+  const ignored = uses.find(
+    (name) =>
+      ANSWERS.includes(name) &&
+      [...body.matchAll(new RegExp(`\\b${name}\\s*\\(`, 'g'))].every((m) => /(?:^|[;{}])\s*(?:std\s*::\s*)?$/.test(body.slice(0, m.index)))
+  )
+  if (ignored) {
+    return fail(
+      `${fn} uses what std::${ignored} gives back`,
+      `${fn} calls std::${ignored} on a line of its own, so what it gives back is thrown away. std::${ignored} changes nothing: its answer is what it gives back, so ${fn} uses that answer instead of working it out again.`
+    )
+  }
+  for (const [header, uses] of HEADERS) {
+    const used = uses.exec(body)
+    if (!used || new RegExp(`^\\s*#\\s*include\\s*<${header}>`, 'm').test(code)) continue
+    return fail(
+      `${file} includes <${header}>`,
+      `${fn} uses std::${used[1]}, which comes from the header <${header}>, and ${file} has no #include <${header}> at the top. One compiler may find std::${used[1]} through another header, but the next one will not: add the line, above main, with the other #include lines.`
+    )
+  }
+  return null
 }
