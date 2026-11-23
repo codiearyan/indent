@@ -34,7 +34,7 @@ const shared = (method, what, section, parses = false) => [
       const code = codeOnly(section)
       return parses && r.case.throws === 'NullPointerException' && !x && /\bparseInt\s*\(/.test(code) && !/\.(?:trim|strip)\s*\(|\bNullPointerException\b/.test(code)
     },
-    hint: `${method} carried on with a null, so the mistake in the calling code was hidden. Handed null, Integer.parseInt throws a NumberFormatException, not a NullPointerException, so your catch took it for a typing slip. Leave out the spaces first, before the try: on a null, that line throws the NullPointerException that should reach the caller.`
+    hint: `${method} carried on with a null, so the mistake in the calling code was hidden. Handed null, Integer.parseInt throws a NumberFormatException, not a NullPointerException, so your catch took the null for a typing slip.`
   },
   {
     when: (r, x) => r.case.throws === 'NullPointerException' && !x,
@@ -102,7 +102,7 @@ export const checks = tasks({
             ...shared('summary', 'an entry that is not a whole number', ctx.section, true),
             {
               when: (r) => r.case.past && /^\d+ seats, 1 not read$/.test(got(r) ?? '') && got(r) !== r.case.expected.got,
-              hint: 'summary stopped adding at the first entry it could not read, so the entries after it were never added. The try is around more than the line that can fail: put it inside the loop, around the reading of one entry.'
+              hint: 'summary stopped adding at the first entry it could not read, so the entries after it were never added. When a line inside a try fails, everything after it in that try is skipped: look at how much your try holds.'
             }
           ]
         })(runs, ctx)

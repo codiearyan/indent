@@ -131,7 +131,7 @@ export const checks = tasks({
           { when: (r) => /till shut.*printer off/.test(log(r)), hint: 'sellAll shuts the till before the printer is switched off. Things are closed in the opposite order to the one they were opened in: the printer, opened last, is closed first.' },
           {
             when: (r) => r.case.fails && /printer would not start/.test(log(r)) && count(r, 'till open') > 0 && count(r, 'till shut') === 0,
-            hint: 'When the printer would not start, the till was already open and was never shut: the printer was made before the cleaning up could begin, so it never ran. A try with resources that holds both shuts the till when the printer cannot start.'
+            hint: 'When the printer would not start, the till was already open and was never shut: the printer failed before the cleaning up could begin, so it never ran for the till.'
           },
           {
             when: (r) => /^till open, printer on, printed/.test(log(r)),
