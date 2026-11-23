@@ -1,0 +1,129 @@
+{
+  "id": "permissions",
+  "title": "Who may do what with a file",
+  "files": ["today.txt"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Read the letters with ls -l before and after each change.",
+    "suggestedCommand": "ls -l"
+  },
+  "tasks": [
+    {
+      "id": "lock",
+      "title": "Lock the price list",
+      "file": "today.txt",
+      "description": "Make `prices.csv` in the top folder read-only for everyone: nobody may change it, you included, and everyone may still read it.\n\nCheck reads the permissions of `prices.csv` in the top folder: no `w` for anyone, and `r` for the owner, the group and others.",
+      "nextSteps": [
+        "Run `ls -l prices.csv` and read the nine letters after the first one.",
+        "Find which of the owner, the group and others have `w` now.",
+        "Take `w` away from all of them with `chmod`, and leave `r` alone.",
+        "Run `ls -l prices.csv` again and read the letters."
+      ],
+      "hints": [
+        "The lesson's part on read-only files says which letter to take away, and from whom.",
+        "`chmod` takes who, a sign and a letter. `a` means all three, and `-` takes a letter away.",
+        "Run `chmod a-w prices.csv` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "chmod: change file mode bits",
+          "url": "https://man7.org/linux/man-pages/man1/chmod.1.html"
+        },
+        {
+          "title": "chmod: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/chmod.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "File permissions in five minutes",
+          "url": "https://www.youtube.com/watch?v=LnKoncbQBsM"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "private",
+      "title": "Keep the bank details to yourself",
+      "file": "today.txt",
+      "description": "`accounts/bank-details.txt` is for your eyes only. You, its owner, keep `r` and `w`. The group and others get nothing: no `r`, no `w` and no `x`.\n\nCheck reads the permissions of `accounts/bank-details.txt`: `r` and `w` for the owner, and nothing for the group or others.",
+      "nextSteps": [
+        "Run `ls -l accounts` and find the owner and the group of `bank-details.txt`.",
+        "Read which letters the group and others have now.",
+        "Take every letter away from both of them with one `chmod`.",
+        "Run `ls -l accounts` again: the owner's letters are the same as before."
+      ],
+      "hints": [
+        "Two of the three kinds of people lose everything here, and the owner keeps what they have.",
+        "Who can be two letters at once, such as `go`. Take away `rwx`, or set them to nothing with `=`.",
+        "Run `chmod go-rwx accounts/bank-details.txt` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "chmod: change file mode bits",
+          "url": "https://man7.org/linux/man-pages/man1/chmod.1.html"
+        },
+        {
+          "title": "ls: the long format",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/ls.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "archive",
+      "title": "Lock the old price lists",
+      "file": "today.txt",
+      "description": "Lock the three price lists in `archive` the way `prices.csv` is locked: nobody may change them, and everyone may still read them. The `archive` folder itself stays open: its owner keeps `w` on it, so next year's list can go in.\n\nCheck reads the permissions of each price list in `archive` and of the folder: no `w` on any list, `r` on each for everyone, and `w` still on the folder for its owner.",
+      "nextSteps": [
+        "Run `ls -l` in the top folder to see the folder's own letters, and `ls -l archive` to see the lists.",
+        "Write one `chmod` that names every list at once, with a pattern.",
+        "Leave the folder's own letters as they are.",
+        "List both again and compare the letters."
+      ],
+      "hints": [
+        "A folder's letters and the letters of the files in it are separate. This task changes only the files.",
+        "A pattern such as `archive/*.csv` hands `chmod` every list at once. Do not name the folder itself.",
+        "Run `chmod a-w archive/*.csv` from the top folder."
+      ],
+      "docs": [
+        {
+          "title": "chmod: change file mode bits",
+          "url": "https://man7.org/linux/man-pages/man1/chmod.1.html"
+        },
+        {
+          "title": "Patterns that match many names",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_14"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "update",
+      "title": "Change a price and lock the list again",
+      "file": "today.txt",
+      "description": "The fox poster now costs 22.00. In `prices.csv`, change the line `fox poster A3,18.00` to `fox poster A3,22.00`. Keep every other line as it is, in its place. Then lock the list again, as in the first task.\n\nCheck compares `prices.csv` with its lines at the start, with only the fox poster's line changed, and reads its permissions: no `w` for anyone.",
+      "nextSteps": [
+        "Try to change the line now, and read what the editor or the terminal says.",
+        "Give the owner `w` back on `prices.csv`.",
+        "Change the fox poster's line and save the file.",
+        "Lock the list again, then look at it with `ls -l` and `cat`."
+      ],
+      "hints": [
+        "A locked file has to be unlocked before anyone can change it, you included.",
+        "`chmod u+w` gives the owner `w` back. After the change, take `w` from everyone again.",
+        "Run `chmod u+w prices.csv`, change the line in the editor and let it save, then run `chmod a-w prices.csv`."
+      ],
+      "docs": [
+        {
+          "title": "chmod: change file mode bits",
+          "url": "https://man7.org/linux/man-pages/man1/chmod.1.html"
+        },
+        {
+          "title": "chmod: the standard",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/chmod.html"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

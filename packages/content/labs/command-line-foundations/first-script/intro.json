@@ -1,0 +1,30 @@
+{
+  "stations": [
+    {
+      "title": "Idris",
+      "say": "One word for my four lines?",
+      "note": "Some evenings one goes wrong."
+    },
+    {
+      "title": "Sol's count.sh",
+      "text": "Counts one day only, and always says yes.",
+      "note": "Even when it counted nothing."
+    },
+    {
+      "title": "Your scripts",
+      "file": "evening.sh",
+      "mine": true,
+      "gap": "Typed by hand each night",
+      "tasks": ["Save the four lines", "Run it by its name", "Count any day", "Say when it fails"]
+    },
+    { "title": "Idris", "say": "One word, and I can trust it." }
+  ],
+  "ticket": { "label": "Evening", "wrong": "typed by hand", "why": "Easy to slip", "right": "one command" },
+  "captions": [
+    "At Ashgrove, Idris types the same four lines every evening and wants one word instead.",
+    "Today each line is typed by hand, and Sol's counter always says it worked.",
+    "You write your first scripts, make them run and hand them files, in four small tasks.",
+    "One command runs the evening's lines, and the counter counts any day it is given.",
+    "Idris types one word each evening, and a failed count now says that it failed."
+  ]
+}

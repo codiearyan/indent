@@ -1,0 +1,30 @@
+{
+  "stations": [
+    {
+      "title": "Idris",
+      "say": "Lock it so nobody saves over it.",
+      "note": "Old prices came back last month."
+    },
+    {
+      "title": "Price list",
+      "text": "Any account on the laptop can change it.",
+      "note": "The bank details are open too."
+    },
+    {
+      "title": "Your commands",
+      "file": "today.txt",
+      "mine": true,
+      "gap": "Open to everyone",
+      "tasks": ["Lock the price list", "Hide the bank details", "Lock the old lists", "Change one price"]
+    },
+    { "title": "Saturday helper", "say": "I can read it, not change it." }
+  ],
+  "ticket": { "label": "Price list", "wrong": "saved over", "why": "Open to all", "right": "locked" },
+  "captions": [
+    "At Ashgrove, Idris wants the price list locked after it was saved over last month.",
+    "Today any account on the laptop can change the list, and the bank details are open too.",
+    "You read the permission letters and change them, in four small tasks.",
+    "The lists are locked, the bank details are yours alone, and a price can still change.",
+    "Idris knows the lists cannot change by mistake, and only you can open the bank details."
+  ]
+}

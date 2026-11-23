@@ -1,0 +1,30 @@
+{
+  "stations": [
+    {
+      "title": "Idris",
+      "say": "Why is From: empty again?",
+      "note": "Set yesterday, gone today."
+    },
+    {
+      "title": "The terminal",
+      "text": "Forgets every setting when it closes.",
+      "note": "Sol's tool is not found either."
+    },
+    {
+      "title": "Your settings",
+      "file": "shop-settings.sh",
+      "mine": true,
+      "gap": "Nothing is kept",
+      "tasks": ["Read a variable", "Pass a name on", "Find Sol's tool", "Keep the name"]
+    },
+    { "title": "Idris", "say": "Every label knows who sent it." }
+  ],
+  "ticket": { "label": "The label", "wrong": "no sender", "why": "Forgotten", "right": "sender shown" },
+  "captions": [
+    "At Ashgrove, Idris finds the sender line of the parcel label empty again this morning.",
+    "The terminal forgets every setting when it closes, and Sol's tool cannot be found.",
+    "You set variables, pass them on and keep them in a settings file, in four small tasks.",
+    "Loaded in any new shell, the settings name the sender and find Sol's tool.",
+    "Idris opens a terminal, and the shop's settings are there every morning."
+  ]
+}

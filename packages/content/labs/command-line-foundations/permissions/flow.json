@@ -1,0 +1,94 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "idris", "label": "Idris", "kind": "story" },
+      { "id": "files", "label": "Shop files", "kind": "data" },
+      { "id": "you", "label": "Your commands", "kind": "story", "mine": true },
+      { "id": "letters", "label": "Permission letters", "kind": "data" },
+      { "id": "helper", "label": "Helper account", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "idris", "to": "you", "label": "jobs" },
+      { "from": "files", "to": "you", "label": "files" },
+      { "from": "you", "to": "letters", "label": "changes" },
+      { "from": "letters", "to": "helper", "label": "allowed or not" }
+    ],
+    "note": "You change who may read, change or run the shop's files, and nothing else about them."
+  },
+  "tasks": {
+    "lock": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you", "files", "files->you", "you"],
+          "value": {
+            "kind": "array",
+            "label": "letters of a file",
+            "values": ["owner", "group", "others"]
+          },
+          "note": "The price list can be changed by its owner today, which is how it was saved over."
+        },
+        {
+          "active": ["you", "you->letters", "letters"],
+          "note": "Changing is taken away from everyone, and reading stays as it was."
+        },
+        {
+          "active": ["letters", "letters->helper", "helper"],
+          "note": "Nobody can save over the list by mistake now, and everyone can still read it."
+        }
+      ]
+    },
+    "private": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you", "files", "files->you", "you"],
+          "note": "The bank details can be read by every account on the laptop."
+        },
+        {
+          "active": ["you", "you->letters", "letters"],
+          "note": "The group and others lose every letter, and the owner keeps reading and changing."
+        },
+        {
+          "active": ["letters", "letters->helper", "helper"],
+          "note": "A Saturday helper's account cannot open the file any more."
+        }
+      ]
+    },
+    "archive": {
+      "steps": [
+        {
+          "active": ["files", "files->you", "you"],
+          "value": {
+            "kind": "array",
+            "label": "archive",
+            "values": ["the folder's letters", "each list's letters"]
+          },
+          "note": "Three old price lists sit in the archive folder, and the folder has letters of its own."
+        },
+        {
+          "active": ["you", "you->letters", "letters"],
+          "note": "Every list is locked at once, and the folder's own letters are left alone."
+        },
+        {
+          "active": ["letters", "letters->helper", "helper"],
+          "note": "The old lists cannot change, and next year's list can still go into the folder."
+        }
+      ]
+    },
+    "update": {
+      "steps": [
+        {
+          "active": ["idris", "idris->you", "files", "files->you", "you"],
+          "note": "The fox poster costs more now, and the price list is locked."
+        },
+        {
+          "active": ["you", "you->letters", "letters"],
+          "note": "The list is opened for its owner, the one line changes, and it is locked again."
+        },
+        {
+          "active": ["letters", "letters->helper", "helper"],
+          "note": "The list has the new price and is safe from mistakes again."
+        }
+      ]
+    }
+  }
+}

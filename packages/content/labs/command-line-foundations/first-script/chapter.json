@@ -1,0 +1,129 @@
+{
+  "id": "first-script",
+  "title": "A script of your own",
+  "files": ["today.txt", "count.sh"],
+  "terminal": {
+    "description": "A shell that starts in the shop's top folder. Run each script after every change and read what it prints.",
+    "suggestedCommand": "cat count.sh"
+  },
+  "tasks": [
+    {
+      "id": "save",
+      "title": "Save the evening commands in a script",
+      "file": "today.txt",
+      "description": "Make `evening.sh` in the top folder with Idris's four evening commands from `today.txt`, one per line, in that order. `sh evening.sh` then runs all four.\n\nCheck gives a copy of the top folder an `orders/today.csv` of its own, runs `sh evening.sh` there, and compares what it prints with what Idris's commands print.",
+      "nextSteps": [
+        "Run Idris's four commands one at a time and read what each prints.",
+        "Make an empty `evening.sh` with `touch` and open it from the file panel.",
+        "Write the four commands in it, one per line, exactly as `today.txt` has them.",
+        "Run `sh evening.sh` and compare with what you saw."
+      ],
+      "hints": [
+        "A script holds the commands you would type, one per line.",
+        "The file needs nothing but Idris's four lines. `sh evening.sh` runs them in the folder you are in.",
+        "Write these four lines in evening.sh: `echo \"Orders today:\"`, `wc -l < orders/today.csv`, `echo \"Unpaid:\"` and `grep -c unpaid orders/today.csv`."
+      ],
+      "docs": [
+        {
+          "title": "sh: the shell that runs scripts",
+          "url": "https://man7.org/linux/man-pages/man1/sh.1p.html"
+        },
+        {
+          "title": "Redirecting input",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07_01"
+        }
+      ],
+      "videos": [
+        {
+          "title": "How a shell script runs",
+          "url": "https://www.youtube.com/watch?v=U2_MvxnqLRE"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "program",
+      "title": "Make evening.sh a program",
+      "file": "today.txt",
+      "description": "Give `evening.sh` a first line that names `sh` (or `bash`), and let its owner run it, so that `./evening.sh` works from the top folder.\n\nCheck reads the first line of `evening.sh` and its permissions, then runs `./evening.sh` in a copy of the top folder and compares what it prints with what Idris's commands print.",
+      "nextSteps": [
+        "Run `./evening.sh` now and read the message.",
+        "Add the first line from the lesson at the very top of the file.",
+        "Give the owner `x` with `chmod`, then run `ls -l evening.sh`.",
+        "Run `./evening.sh` again."
+      ],
+      "hints": [
+        "Two things are missing: the line that names the program, and the permission to run.",
+        "The first line starts with `#!`, followed by the full path of `sh`. `chmod u+x` lets the owner run the file.",
+        "Make `#!/bin/sh` the first line of evening.sh, then run `chmod u+x evening.sh`."
+      ],
+      "docs": [
+        {
+          "title": "Command search and execution",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_09_01_04"
+        },
+        {
+          "title": "chmod: change file mode bits",
+          "url": "https://man7.org/linux/man-pages/man1/chmod.1.html"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "argument",
+      "title": "Count the file it is given",
+      "file": "count.sh",
+      "description": "Change `count.sh` so that it prints how many orders, that is lines, are in the file named by its first argument, as in `./count.sh orders/2026-04-02.csv`. It must work from any folder, with the path given from that folder, and with a file name that has a space in it.\n\nCheck runs `count.sh` with `sh` on files of its own: once from the top folder, and once from inside another folder, on a name with a space. Each time, a line of what it prints must start with the right number.",
+      "nextSteps": [
+        "Run `sh count.sh orders/2026-04-02.csv` and see that it counts another file.",
+        "Find the line that names `orders/today.csv`, and put the first argument there instead.",
+        "Try it on each file in `orders`, and compare with `wc -l`.",
+        "Go into `orders` and run `sh ../count.sh 2026-04-02.csv`."
+      ],
+      "hints": [
+        "Sol's script names one file by hand. The lesson's part on arguments shows how a script gets the file you give it.",
+        "`$1` is the first argument. Keep it in double quotes, and put no folder in front of it.",
+        "Change the line `wc -l < orders/today.csv` to `wc -l < \"$1\"`."
+      ],
+      "docs": [
+        {
+          "title": "Positional parameters",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_05_01"
+        },
+        {
+          "title": "Redirecting input",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_07_01"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "status",
+      "title": "Say when it fails",
+      "file": "count.sh",
+      "description": "When `count.sh` counted, it prints the number, then `Counted.`, and ends with exit status 0. When the file does not exist, it must not print `Counted.`, and its exit status must not be 0.\n\nCheck runs `count.sh` with `sh` on a file of its own and on a file that does not exist, and reads what it prints and its exit status each time.",
+      "nextSteps": [
+        "Run `sh count.sh nowhere.csv`, then `echo $?`, and read both.",
+        "Find which line decides the status the script ends with.",
+        "Make `Counted.` print only when the count worked.",
+        "Run both cases again, with `echo $?` after each."
+      ],
+      "hints": [
+        "A script ends with the status of its last command, and here that is the `echo`.",
+        "`&&` runs the next command only if the one before it worked, and the line keeps the failed status when it did not.",
+        "Make the two lines one: `wc -l < \"$1\" && echo \"Counted.\"`."
+      ],
+      "docs": [
+        {
+          "title": "Exit status for commands",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_08_02"
+        },
+        {
+          "title": "AND lists",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_09_03_06"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
