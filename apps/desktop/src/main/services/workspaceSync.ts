@@ -10,7 +10,8 @@ import {
   isAppPath,
   readFolders,
   readWorkspace,
-  resolveInside
+  resolveInside,
+  unlock
 } from './workspaceFiles'
 
 // Kept as one file, not a copy of the starter tree, so test runners and type checks in the
@@ -69,6 +70,7 @@ async function readMine(dir: string, paths: string[]): Promise<Files> {
 async function takeFromStarter(starterDir: string, dir: string, path: string): Promise<void> {
   const file = resolveInside(dir, path)
   await mkdir(dirname(file), { recursive: true })
+  await unlock(file)
   await copyFile(resolveInside(starterDir, path), file)
 }
 
@@ -153,6 +155,7 @@ export async function resetWorkspace(
 ): Promise<WorkspaceSnapshot> {
   const old = await readRemembered(dir)
   const next = await readStarter(starterDir, first)
+  await unlock(dir)
   if (!old) await emptyDir(dir)
   else {
     for (const path of Object.keys(old)) {

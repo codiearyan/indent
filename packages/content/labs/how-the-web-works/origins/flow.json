@@ -1,0 +1,237 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "page", "label": "Village hall page", "kind": "story" },
+      { "id": "read", "label": "readAsPage()", "kind": "function", "mine": true },
+      {
+        "id": "same",
+        "label": "sameOrigin()",
+        "kind": "function",
+        "mine": true,
+        "fn": "sameOrigin"
+      },
+      {
+        "id": "preflight",
+        "label": "needsPreflight()",
+        "kind": "function",
+        "mine": true,
+        "fn": "needsPreflight"
+      },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      {
+        "id": "allow",
+        "label": "allowOrigin()",
+        "kind": "function",
+        "mine": true,
+        "fn": "allowOrigin"
+      },
+      {
+        "id": "answer",
+        "label": "answerPreflight()",
+        "kind": "function",
+        "mine": true,
+        "fn": "answerPreflight"
+      }
+    ],
+    "edges": [
+      { "from": "page", "to": "read", "label": "asks" },
+      { "from": "read", "to": "same", "label": "two addresses" },
+      { "from": "page", "to": "preflight", "label": "the request" },
+      { "from": "read", "to": "server", "label": "with origin" },
+      { "from": "server", "to": "allow", "label": "the origin" },
+      { "from": "server", "to": "answer", "label": "asks first" }
+    ],
+    "note": "Pages on other sites ask the cupboard server for answers, and the server says which of them may read what comes back."
+  },
+  "tasks": {
+    "same": {
+      "trace": {
+        "file": "src/origins.js",
+        "call": "sameOrigin",
+        "args": [
+          "https://heronsgate-hall.example/whats-on.html",
+          "https://heronsgate-radio.example/api/now-playing"
+        ]
+      },
+      "steps": [
+        {
+          "active": ["same"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "a", "value": "a whole address" },
+              { "key": "b", "value": "a whole address" }
+            ]
+          },
+          "note": "sameOrigin() gets two addresses, like the hall's page and the cupboard server's now playing page."
+        },
+        {
+          "active": ["same"],
+          "note": "The scheme, the host and the port decide. What comes after the host does not."
+        },
+        {
+          "active": ["same"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "one origin", "value": "true" },
+              { "key": "two origins", "value": "false" }
+            ]
+          },
+          "note": "Two places on one origin may read each other's answers. Two origins need the server's say."
+        }
+      ]
+    },
+    "read": {
+      "steps": [
+        {
+          "active": ["page", "page->read", "read"],
+          "note": "The village hall's page wants the song that is playing now."
+        },
+        {
+          "active": ["read", "read->server", "server"],
+          "note": "A request to another origin carries the page's origin, so the server knows whose page is asking."
+        },
+        {
+          "active": ["server", "read"],
+          "note": "The answer says which page may read it, and the browser holds it back from every other page."
+        },
+        {
+          "active": ["read"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "may read", "value": "the body" },
+              { "key": "may not", "value": "an Error" }
+            ]
+          },
+          "note": "The hall's page shows the song, or stops the way fetch stops in a browser."
+        }
+      ]
+    },
+    "allow": {
+      "trace": {
+        "file": "src/origins.js",
+        "call": "allowOrigin",
+        "args": [
+          "https://heronsgate-hall.example",
+          ["https://heronsgate-hall.example", "https://heronsgate-radio.example"]
+        ]
+      },
+      "steps": [
+        {
+          "active": ["server", "server->allow", "allow"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "origin", "value": "the request's origin header, or null" },
+              { "key": "allowed", "value": "the origins the server trusts" }
+            ]
+          },
+          "note": "allowOrigin() gets the origin of a request and the pages Odette trusts."
+        },
+        {
+          "active": ["allow"],
+          "note": "Only an origin on the list, compared whole, may read the answer."
+        },
+        {
+          "active": ["allow"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "trusted", "value": "a header naming it, and vary" },
+              { "key": "anything else", "value": "only vary" }
+            ]
+          },
+          "note": "Either way the answer says it depends on the origin, so no cache mixes the pages up."
+        }
+      ]
+    },
+    "preflight": {
+      "trace": {
+        "file": "src/origins.js",
+        "call": "needsPreflight",
+        "args": ["POST", { "Content-Type": "application/json" }]
+      },
+      "steps": [
+        {
+          "active": ["page", "page->preflight", "preflight"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "method", "value": "in capitals" },
+              { "key": "headers", "value": "names in any letter case" }
+            ]
+          },
+          "note": "The station's new site wants to send a song request as JSON to the cupboard server."
+        },
+        {
+          "active": ["preflight"],
+          "note": "A browser sends straight away only what a plain form or link could already send."
+        },
+        {
+          "active": ["preflight"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "straight away", "value": "false" },
+              { "key": "ask first", "value": "true" }
+            ]
+          },
+          "note": "Anything more, and the browser asks the server before it sends the request."
+        }
+      ]
+    },
+    "answer": {
+      "trace": {
+        "file": "src/origins.js",
+        "call": "answerPreflight",
+        "args": [
+          {
+            "method": "OPTIONS",
+            "path": "/api/requests",
+            "headers": {
+              "origin": "https://heronsgate-radio.example",
+              "access-control-request-method": "POST",
+              "access-control-request-headers": "content-type"
+            }
+          },
+          {
+            "origins": ["https://heronsgate-hall.example", "https://heronsgate-radio.example"],
+            "methods": ["GET", "POST"],
+            "headers": ["content-type"]
+          }
+        ]
+      },
+      "steps": [
+        {
+          "active": ["server", "server->answer", "answer"],
+          "note": "Before the JSON song request, the browser sends an OPTIONS request that describes it."
+        },
+        {
+          "active": ["answer"],
+          "note": "The page's origin, the method and every header it asks about must all be allowed."
+        },
+        {
+          "active": ["answer"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "allowed", "value": "a status and the allowing headers" },
+              { "key": "refused", "value": "a status and no allowing header" }
+            ]
+          },
+          "note": "Only after a yes does the browser send the song request itself."
+        }
+      ]
+    }
+  }
+}

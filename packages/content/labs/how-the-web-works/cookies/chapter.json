@@ -1,0 +1,139 @@
+{
+  "id": "cookies",
+  "title": "Cookies, and what they cannot prove",
+  "files": [
+    "src/cookies.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "signin",
+      "title": "Sign in and bring the cookies back",
+      "file": "src/cookies.js",
+      "description": "Under `// Task 1` in `src/cookies.js`, make `playlistAs(base, presenter, key)` sign in to the server at `base`, then ask for the playlist as the presenter who signed in:\n\n1. a `POST` to `/studio/sign-in` whose body is JSON with `presenter` and `key`, and nothing else\n2. when the server refuses the sign-in, with a status that is not in the 200s, it throws an `Error` and asks for nothing more\n3. otherwise a `GET` for `/studio/playlist` that carries every cookie the sign-in answer set, as `name=value` pairs in one `cookie` header\n\nIt gives back the body of the playlist answer.\n\nCheck starts a server of its own that sets one cookie, or several with dates and `=` signs in them, and answers with the playlist only when its cookies come back exactly. It looks at both requests its server received.",
+      "nextSteps": [
+        "Send the sign-in the way Part 2 sent JSON.",
+        "Read every set-cookie line of its answer, one by one.",
+        "Keep only the name=value part of each line, and join them for one cookie header.",
+        "Run `node run.js`: the studio app's playlist request today gets 401, yours should not."
+      ],
+      "hints": [
+        "`fetch` keeps no cookies, unlike a browser. Whatever the sign-in sets, your code has to send back itself.",
+        "`response.headers.getSetCookie()` gives a list with one text per set-cookie line. `headers.get('set-cookie')` joins them with commas, and an `Expires` date has a comma of its own. In each line, everything before the first semicolon is `name=value`; the rest are attributes for the browser, never sent back.",
+        "`const pairs = signIn.headers.getSetCookie().map((line) => line.split(';')[0].trim())`, then `fetch(new URL('/studio/playlist', base), { headers: { cookie: pairs.join('; ') } })`, and `return` its `text()`."
+      ],
+      "docs": [
+        {
+          "title": "Headers: getSetCookie() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Headers/getSetCookie"
+        },
+        {
+          "title": "Cookie header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cookie"
+        },
+        {
+          "title": "Using HTTP cookies",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "header",
+      "title": "Choose the cookies a request carries",
+      "file": "src/cookies.js",
+      "description": "A browser does this part for you. Under `// Task 2`, make `cookieHeader(jar, address, now)` do it the way a browser does. `jar` is a list of the cookies a browser keeps, each one:\n\n`{ name, value, domain, hostOnly, path, secure, httpOnly, expires }`\n\n`hostOnly` is `true` for a cookie set without a `Domain` attribute, and `expires` is a time in milliseconds, or `null` for a cookie that lasts until the browser closes.\n\nIt gives back the text of the `cookie` header that a request for `address` carries at the time `now`: `name=value` for every cookie whose host, path, `Secure` and expiry rules from the lesson allow it, separated by a semicolon and a space, in any order. When no cookie goes, it gives back `''`.\n\nCheck calls `cookieHeader` with a jar and times of its own, and addresses on other hosts, paths, schemes and ports.",
+      "nextSteps": [
+        "Take the address apart with `new URL`, as in the first issue.",
+        "Go through the jar and keep each cookie only when its host, its path, Secure and its expiry all allow it.",
+        "Write the ones you kept as name=value, joined by a semicolon and a space.",
+        "Run `node run.js`: of the four addresses, only the first carries the session cookie."
+      ],
+      "hints": [
+        "Four questions per cookie, each a yes or a no: the host, the path, Secure, and whether it has expired. Two things never matter for requests: the port, and HttpOnly.",
+        "A host is under a domain only when it ends with a dot and the domain. A path is under the cookie's path when it is the same, or starts with it and the next character is a slash, or the cookie's path ends with one. `expires` is either `null` or a time to compare with `now`.",
+        "`jar.filter((c) => hostOk && pathOk && (!c.secure || url.protocol === 'https:') && (c.expires === null || c.expires > now))`, where `hostOk` is `c.hostOnly ? host === c.domain : host === c.domain || host.endsWith('.' + c.domain)`, then `` .map((c) => `${c.name}=${c.value}`).join('; ') ``."
+      ],
+      "docs": [
+        {
+          "title": "Using HTTP cookies: where cookies are sent",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies"
+        },
+        {
+          "title": "Set-Cookie header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "session",
+      "title": "Write the cookie that keeps a presenter signed in",
+      "file": "src/cookies.js",
+      "description": "Now the server's side. Under `// Task 3`, make `sessionCookie(id, path, seconds)` give back the text of the `set-cookie` header the cupboard server sends after a sign-in, without the header's name. It sets a cookie called `session` whose value is `id`, and its attributes say that it is:\n\n- sent back only to the host that set it, never to other hosts under its domain\n- sent only with requests for `path` and the paths under it\n- kept for `seconds` seconds\n- sent only over https\n- never readable by a page's scripts\n- left off requests that pages on other sites make, such as forms they post, but still sent when someone follows a link to the station\n\nCheck calls `sessionCookie` with ids, paths and lifetimes of its own, and reads the attributes in any order and letter case.",
+      "nextSteps": [
+        "Start with the cookie itself: its name, an equals sign and the id.",
+        "Add one attribute per line of the task, each after a semicolon and a space.",
+        "Pick each attribute from the lesson's list, and leave out the one that would widen where the cookie goes.",
+        "Run `node run.js` and read the Task 3 line."
+      ],
+      "hints": [
+        "Every line of the task is one attribute, except the first: a cookie goes back only to the host that set it when it has no `Domain` at all.",
+        "`Path` takes the path and `Max-Age` the seconds. `Secure` and `HttpOnly` take no value. `SameSite` has three values, and the one the task describes lets links from other sites through.",
+        "`` return `session=${id}; Path=${path}; Max-Age=${seconds}; Secure; HttpOnly; SameSite=Lax` ``."
+      ],
+      "docs": [
+        {
+          "title": "Set-Cookie header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie"
+        },
+        {
+          "title": "Using HTTP cookies: security",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Cookie attributes, one by one",
+          "url": "https://www.youtube.com/watch?v=9uqh9VlhMzQ",
+          "start": 105,
+          "end": 625
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "trust",
+      "title": "Find who is signed in, from the session only",
+      "file": "src/cookies.js",
+      "description": "Under `// Task 4`, make `whoIsThis(cookie, sessions, now)` take the text of a request's `cookie` header, or `null` when the request had none (its cookies are separated by semicolons, with or without a space after each), the sessions the server keeps, an object from session id to `{ presenter, expires }`, and a time `now` in milliseconds.\n\nIt gives back the `presenter` of the session named by the request's cookie called `session`, or `null` when there is no such cookie, the server keeps no session with that id, or the session's `expires` is not later than `now`. Any other cookie, like one called `presenter`, proves nothing.\n\nCheck calls `whoIsThis` with cookie headers, sessions and times of its own: some with a presenter cookie that names someone else, some with ids the server never made.",
+      "nextSteps": [
+        "Handle a request with no cookie header first.",
+        "Split the header into its cookies, and each cookie at its first `=` only.",
+        "Find the cookie called exactly session, and look its value up in sessions.",
+        "Check that the session has not expired, then run `node run.js`."
+      ],
+      "hints": [
+        "The browser sends whatever cookies it holds, and a person can change any of them. Only an id the server made and stored itself tells you who someone is.",
+        "Cookies in the header are separated by semicolons, with or without a space. `indexOf('=')` finds the first `=`, and an id may have more `=` signs in it. `sessions[id]` is `undefined` for an id the server never made.",
+        "Loop over `(cookie ?? '').split(';')`, and for the part whose name, `part.slice(0, at).trim()`, is `'session'`, take `sessions[part.slice(at + 1).trim()]`. Return its `presenter` when it exists and `expires > now`, and `null` at the end."
+      ],
+      "docs": [
+        {
+          "title": "Using HTTP cookies",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies"
+        },
+        {
+          "title": "String: indexOf() method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,189 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "app", "label": "Studio app", "kind": "story" },
+      { "id": "signin", "label": "playlistAs()", "kind": "function", "mine": true },
+      { "id": "server", "label": "Cupboard server", "kind": "story" },
+      {
+        "id": "session",
+        "label": "sessionCookie()",
+        "kind": "function",
+        "mine": true,
+        "fn": "sessionCookie"
+      },
+      { "id": "jar", "label": "Cookie jar", "kind": "data" },
+      {
+        "id": "header",
+        "label": "cookieHeader()",
+        "kind": "function",
+        "mine": true,
+        "fn": "cookieHeader"
+      },
+      { "id": "trust", "label": "whoIsThis()", "kind": "function", "mine": true, "fn": "whoIsThis" }
+    ],
+    "edges": [
+      { "from": "app", "to": "signin", "label": "name and key" },
+      { "from": "signin", "to": "server", "label": "requests" },
+      { "from": "server", "to": "session", "label": "after sign-in" },
+      { "from": "session", "to": "jar", "label": "set-cookie" },
+      { "from": "jar", "to": "header", "label": "kept cookies" },
+      { "from": "header", "to": "trust", "label": "cookie header" },
+      { "from": "trust", "to": "app", "label": "who it is" }
+    ],
+    "note": "A sign-in sets a session cookie, the next requests carry it back, and the cupboard server knows who is asking only from the sessions it keeps itself."
+  },
+  "tasks": {
+    "signin": {
+      "steps": [
+        {
+          "active": ["app", "app->signin", "signin"],
+          "note": "The studio app signs Ffion in with her name and her key."
+        },
+        {
+          "active": ["signin", "signin->server", "server"],
+          "note": "The cupboard server answers with cookies, and the playlist request after it has to carry them back."
+        },
+        {
+          "active": ["signin"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "signed in", "value": "the text of the playlist" },
+              { "key": "refused", "value": "an Error" }
+            ]
+          },
+          "note": "Ffion gets tonight's playlist, not another sign-in screen."
+        }
+      ]
+    },
+    "header": {
+      "trace": {
+        "file": "src/cookies.js",
+        "call": "cookieHeader",
+        "args": [
+          [
+            {
+              "name": "session",
+              "value": "5f1c0e",
+              "domain": "heronsgate-radio.example",
+              "hostOnly": true,
+              "path": "/studio",
+              "secure": true,
+              "httpOnly": true,
+              "expires": 1767283200000
+            },
+            {
+              "name": "presenter",
+              "value": "Ffion",
+              "domain": "heronsgate-radio.example",
+              "hostOnly": false,
+              "path": "/",
+              "secure": false,
+              "httpOnly": false,
+              "expires": 1767283200000
+            }
+          ],
+          "https://heronsgate-radio.example/studio/playlist",
+          1767254400000
+        ]
+      },
+      "steps": [
+        {
+          "active": ["jar", "jar->header", "header"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "jar", "value": "the cookies a browser keeps" },
+              { "key": "address", "value": "where a request goes" },
+              { "key": "now", "value": "a time in milliseconds" }
+            ]
+          },
+          "note": "cookieHeader() gets the cookies a browser in the studio keeps, and a request it is about to send."
+        },
+        {
+          "active": ["header"],
+          "note": "Each cookie goes only where its host, its path, Secure and its lifetime allow."
+        },
+        {
+          "active": ["header"],
+          "value": {
+            "kind": "array",
+            "label": "what comes back",
+            "values": ["name=value", "name=value", "..."]
+          },
+          "note": "The cookies that go come back as one cookie header, or as empty text when none does."
+        }
+      ]
+    },
+    "session": {
+      "trace": {
+        "file": "src/cookies.js",
+        "call": "sessionCookie",
+        "args": ["5f1c0e", "/studio", 28800]
+      },
+      "steps": [
+        {
+          "active": ["server", "server->session", "session"],
+          "note": "After Ffion signs in, the cupboard server makes up a session id for her."
+        },
+        {
+          "active": ["session"],
+          "note": "The cookie's attributes say where it goes, for how long, and what may never see it."
+        },
+        {
+          "active": ["session", "session->jar", "jar"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [{ "key": "set-cookie", "value": "session=id, then its attributes" }]
+          },
+          "note": "The browser keeps the cookie in its jar, by the rules the attributes give."
+        }
+      ]
+    },
+    "trust": {
+      "trace": {
+        "file": "src/cookies.js",
+        "call": "whoIsThis",
+        "args": [
+          "presenter=Odette; session=5f1c0e",
+          { "5f1c0e": { "presenter": "Ffion", "expires": 1767283200000 } },
+          1767254400000
+        ]
+      },
+      "steps": [
+        {
+          "active": ["header->trust", "trust"],
+          "value": {
+            "kind": "map",
+            "label": "what goes in",
+            "entries": [
+              { "key": "cookie", "value": "the request's cookie header, or null" },
+              { "key": "sessions", "value": "id to presenter and expires" },
+              { "key": "now", "value": "a time in milliseconds" }
+            ]
+          },
+          "note": "A request arrives with whatever cookies its browser holds, and any of them may have been changed."
+        },
+        {
+          "active": ["trust"],
+          "note": "Only the session id counts, and only when the cupboard server made it and it has not expired."
+        },
+        {
+          "active": ["trust", "trust->app", "app"],
+          "value": {
+            "kind": "map",
+            "label": "what comes back",
+            "entries": [
+              { "key": "a live session", "value": "its presenter" },
+              { "key": "anything else", "value": "null" }
+            ]
+          },
+          "note": "The studio app shows the playlist to the presenter the server knows, whatever the other cookies say."
+        }
+      ]
+    }
+  }
+}

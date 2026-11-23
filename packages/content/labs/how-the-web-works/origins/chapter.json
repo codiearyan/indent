@@ -1,0 +1,173 @@
+{
+  "id": "origins",
+  "title": "Pages from more than one place",
+  "files": [
+    "src/origins.js",
+    "run.js",
+    "server/station.js"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. run.js starts the cupboard server, runs your functions against it and prints every request and answer.",
+    "suggestedCommand": "node run.js"
+  },
+  "tasks": [
+    {
+      "id": "same",
+      "title": "Say whether two addresses share an origin",
+      "file": "src/origins.js",
+      "description": "Under `// Task 1` in `src/origins.js`, make `sameOrigin(a, b)` take two whole addresses and give back `true` when they have the same origin, and `false` otherwise.\n\nCheck calls `sameOrigin` with pairs of its own: addresses that differ only in their path, in their scheme, in their port, with and without the usual port written, with capital letters in the host, and with hosts that only look alike.",
+      "nextSteps": [
+        "Find in the lesson the three parts an origin is made of.",
+        "Take both addresses apart with `new URL`.",
+        "Compare the origins, not the whole addresses.",
+        "Run `node run.js` and read the Task 1 lines."
+      ],
+      "hints": [
+        "The path and the question mark part are not part of an origin. The scheme, the host and the port all are, even a port nobody wrote.",
+        "`new URL` writes the host in small letters and leaves out a port that is the scheme's usual one, so two spellings of the same place come out the same. A URL has a property that holds exactly its origin.",
+        "`return new URL(a).origin === new URL(b).origin`."
+      ],
+      "docs": [
+        {
+          "title": "Same-origin policy",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy"
+        },
+        {
+          "title": "URL: origin property",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/origin"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "read",
+      "title": "Read an answer the way a page in a browser may",
+      "file": "src/origins.js",
+      "description": "A browser does this part for you. Under `// Task 2`, make `readAsPage(page, address, withCookies)` do it the way a browser does for a script in the page at the address `page`:\n\n- when `page` and `address` share an origin, it asks for `address` and gives back the body\n- otherwise it sends **one** request for `address` with an `origin` header that names the page's origin, and gives back the body only when the answer lets that page read it, by the rules in the lesson. `withCookies` is `true` when the script asked for the person's cookies to go with the request, which makes the rules stricter.\n- when the answer does not let the page read it, it throws an `Error`, the way `fetch` stops in a page\n\nCheck starts a server of its own that answers each page with headers of its own: its exact origin, `*`, other origins that look like it, a list, credentials or none. It looks at the `origin` header its server received.",
+      "nextSteps": [
+        "Use your function from Task 1 for a page on the same origin.",
+        "Send the page's origin, and only its origin, in the `origin` header.",
+        "Read `access-control-allow-origin`, and `access-control-allow-credentials` when cookies go too.",
+        "Run `node run.js`: one page may read, and two may not."
+      ],
+      "hints": [
+        "An answer lets a page read it in two ways: it allows `*`, or it names the page's origin exactly. With cookies, only the second counts, and the answer must also say `access-control-allow-credentials: true`.",
+        "`new URL(page).origin` is what goes in the `origin` header and what the answer must name. Compare with `===`: an origin that only contains or starts with the page's is someone else's.",
+        "Send `fetch(address, { headers: { origin } })`, read both headers with `headers.get`, then `const mayRead = withCookies ? allowed === origin && credentials === 'true' : allowed === '*' || allowed === origin`. Throw when it is `false`, otherwise `return response.text()`."
+      ],
+      "docs": [
+        {
+          "title": "Cross-origin resource sharing (CORS)",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS"
+        },
+        {
+          "title": "Access-Control-Allow-Origin header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Origin"
+        },
+        {
+          "title": "Access-Control-Allow-Credentials header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Credentials"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "allow",
+      "title": "Let the trusted pages read an answer",
+      "file": "src/origins.js",
+      "description": "Now the server's side. Under `// Task 3`, make `allowOrigin(origin, allowed)` take the `origin` header of a request, or `null` when it had none, and the list of origins the cupboard server trusts. It gives back an object of the headers to add to the answer:\n\n- `access-control-allow-origin` naming the request's origin, only when that origin is in the list, exactly as written. Never `*`.\n- always `vary`, saying that the answer depends on the request's `Origin`\n\nCheck calls `allowOrigin` with lists and origins of its own: trusted ones, ones that only look trusted, none at all, and `'null'`.",
+      "nextSteps": [
+        "Decide whether the origin is in the list, compared whole.",
+        "Build the object of headers for each case.",
+        "Add `vary` to both.",
+        "Run `node run.js` and read the Task 3 lines."
+      ],
+      "hints": [
+        "Two answers: one for a trusted origin, one for everything else, missing origins included. Both carry `vary`.",
+        "`allowed.includes(origin)` compares each item whole. `vary: 'Origin'` tells caches, like the ones in the last issue, to keep a separate copy for each origin.",
+        "`if (!allowed.includes(origin)) return { vary: 'Origin' }`, then `return { 'access-control-allow-origin': origin, vary: 'Origin' }`."
+      ],
+      "docs": [
+        {
+          "title": "Access-Control-Allow-Origin header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Origin"
+        },
+        {
+          "title": "Vary header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Vary"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "preflight",
+      "title": "Say whether a request needs asking first",
+      "file": "src/origins.js",
+      "description": "A browser does this part for you too. Under `// Task 4`, make `needsPreflight(method, headers)` take the method of a request that a page's script wants to send to another origin, in capitals, and an object of the headers the script sets, with names in any letter case.\n\nIt gives back `false` when a browser would send the request straight away, by the rules in the lesson: one of the three methods, and only headers from the lesson's short list, with a `content-type` whose type is one of the three the lesson names. Otherwise it gives back `true`, because a browser would ask the server first.\n\nCheck calls `needsPreflight` with methods and headers of its own, in different letter cases, and with types that have parameters or only start like one of the three.",
+      "nextSteps": [
+        "Check the method first.",
+        "Go through the header names in small letters.",
+        "For `content-type`, compare the type before any semicolon, in small letters, with the three types.",
+        "Run `node run.js` and read the Task 4 lines."
+      ],
+      "hints": [
+        "A request goes straight away only when everything about it is something a plain form or link could already send. Any header outside the list, `authorization` included, means asking first.",
+        "The methods are `GET`, `HEAD` and `POST`. The headers are `accept`, `accept-language`, `content-language` and `content-type`, and the types are `application/x-www-form-urlencoded`, `multipart/form-data` and `text/plain`. `Object.entries(headers)` gives each name and value.",
+        "Return `true` for any other method, then `return Object.entries(headers).some(([name, value]) => ...)`, where a name in the list of three gives `false`, `content-type` gives `!types.includes(value.split(';')[0].trim().toLowerCase())`, and any other name gives `true`."
+      ],
+      "docs": [
+        {
+          "title": "Preflight request",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request"
+        },
+        {
+          "title": "CORS-safelisted request header",
+          "url": "https://developer.mozilla.org/en-US/docs/Glossary/CORS-safelisted_request_header"
+        },
+        {
+          "title": "Object.entries()",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "answer",
+      "title": "Answer the request that asks first",
+      "file": "src/origins.js",
+      "description": "Under `// Task 5`, make `answerPreflight(request, rules)` answer the request a browser sends first. `request` is `{ method, path, headers }`, an `OPTIONS` request whose header names are in small letters, as a Node server sees them. `rules` is `{ origins, methods, headers }`: the origins the server trusts, the methods it allows them, and the request headers it allows.\n\nWhen the request's origin is in `rules.origins`, the method it asks about is in `rules.methods`, and every header it asks about is in `rules.headers` (names in any letter case), it gives back `{ status: 204, headers }` where `headers` has:\n\n- `access-control-allow-origin` naming the request's origin\n- `access-control-allow-methods` listing `rules.methods`\n- `access-control-allow-headers` listing `rules.headers`\n\nOtherwise it gives back `{ status: 403, headers }` with no `access-control-allow-` header. Either way there is no body.\n\nCheck calls `answerPreflight` with requests and rules of its own.",
+      "nextSteps": [
+        "Read the origin, the method asked about and the headers asked about from the request.",
+        "Split the headers asked about at commas, trimmed and in small letters.",
+        "Refuse unless the origin, the method and every header are allowed.",
+        "Run `node run.js` and compare with what the cupboard server answers."
+      ],
+      "hints": [
+        "The request that asks first carries the real request's method in `access-control-request-method` and its header names in `access-control-request-headers`, a list separated by commas. It may carry no list at all.",
+        "A list header's value is the items joined by a comma and a space. Your function from Task 3 already gives the origin header and `vary`.",
+        "When everything is allowed, `return { status: 204, headers: { ...allowOrigin(origin, rules.origins), 'access-control-allow-methods': rules.methods.join(', '), 'access-control-allow-headers': rules.headers.join(', ') } }`. Otherwise `return { status: 403, headers: { vary: 'Origin' } }`."
+      ],
+      "docs": [
+        {
+          "title": "OPTIONS request method",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS"
+        },
+        {
+          "title": "Access-Control-Allow-Methods header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Methods"
+        },
+        {
+          "title": "Access-Control-Allow-Headers header",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Headers"
+        }
+      ],
+      "videos": [
+        {
+          "title": "The request a browser sends first, and why",
+          "url": "https://www.youtube.com/watch?v=tcLW5d0KAYE"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
