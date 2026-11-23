@@ -7,7 +7,7 @@
       "file": "season_report.py",
       "mine": true,
       "gap": "Def lines that say nothing",
-      "tasks": ["Hints on a total", "Hints that tell truth", "A leader, or None", "A rule, the longest"]
+      "tasks": ["Hints on a total", "Hints that are true", "A leader, or None", "A rule, the longest"]
     },
     { "title": "Next winter", "say": "Every def line says it all.", "note": "Whoever looks after the code next." }
   ],

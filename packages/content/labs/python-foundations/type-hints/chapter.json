@@ -27,9 +27,6 @@
         { "title": "Function annotations", "url": "https://docs.python.org/3/tutorial/controlflow.html#function-annotations" },
         { "title": "Generic alias type", "url": "https://docs.python.org/3/library/stdtypes.html#types-genericalias" }
       ],
-      "videos": [
-        { "title": "Type hints, and what they are for", "url": "https://www.youtube.com/watch?v=QORvB-_mbZ0" }
-      ],
       "points": 10
     },
     {
