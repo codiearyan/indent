@@ -1,0 +1,11 @@
+-- Task 2: the animals heavier than the average weight of all the animals.
+-- Return three columns, in this order:
+--   name
+--   species
+--   weight_kg
+-- Work the average out in the query, from the animals table. Any order of rows.
+--   node run.mjs queries/2-heavier-than-average.sql
+
+SELECT name, species, weight_kg
+FROM animals
+WHERE weight_kg > (SELECT AVG(weight_kg) FROM animals);

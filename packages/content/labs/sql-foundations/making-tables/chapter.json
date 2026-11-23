@@ -1,0 +1,127 @@
+{
+  "id": "making-tables",
+  "title": "Making a table",
+  "files": [
+    "queries/1-vets.sql",
+    "queries/2-microchips.sql",
+    "queries/3-reminders.sql",
+    "queries/4-appointments.sql",
+    "queries/5-price-list.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs every statement in that file on a fresh copy of the practice's database, shows each table you make and what happens to each row you try, and saves nothing.",
+    "suggestedCommand": "node run.mjs queries/1-vets.sql"
+  },
+  "tasks": [
+    {
+      "id": "vets-table",
+      "title": "Make the vets table",
+      "file": "queries/1-vets.sql",
+      "description": "Today each visit has its vet's name typed in by hand. Rosamund wants the vets in a table of their own.\n\nIn `queries/1-vets.sql`, above the rows that try it, write a `CREATE TABLE` for a table called `vets` with three columns:\n\n- `id`: the table's key, a whole number that fills itself in when a row comes without one\n- `name`: text, never empty\n- `phone`: text, may be empty\n\nCheck runs only your `CREATE TABLE`, on its own fresh copy of the database. It looks at the columns and their types, then tries rows of its own: one without an id, two with the same id, one with no name, one with no phone, and a phone number written without spaces.",
+      "nextSteps": [
+        "Read how `schema.sql` makes the `owners` table: the same shape works here.",
+        "Write the three columns with their types and rules, and run the file. Read what happens to each of the rows below it.",
+        "The vet with no name should be refused, and the phone number should come back exactly as typed."
+      ],
+      "hints": [
+        "Read the lesson's parts \"A table and its columns\" and \"The key\". What type is a phone number?",
+        "A phone number is text: as a number its first 0 would go. Only one exact type makes a key fill itself in. A rule after a column's type keeps it from being empty.",
+        "The statement has the shape `CREATE TABLE vets (id INTEGER PRIMARY KEY, name TEXT NOT NULL, phone ...);`."
+      ],
+      "docs": [
+        { "title": "CREATE TABLE", "url": "https://www.sqlite.org/lang_createtable.html" },
+        { "title": "Datatypes in SQLite", "url": "https://www.sqlite.org/datatype3.html" }
+      ],
+      "videos": [
+        { "title": "Making a table with a primary key", "url": "https://www.youtube.com/watch?v=Ly2uy_jUHU8" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "microchips-table",
+      "title": "Make the microchips table",
+      "file": "queries/2-microchips.sql",
+      "description": "Every chipped animal has a chip number, and no two chips share one. Winnie wants them on record.\n\nIn `queries/2-microchips.sql`, write a `CREATE TABLE` for a table called `microchips`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty, the id of the animal in `animals`\n- `chip`: text, never empty, and never the same on two rows\n\nAn animal can have two chips, when the first one stops working. Check runs only your `CREATE TABLE` and tries rows of its own: two chips for one animal, one chip for two animals, rows with no chip and a row with no animal.",
+      "nextSteps": [
+        "Write the three columns, with the rule that a value never repeats on the right one.",
+        "Run the file and read what happens to each row below it.",
+        "Rows with no chip should be refused too. Does your table refuse them?"
+      ],
+      "hints": [
+        "Read the lesson's part \"Rules for a column\". Which column must never repeat: the animal or the chip?",
+        "`UNIQUE` goes on the column whose values never repeat. It still lets several rows be empty, so a column that is never empty needs `NOT NULL` as well.",
+        "The chip column has the shape `chip TEXT NOT NULL UNIQUE`."
+      ],
+      "docs": [
+        { "title": "UNIQUE constraints", "url": "https://www.sqlite.org/lang_createtable.html#unique_constraints" },
+        { "title": "NOT NULL constraints", "url": "https://www.sqlite.org/lang_createtable.html#not_null_constraints" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "reminders-table",
+      "title": "Make the reminders table",
+      "file": "queries/3-reminders.sql",
+      "description": "The front desk sends a reminder when a booster is due, by phone unless an owner asks for something else.\n\nIn `queries/3-reminders.sql`, write a `CREATE TABLE` for a table called `reminders`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty\n- `due`: text, never empty, the date the booster is due as `YYYY-MM-DD`\n- `send_by`: text, never empty, and `'phone'` when a row does not give it\n\nCheck runs only your `CREATE TABLE` and tries rows of its own: one without `send_by`, one with `send_by` given, one with `send_by` set to `NULL`, and one with no due date.",
+      "nextSteps": [
+        "Write the four columns with their types and rules.",
+        "Give `send_by` the value it takes when a row leaves it out, and run the file.",
+        "The first row below it should come back with `phone`, and the row with `NULL` should be refused."
+      ],
+      "hints": [
+        "Read the lesson's part \"Rules for a column\". What fills a column that a row leaves out?",
+        "`DEFAULT` gives the value for a column a row leaves out. It does not stop a row from setting the column to `NULL`, so `NOT NULL` is still needed.",
+        "The last column has the shape `send_by TEXT NOT NULL DEFAULT 'phone'`."
+      ],
+      "docs": [
+        { "title": "The DEFAULT clause", "url": "https://www.sqlite.org/lang_createtable.html#the_default_clause" },
+        { "title": "CREATE TABLE", "url": "https://www.sqlite.org/lang_createtable.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "appointments-table",
+      "title": "Make the appointments table",
+      "file": "queries/4-appointments.sql",
+      "description": "The practice starts booking visits ahead. An appointment must be for an animal the practice knows.\n\nIn `queries/4-appointments.sql`, write a `CREATE TABLE` for a table called `appointments`:\n\n- `id`: the table's key, as in task 1\n- `animal_id`: a whole number, never empty, that points at the `id` of a row in `animals`\n- `starts`: text, never empty, as `YYYY-MM-DD HH:MM`\n- `vet`: text, never empty\n\nAn appointment for an animal that is not in `animals` is refused, and an animal with an appointment cannot be removed from `animals`. Check switches on keys that point at another table, as `run.mjs` does, runs only your `CREATE TABLE` and tries rows of its own: an appointment for an animal that exists, one for an id no animal has, removing an animal that has an appointment, and an appointment with no time or vet.",
+      "nextSteps": [
+        "Write the four columns with their types and rules.",
+        "Make `animal_id` point at the `id` of `animals`, and run the file.",
+        "The appointment for animal 99 and the removal of Pickle should both be refused."
+      ],
+      "hints": [
+        "Read the lesson's part \"A key that points at another table\". Which table and which column does `animal_id` point at?",
+        "`REFERENCES` after a column's type names the table and the column it points at. With it switched on, the database refuses a value that no row has there, and a removal that would leave a row pointing at nothing.",
+        "The animal column has the shape `animal_id INTEGER NOT NULL REFERENCES animals (id)`."
+      ],
+      "docs": [
+        { "title": "Foreign key support", "url": "https://www.sqlite.org/foreignkeys.html" },
+        { "title": "CREATE TABLE", "url": "https://www.sqlite.org/lang_createtable.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "price-list-table",
+      "title": "Make the price list strict",
+      "file": "queries/5-price-list.sql",
+      "description": "Rosamund wants one price list, and a price that is not a number must never get in, not even by mistake.\n\nIn `queries/5-price-list.sql`, write a `CREATE TABLE` for a table called `price_list`:\n\n- `id`: the table's key, as in task 1\n- `name`: text, never empty, and never the same on two rows\n- `price`: a number that may have pence, never empty, in pounds\n\nA price that is not a number is refused. Check runs only your `CREATE TABLE` and tries rows of its own: a price written as a word, prices of 19.20 and of 32, two prices with the same name, and a row with no price.",
+      "nextSteps": [
+        "Write the three columns with their types and rules, and run the file.",
+        "Look at what happens to the price written as a word. Is it refused?",
+        "Make the types of this table rules, not preferences, and run it again."
+      ],
+      "hints": [
+        "Read the lesson's part \"A table and its columns\". Which type holds a number with pence, and what does this engine do with a word in it?",
+        "The type `REAL` holds numbers with a fraction. Without a word after the closing bracket, this engine keeps a value of the wrong type as it is.",
+        "The statement ends with the shape `price REAL NOT NULL) STRICT;`."
+      ],
+      "docs": [
+        { "title": "STRICT tables", "url": "https://www.sqlite.org/stricttables.html" },
+        { "title": "Datatypes in SQLite", "url": "https://www.sqlite.org/datatype3.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

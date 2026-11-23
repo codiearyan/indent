@@ -1,0 +1,105 @@
+{
+  "id": "changing-rows",
+  "title": "Adding, changing and removing rows",
+  "files": [
+    "queries/1-new-owner.sql",
+    "queries/2-moss-record.sql",
+    "queries/3-double-charge.sql",
+    "queries/4-clear-out.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs every statement in that file on a fresh copy of the practice's database, says what each one did and what changed, and saves nothing.",
+    "suggestedCommand": "node run.mjs queries/1-new-owner.sql"
+  },
+  "tasks": [
+    {
+      "id": "add-owner",
+      "title": "Add a new owner",
+      "file": "queries/1-new-owner.sql",
+      "description": "Tomos Fenwick signed up at the front desk this morning, and Winnie wants him in the records before his cat comes in.\n\nIn `queries/1-new-owner.sql`, add one row to `owners`:\n\n- `first_name`: `Tomos`\n- `last_name`: `Fenwick`\n- `phone`: `01632 960114`\n- `email`: none, he has no email\n- `town`: `Larkhill`\n\nLeave `id` out, so the database picks the next free one. Check runs your file on its own fresh copy of the data you can see and of hidden data, which has more rows, and compares every table afterwards: one new owner with these values, and nothing else changed.",
+      "nextSteps": [
+        "Read the `owners` table in `schema.sql`: its columns, their order, and which ones may be empty.",
+        "Write the `INSERT` with a list of the columns you fill, then the values in the same order.",
+        "Run it and read what changed. Is the email an empty cell, and did Tomos get the next id?"
+      ],
+      "hints": [
+        "Read the lesson's part \"Adding a row\". Which columns does Tomos have a value for?",
+        "List the five columns after the table name, and give five values in the same order. No email is `NULL` without quotes, or a column you leave out of the list.",
+        "The statement has the shape `INSERT INTO owners (first_name, last_name, phone, email, town) VALUES (...);`."
+      ],
+      "docs": [
+        { "title": "INSERT", "url": "https://www.sqlite.org/lang_insert.html" },
+        { "title": "INTEGER PRIMARY KEY and rowid", "url": "https://www.sqlite.org/lang_createtable.html#rowid" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "update-moss",
+      "title": "Update Moss's record",
+      "file": "queries/2-moss-record.sql",
+      "description": "Moss, Agnes Dimmock's dog, came in today. Ifan found out his breed and weighed him.\n\nIn `queries/2-moss-record.sql`, change Moss's row in `animals`:\n\n- `breed`: `Collie cross`\n- `weight_kg`: `23.1`\n\nChange only Moss's row: no other animal may change. A `SELECT` that finds the row first is welcome in the file. Check runs your file on its own fresh copy of the data you can see and of hidden data, which has another dog called Moss, and compares every table afterwards.",
+      "nextSteps": [
+        "Find Moss with a `SELECT` and note what is different about his row from every other row.",
+        "Write the `UPDATE` with both changes in one `SET`, and a `WHERE` that picks only his row.",
+        "Run it and read what changed: one row of `animals`, two columns."
+      ],
+      "hints": [
+        "Read the lesson's parts \"Changing rows\" and \"Look before you change\". What does your `WHERE` pick, and could another row match it one day?",
+        "A name can belong to two animals. The `id` belongs to one. Two changes in one `SET` are split by a comma.",
+        "The statement has the shape `UPDATE animals SET breed = ..., weight_kg = ... WHERE id = ...;`."
+      ],
+      "docs": [
+        { "title": "UPDATE", "url": "https://www.sqlite.org/lang_update.html" },
+        { "title": "The WHERE clause of UPDATE", "url": "https://www.sqlite.org/lang_update.html#details" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "remove-double-charge",
+      "title": "Take off the double charge",
+      "file": "queries/3-double-charge.sql",
+      "description": "Pepper's blood test on 30 September is on the bill twice: the second time someone typed it as £58. Rosamund wants that row gone before the bill goes out.\n\nIn `queries/3-double-charge.sql`, inside one transaction:\n\n1. start the transaction\n2. delete the second blood test row from `treatments`, and no other row\n3. look at Pepper's charges with a `SELECT`\n4. keep the change\n\nCheck runs your file on its own fresh copy of the data you can see and of hidden data, which has another blood test typed as £58, compares every table afterwards, and looks at the order of the four steps.",
+      "nextSteps": [
+        "Find the treatments of Pepper's visit on 30 September with a `SELECT`. Which row is the wrong one?",
+        "Write a `DELETE` whose `WHERE` picks only that row. Run it and read what changed.",
+        "Put it inside a transaction, with the `SELECT` after the delete, and end the transaction so the change stays."
+      ],
+      "hints": [
+        "Read the lesson's parts \"Removing rows\" and \"Undo with a transaction\". Which statements open and close a transaction?",
+        "Several rows share the name `Blood test`, and several share the price 58. Only the `id` picks one row by itself. `COMMIT` keeps what a transaction did.",
+        "The file has the shape `BEGIN; DELETE FROM treatments WHERE ...; SELECT ... FROM treatments WHERE visit_id = ...; COMMIT;`."
+      ],
+      "docs": [
+        { "title": "DELETE", "url": "https://www.sqlite.org/lang_delete.html" },
+        { "title": "BEGIN, COMMIT and ROLLBACK", "url": "https://www.sqlite.org/lang_transaction.html" }
+      ],
+      "videos": [
+        { "title": "What a transaction is", "url": "https://www.youtube.com/watch?v=P80Js_qClUE" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "try-a-clear-out",
+      "title": "Try a clear-out and undo it",
+      "file": "queries/4-clear-out.sql",
+      "description": "Rosamund may move every visit from before 2026 to the paper files. Before she decides, she wants to know how many visits would be left.\n\nIn `queries/4-clear-out.sql`, inside one transaction:\n\n1. start the transaction\n2. delete every visit dated before `2026-01-01`, and no other\n3. count the visits that are left with a `SELECT`\n4. undo the delete\n\nWhen the file has run, every visit must still be there. Check runs your file on its own fresh copy of the data you can see and of hidden data, which has visits on the last day of 2025 and the first day of 2026. It looks at the visits just before the undo, and at every table afterwards.",
+      "nextSteps": [
+        "Write a `SELECT` of the visits before 2026 and check its rows by hand in `seed.sql`.",
+        "Turn it into a `DELETE` inside a transaction, and count what is left with a `SELECT`.",
+        "End the transaction so the delete is undone, and run it: nothing should have changed."
+      ],
+      "hints": [
+        "Read the lesson's part \"Undo with a transaction\". Which statement ends a transaction and throws its changes away?",
+        "Dates are text in the form `YYYY-MM-DD`, so `<` with a date in quotes compares them in order. `ROLLBACK` undoes everything since `BEGIN`.",
+        "The file has the shape `BEGIN; DELETE FROM visits WHERE visit_date < ...; SELECT COUNT(*) FROM visits; ROLLBACK;`."
+      ],
+      "docs": [
+        { "title": "BEGIN, COMMIT and ROLLBACK", "url": "https://www.sqlite.org/lang_transaction.html" },
+        { "title": "DELETE", "url": "https://www.sqlite.org/lang_delete.html" }
+      ],
+      "points": 10
+    }
+  ]
+}

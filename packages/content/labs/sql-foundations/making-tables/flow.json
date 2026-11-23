@@ -1,0 +1,124 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "paper", "label": "Cards, diary and book", "kind": "story" },
+      { "id": "queries", "label": "Your CREATE TABLE", "kind": "file", "mine": true },
+      { "id": "table", "label": "The new table", "kind": "data" },
+      { "id": "tries", "label": "Rows that try it", "kind": "data" },
+      { "id": "animals", "label": "animals", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "paper", "to": "queries", "label": "what to keep" },
+      { "from": "queries", "to": "table", "label": "makes" },
+      { "from": "tries", "to": "table", "label": "rows" },
+      { "from": "table", "to": "animals", "label": "animal_id" }
+    ],
+    "note": "What the practice keeps on paper gets a table of its own, with rules that refuse a bad row before it gets in."
+  },
+  "tasks": {
+    "vets-table": {
+      "steps": [
+        {
+          "active": ["paper", "paper->queries", "queries"],
+          "note": "The vets' names come off the visits and into a table of their own."
+        },
+        {
+          "active": ["queries", "queries->table", "table"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the table",
+            "colLabels": ["id", "name", "phone"],
+            "cells": [["fills itself in", "never empty", "text, may be empty"]]
+          },
+          "note": "The table has a key, a name that is always there, and a phone kept as text."
+        },
+        {
+          "active": ["tries", "tries->table", "table"],
+          "note": "A vet with no name is refused. The other rows go in, each with an id."
+        }
+      ]
+    },
+    "microchips-table": {
+      "steps": [
+        {
+          "active": ["paper", "paper->queries", "queries"],
+          "note": "The chip numbers come off the cards."
+        },
+        {
+          "active": ["queries", "queries->table", "table"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the table",
+            "colLabels": ["id", "animal_id", "chip"],
+            "cells": [["fills itself in", "never empty", "never empty, never repeated"]]
+          },
+          "note": "One column may repeat, and one never may."
+        },
+        {
+          "active": ["tries", "tries->table", "table"],
+          "note": "A second chip for one animal goes in. A chip number used twice, or missing, is refused."
+        }
+      ]
+    },
+    "reminders-table": {
+      "steps": [
+        {
+          "active": ["paper", "paper->queries", "queries"],
+          "note": "The booster reminders come out of the diary."
+        },
+        {
+          "active": ["queries", "queries->table", "table"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the table",
+            "colLabels": ["id", "animal_id", "due", "send_by"],
+            "cells": [["fills itself in", "never empty", "a date, never empty", "never empty, with a value of its own"]]
+          },
+          "note": "One column fills itself in when a row leaves it out."
+        },
+        {
+          "active": ["tries", "tries->table", "table"],
+          "note": "A reminder that leaves it out gets the usual way. One that sets it to empty is refused."
+        }
+      ]
+    },
+    "appointments-table": {
+      "steps": [
+        {
+          "active": ["paper", "paper->queries", "queries"],
+          "note": "The appointments come out of the book at the desk."
+        },
+        {
+          "active": ["queries", "queries->table", "table", "table->animals", "animals"],
+          "note": "Each appointment points at a row of animals, and the database keeps it that way."
+        },
+        {
+          "active": ["tries", "tries->table", "table", "animals"],
+          "note": "An appointment for an animal that is not there is refused, and so is removing an animal that has one."
+        }
+      ]
+    },
+    "price-list-table": {
+      "steps": [
+        {
+          "active": ["paper", "paper->queries", "queries"],
+          "note": "The prices come off the sheet nobody agrees on."
+        },
+        {
+          "active": ["queries", "queries->table", "table"],
+          "value": {
+            "kind": "grid",
+            "label": "the shape of the table",
+            "colLabels": ["id", "name", "price"],
+            "cells": [["fills itself in", "never empty, never repeated", "a number, never empty"]]
+          },
+          "note": "The types of this table are rules, not preferences."
+        },
+        {
+          "active": ["tries", "tries->table", "table"],
+          "note": "A price written as a word is refused, and so is a name used twice."
+        }
+      ]
+    }
+  }
+}
