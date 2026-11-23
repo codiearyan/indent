@@ -1,0 +1,79 @@
+{
+  "id": "actions",
+  "title": "Changes with names",
+  "files": ["src/store.js", "src/order-actions.js", "src/try.js", "src/price-list.js", "src/order.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the order screen loads its prices and changes its basket through named actions.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "actions",
+      "title": "Keep actions beside the state",
+      "file": "src/store.js",
+      "description": "Give `createStore` a second argument, `makeActions`, in `src/store.js`.\n\n- `createStore(initial, makeActions)` calls `makeActions` once, with the store itself, the very object it returns\n- what `makeActions` returns is kept as `store.actions`, so `store.actions.add(...)` calls the function it made, with its arguments, and gives back what it returns\n- `store.actions` is in place by the time an action runs, so one action can call another through `store.actions`\n- without `makeActions`, `store.actions` is an empty object; a `makeActions` that is not a function throws a `TypeError`\n\nThe check makes stores with actions of its own, calls them, and has one call another.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error.",
+        "Keep the object `createStore` returns in a variable instead of returning it at once.",
+        "Give it an `actions` property, then fill it from `makeActions` when there is one, and return the store."
+      ],
+      "hints": [
+        "An action is a function that knows how to make one change. It needs the store to do it, which is why `makeActions` is given the store.",
+        "If `makeActions` were given a copy, or ran before `store.actions` existed, an action could not reach the others. Set `store.actions` on the very object you hand it.",
+        "`const store = { getState, setState, subscribe, actions: {} }`, then `if (makeActions !== undefined) { if (typeof makeActions !== 'function') throw new TypeError('...'); store.actions = makeActions(store) }` and `return store`."
+      ],
+      "docs": [
+        { "title": "Method definitions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions" },
+        { "title": "Functions as values", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "basket",
+      "title": "Name the basket's changes",
+      "file": "src/order-actions.js",
+      "description": "Implement `add`, `remove` and `reorder` in `orderActions(store)` in `src/order-actions.js`.\n\n- `add(item, quantity)` puts `{ item, quantity }` at the end of the basket; when the basket already has a line for that item, its quantity goes up instead and it keeps its place\n- `remove(item)` takes that item's line out, and the others keep their order; an item not in the basket changes nothing, so nobody is told\n- `reorder(lines)` puts each line of an earlier order, an array of `{ item, quantity }`, into the basket exactly as `add` would; build it on `add`, called through `store.actions`, rather than writing the rule twice\n- every change makes a new basket array and leaves the old one as it was\n- the actions work when taken out of the object, as in `const { add } = store.actions`\n\nThe check runs your actions on a store of its own with a basket of its own, so they are judged even if task 1 is not done.",
+      "nextSteps": [
+        "Read \"An action builds on another\" in the lesson.",
+        "In `add`, use `store.setState` with a function, and build the new basket from the one in the state.",
+        "In `remove`, find out first whether the item is there.",
+        "Write `reorder` with `store.actions.add`, then run `node src/try.js`."
+      ],
+      "hints": [
+        "The basket is an array in the state. Changing it in place gives the store the same array back, which it counts as no change: build a new one with `map`, `filter` or spread.",
+        "`some` tells you whether a line for the item is there; `map` gives a new array where one line has a new quantity; spread adds a line at the end.",
+        "In `add`: `store.setState((state) => ({ basket: found ? state.basket.map((l) => (l.item === item ? { ...l, quantity: l.quantity + quantity } : l)) : [...state.basket, { item, quantity }] }))`. In `reorder`: `for (const line of lines) store.actions.add(line.item, line.quantity)`."
+      ],
+      "docs": [
+        { "title": "Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" },
+        { "title": "Array.prototype.some()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some" },
+        { "title": "this", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "prices",
+      "title": "An action that waits",
+      "file": "src/order-actions.js",
+      "description": "Implement `loadPrices()` in `src/order-actions.js`.\n\n- at once, before it waits, it sets `loading` to `true` and `error` to `null`, so the screen can say it is loading\n- it asks the price list with `fetchPrices()` from `price-list.js`, once, and waits for the answer\n- when the prices come, `prices` is what the price list gave and `loading` is `false`\n- when the price list fails, `loading` is `false`, `error` is the failure's message, and `prices` stays as it was\n- it sets only the keys it changes, so a change made by someone else while it waits is kept\n- it returns a promise that settles once the state is set, and never rejects\n\nThe check puts a price list of its own in place of yours, one that answers or fails when the check says so, and reads the state before, during and after the wait.",
+      "nextSteps": [
+        "Run `node src/try.js` and look for the line that says it is loading.",
+        "Set the waiting state first, then wait for `fetchPrices()`.",
+        "Set the prices when they come, and the message when it fails.",
+        "Make sure the promise `loadPrices` returns waits for all of it."
+      ],
+      "hints": [
+        "Between asking and the answer, the screen is still there and people still click. The state should say what is going on, and the rest of the state keeps changing.",
+        "An `async` function returns a promise that settles when its body has finished. `await` inside `try` lets `catch` take a failure, which keeps the promise from rejecting.",
+        "`async loadPrices() { store.setState({ loading: true, error: null }); try { const prices = await fetchPrices(); store.setState({ prices, loading: false }) } catch (error) { store.setState({ loading: false, error: error.message }) } }`."
+      ],
+      "docs": [
+        { "title": "async function", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" },
+        { "title": "try...catch", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch" },
+        { "title": "Using promises", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises" }
+      ],
+      "videos": [{ "title": "Async and await in JavaScript", "url": "https://www.youtube.com/watch?v=9j1dZwFEJ-c" }],
+      "points": 10
+    }
+  ]
+}

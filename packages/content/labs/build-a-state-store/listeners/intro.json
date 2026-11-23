@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Sefton", "say": "I forgot to redraw the total again.", "note": "Twice this morning." },
+    { "title": "One state", "text": "Holds the order, but tells nobody.", "note": "Parts read it once." },
+    {
+      "title": "Your store",
+      "file": "store.js",
+      "mine": true,
+      "gap": "Nobody is told of a change",
+      "tasks": ["Tell every listener", "Quiet if unchanged", "Keep a round whole"]
+    },
+    { "title": "Order screen", "rows": [["Header", "told"], ["Total", "told"], ["Note box", "told"]] }
+  ],
+  "ticket": { "label": "40 posters", "wrong": "old total", "why": "Not told", "right": "total updated" },
+  "captions": [
+    "Sefton adds 40 posters to an order, and the total on the screen does not move.",
+    "The store holds the new order, but nothing tells the total it changed.",
+    "You let parts listen and tell them after every change, in three tasks.",
+    "Now the total hears about the posters the moment they are added.",
+    "Every part is told once per change, and nobody when nothing changed."
+  ]
+}

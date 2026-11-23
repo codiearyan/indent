@@ -1,0 +1,20 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "screen", "label": "Order screen", "kind": "story" },
+      { "id": "store", "label": "Your store", "kind": "file", "mine": true },
+      { "id": "header", "label": "Basket count", "kind": "story" },
+      { "id": "total", "label": "Order total", "kind": "story" },
+      { "id": "prices", "label": "Idris's price list", "kind": "story" },
+      { "id": "hesper", "label": "Hesper", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "screen", "to": "store", "label": "named changes" },
+      { "from": "store", "to": "header", "label": "its own part" },
+      { "from": "store", "to": "total", "label": "its own part" },
+      { "from": "prices", "to": "store", "label": "prices, later" },
+      { "from": "hesper", "to": "store", "label": "every line explained" }
+    ],
+    "note": "At Ashgrove Press, the order screen keeps its state in one store you write yourself, and every part of the screen is told when its own part changes."
+  }
+}

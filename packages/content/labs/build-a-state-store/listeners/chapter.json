@@ -1,0 +1,79 @@
+{
+  "id": "listeners",
+  "title": "Telling who listens",
+  "files": ["src/store.js", "src/try.js", "src/order.js"],
+  "terminal": {
+    "description": "A shell in your workspace where parts of the order screen listen to your store and print each time they are told.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "subscribe",
+      "title": "Tell every listener",
+      "file": "src/store.js",
+      "description": "Implement `store.subscribe(listener)` in `src/store.js`, and tell the listeners in `setState`.\n\n- `subscribe(listener)` keeps the listener and returns a function that stops it\n- after every change, made with a part or with a function, each listener is called once with `(state, previous)`: the new state and the state before, the very objects\n- the listeners are told in the order they subscribed, once the state has changed, so `getState()` inside a listener gives the new state\n- a stopped listener is not told again\n- `subscribe` throws a `TypeError` when `listener` is not a function\n\nThe check makes its own stores and listeners, changes the state and notes who was told, with what and in which order.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error.",
+        "Give the store a list of listeners, in a variable beside the state.",
+        "In `subscribe`, add the listener and return a function that takes it out again.",
+        "At the end of `setState`, once the state has changed, call every listener with the new state and the old one."
+      ],
+      "hints": [
+        "Nothing on the screen can know the state changed unless the store says so. The store keeps a list of whoever asked to be told.",
+        "Keep the state before the change in a variable, change the state, then go through the listeners. The stop function is a closure that remembers which listener it belongs to.",
+        "`listeners.push(listener)` and `return () => { listeners = listeners.filter((l) => l !== listener) }` in `subscribe`; in `setState`, `const previous = state`, `state = nextState(state, part)`, then `for (const l of listeners) l(state, previous)`."
+      ],
+      "docs": [
+        { "title": "Array.prototype.filter()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" },
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "for...of", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of" }
+      ],
+      "videos": [{ "title": "The observer pattern", "url": "https://www.youtube.com/watch?v=3PUVr8jFMGg" }],
+      "points": 10
+    },
+    {
+      "id": "unchanged",
+      "title": "Stay quiet when nothing changed",
+      "file": "src/store.js",
+      "description": "Make `setState` do nothing at all when the part changes nothing.\n\n- a part changes nothing when every one of its keys is already in the state with that very value, compared with `Object.is`; an empty part changes nothing\n- then the state stays the same object, and no listener is told\n- this holds for a part a function returns, too\n- one key with a new value is a change, and a new array or object is a new value, even with the same things inside\n\nThe check sets values the state already has, a new array of the same words, `NaN` again, and adds a listener of its own that sets state each time it is told: with nothing changed, that has to come to rest.",
+      "nextSteps": [
+        "Read \"Nothing changed, nobody told\" in the lesson.",
+        "Once `setState` has the part, go through its keys and compare each with the state's value.",
+        "When none is different, return before changing the state or telling anyone."
+      ],
+      "hints": [
+        "A listener that sets state when it is told starts another round. If a round starts even when nothing changed, two such listeners can talk to each other for ever.",
+        "`Object.keys(part).every(...)` asks a question of every key. `===` says `NaN` is not `NaN`; `Object.is` says it is, and is otherwise the same as `===` here.",
+        "`if (Object.keys(part).every((key) => key in state && Object.is(state[key], part[key]))) return` right after the part is checked."
+      ],
+      "docs": [
+        { "title": "Object.is()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" },
+        { "title": "Array.prototype.every()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every" },
+        { "title": "Equality comparisons and sameness", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "rounds",
+      "title": "Keep a round whole",
+      "file": "src/store.js",
+      "description": "Make the listeners and their stop functions safe to use at any time, during a round included.\n\n- the same function subscribed twice listens twice, and each stop function stops only its own subscription; calling a stop function again does nothing\n- a round, the telling after one change, tells everyone who was listening when it began, once each, in order\n- a listener that stops itself or another listener during a round does not change that round: nobody is skipped, and the stopped one is not told from the next change on\n- a listener that subscribes another during a round: the new one is told from the next change on\n\nThe check uses listeners of its own that stop themselves, stop others and add new ones while they are being told, and notes who heard about each change.",
+      "nextSteps": [
+        "Run `node src/try.js`: the paper picker stops itself during the first round. Is the note box still told?",
+        "Look at what one entry of your list is. Can two subscriptions of the same function be told apart?",
+        "Look at the loop in `setState`: what happens to it when the list changes in the middle?"
+      ],
+      "hints": [
+        "Removing from an array while a loop walks through it moves the later entries back a place, and the loop steps past one. A loop over a copy made when the round began cannot be disturbed.",
+        "Give each subscription an entry of its own, such as a small object `{ listener }`, and let its stop function remove that entry. Two subscriptions of one function are then two entries.",
+        "`const entry = { listener }`, `listeners = [...listeners, entry]`, and `return () => { listeners = listeners.filter((e) => e !== entry) }`; in `setState`, `for (const entry of [...listeners]) entry.listener(state, previous)`."
+      ],
+      "docs": [
+        { "title": "Array.prototype.splice()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice" },
+        { "title": "Set", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" },
+        { "title": "Spread syntax (...)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" }
+      ],
+      "points": 10
+    }
+  ]
+}
