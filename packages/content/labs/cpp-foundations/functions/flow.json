@@ -1,0 +1,89 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose", "kind": "story" },
+      { "id": "main", "label": "main()", "kind": "function" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "bill", "label": "Bill", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "main", "label": "the job" },
+      { "from": "main", "to": "funcs", "label": "calls" },
+      { "from": "funcs", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "bill", "label": "printed bill" }
+    ],
+    "note": "Each sum of the bill is written once, in a function, and every line of the bill calls it."
+  },
+  "tasks": {
+    "labour": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->main", "main"],
+          "value": { "kind": "array", "label": "goes in", "values": ["minutes worked"] },
+          "note": "A job took some minutes at the bench."
+        },
+        {
+          "active": ["main->funcs", "funcs"],
+          "value": { "kind": "array", "label": "comes back", "values": ["what they cost"] },
+          "note": "The labour is worked out in one place, from Ambrose's rate, and handed back."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "Whoever called it decides what to do with the cost."
+        }
+      ]
+    },
+    "line": {
+      "steps": [
+        {
+          "active": ["main"],
+          "value": { "kind": "array", "label": "goes in", "values": ["what it is for", "amount"] },
+          "note": "Each line of the bill has a name and an amount."
+        },
+        {
+          "active": ["main->funcs", "funcs"],
+          "note": "One function prints a line, the same way every time, and hands nothing back."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The bill's lines all look alike."
+        }
+      ]
+    },
+    "total": {
+      "steps": [
+        {
+          "active": ["main"],
+          "value": { "kind": "array", "label": "goes in", "values": ["minutes worked", "cost of parts"] },
+          "note": "A whole repair is labour and parts."
+        },
+        {
+          "active": ["main->funcs", "funcs"],
+          "note": "One function asks another for the labour instead of working it out again."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The whole price goes back to the caller."
+        }
+      ]
+    },
+    "quarter": {
+      "steps": [
+        {
+          "active": ["main"],
+          "value": { "kind": "array", "label": "goes in", "values": ["minutes worked"] },
+          "note": "Ambrose bills whole quarter hours."
+        },
+        {
+          "active": ["main->funcs", "funcs"],
+          "note": "The function works on its own copy of the minutes and hands back the rounded ones."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->bill", "bill"],
+          "note": "The caller's minutes stay as they were."
+        }
+      ]
+    }
+  }
+}

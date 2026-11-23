@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "How long will the radio last?", "note": "All night at the radio desk." },
+    { "title": "The night search", "rows": [["Battery", "100"], ["Squares", "9"], ["Channels", "8"]] },
+    {
+      "title": "Your code",
+      "file": "radio_watch.py",
+      "mine": true,
+      "gap": "A countdown that never ends",
+      "tasks": ["Stop the countdown", "Hours of battery", "Search the squares", "Call the channels"]
+    },
+    { "title": "Radio desk", "text": "Each job stops the moment it is done." }
+  ],
+  "ticket": { "label": "Night search", "wrong": "never stops", "why": "Endless loop", "right": "on track" },
+  "captions": [
+    "Saturday night on Stob Ruadh. Ailsa keeps the radio desk until the walker is found.",
+    "Today Dougie's countdown runs for ever, and nobody knows how long the radio will last.",
+    "You write while loops that stop when the job is done, with break and continue.",
+    "Now the countdown ends, the battery is counted, and the search stops at the right square.",
+    "Loops that run while something is true, and how to stop one that never ends."
+  ]
+}

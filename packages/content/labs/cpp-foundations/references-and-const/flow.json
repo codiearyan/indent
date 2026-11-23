@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir", "kind": "story" },
+      { "id": "drawer", "label": "Drawer count", "kind": "data" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "log", "label": "Bench log", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "funcs", "label": "uses parts" },
+      { "from": "drawer", "to": "funcs", "label": "the real count" },
+      { "from": "funcs", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "log", "label": "changed log" }
+    ],
+    "note": "The functions work on the drawer's own count and the bench's own log, not on copies."
+  },
+  "tasks": {
+    "use": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->funcs"],
+          "note": "Kasimir takes some parts out of the drawer."
+        },
+        {
+          "active": ["drawer", "drawer->funcs", "funcs"],
+          "note": "The function gets the drawer's own count, not a copy, and lowers it."
+        },
+        {
+          "active": ["drawer"],
+          "note": "Afterwards the drawer says how many are really left."
+        }
+      ]
+    },
+    "split": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["minutes", "hours", "minutes left"] },
+          "note": "A job's minutes go in, with two of the caller's variables to fill."
+        },
+        {
+          "active": ["funcs"],
+          "note": "One function fills both of them, since return hands back only one value."
+        },
+        {
+          "active": ["funcs->compiler", "compiler"],
+          "note": "The caller reads the hours and the minutes from its own variables."
+        }
+      ]
+    },
+    "label": {
+      "steps": [
+        {
+          "active": ["drawer", "drawer->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["part name", "count"] },
+          "note": "A part's name and its count go in."
+        },
+        {
+          "active": ["funcs"],
+          "note": "The name is read where it is, never copied and never changed."
+        },
+        {
+          "active": ["funcs->compiler", "compiler"],
+          "note": "The label comes back for the front of the drawer."
+        }
+      ]
+    },
+    "note": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the log", "a new note"] },
+          "note": "Kasimir adds what he did to the bench log."
+        },
+        {
+          "active": ["funcs"],
+          "note": "The log is changed for the caller, and the note is only read."
+        },
+        {
+          "active": ["funcs->compiler", "compiler", "compiler->log", "log"],
+          "note": "The bench log keeps every note, one after the other."
+        }
+      ]
+    }
+  }
+}

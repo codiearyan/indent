@@ -1,0 +1,88 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "kasimir", "label": "Kasimir's round", "kind": "story" },
+      { "id": "numbers", "label": "This morning's numbers", "kind": "data" },
+      { "id": "file", "label": "rounds.cpp", "kind": "file", "mine": true },
+      { "id": "compiler", "label": "Compiler", "kind": "story" },
+      { "id": "list", "label": "Morning list", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "kasimir", "to": "numbers", "label": "counts" },
+      { "from": "numbers", "to": "file", "label": "how many" },
+      { "from": "file", "to": "compiler", "label": "builds" },
+      { "from": "compiler", "to": "list", "label": "printed lines" }
+    ],
+    "note": "The same steps of Kasimir's round repeat in a loop, as many times as the morning needs."
+  },
+  "tasks": {
+    "wind": {
+      "steps": [
+        {
+          "active": ["kasimir", "kasimir->numbers", "numbers"],
+          "value": { "kind": "array", "label": "this morning", "values": ["clocksToWind"] },
+          "note": "Kasimir knows how many clocks need winding today."
+        },
+        {
+          "active": ["numbers->file", "file"],
+          "note": "A counter goes through the clocks, one line each time round."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->list", "list"],
+          "note": "The list has one line for each clock, numbered the way he numbers them."
+        }
+      ]
+    },
+    "strikes": {
+      "steps": [
+        {
+          "active": ["numbers"],
+          "value": { "kind": "array", "label": "this morning", "values": ["fromHour", "toHour"] },
+          "note": "The night's strikes run from one hour to another."
+        },
+        {
+          "active": ["numbers->file", "file"],
+          "note": "Each hour adds its own strikes to a total kept outside the loop."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->list", "list"],
+          "note": "One total prints when the hours are done."
+        }
+      ]
+    },
+    "serial": {
+      "steps": [
+        {
+          "active": ["numbers"],
+          "value": { "kind": "array", "label": "this morning", "values": ["serialNumber"] },
+          "note": "The maker stamped a serial number on the movement."
+        },
+        {
+          "active": ["numbers->file", "file"],
+          "note": "One digit at a time comes off the number and onto the sum, until none are left."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->list", "list"],
+          "note": "The check number prints, ready to compare with the maker's."
+        }
+      ]
+    },
+    "springs": {
+      "steps": [
+        {
+          "active": ["numbers"],
+          "value": { "kind": "array", "label": "this morning", "values": ["springsInBox", "springsPerClock", "clocksWaiting"] },
+          "note": "A box of springs, and clocks waiting for them."
+        },
+        {
+          "active": ["numbers->file", "file"],
+          "note": "Each clock takes its springs while the box has enough, and the round stops when it runs out."
+        },
+        {
+          "active": ["file->compiler", "compiler", "compiler->list", "list"],
+          "note": "The list shows each clock fitted, and where the springs ran out."
+        }
+      ]
+    }
+  }
+}

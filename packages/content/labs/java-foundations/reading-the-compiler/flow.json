@@ -1,0 +1,87 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ossian", "label": "Ossian", "kind": "story" },
+      { "id": "file", "label": "Logbook.java", "kind": "file", "mine": true },
+      { "id": "javac", "label": "javac", "kind": "story" },
+      { "id": "run", "label": "java Logbook", "kind": "story" },
+      { "id": "log", "label": "Day's log", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "ossian", "to": "file", "label": "his lines" },
+      { "from": "file", "to": "javac", "label": "source" },
+      { "from": "javac", "to": "run", "label": "class file" },
+      { "from": "run", "to": "log", "label": "lines" }
+    ],
+    "note": "Ossian's log goes through the compiler first and runs only when every line passes; you fix what stops it at each step."
+  },
+  "tasks": {
+    "unknown-name": {
+      "steps": [
+        {
+          "active": ["ossian", "ossian->file", "file"],
+          "note": "Ossian's line takes the passengers who boarded off the seats."
+        },
+        {
+          "active": ["file", "file->javac", "javac"],
+          "note": "The compiler meets a name nobody made, and refuses the whole file."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "seatsLeft", "values": ["seats, less the passengers who boarded"] },
+          "note": "Once the name is one that exists, the seats left follow the day's numbers."
+        }
+      ]
+    },
+    "wrong-type": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "The luggage tag is cut from the destination and put in capitals."
+        },
+        {
+          "active": ["file", "file->javac", "javac"],
+          "note": "The compiler names two types that do not fit: what the value is, and what the variable holds."
+        },
+        {
+          "active": ["file"],
+          "value": { "kind": "array", "label": "code", "values": ["three capital letters"] },
+          "note": "A tag of three letters needs a type that holds text."
+        }
+      ]
+    },
+    "every-way": {
+      "steps": [
+        {
+          "active": ["file"],
+          "note": "The notice depends on the wind, with one way through for strong wind and one for light."
+        },
+        {
+          "active": ["file", "file->javac", "javac"],
+          "note": "On a light day nothing gives the notice a value, and the compiler follows every way through to find that."
+        },
+        {
+          "active": ["javac", "javac->run", "run", "run->log", "log"],
+          "note": "With a value on every way, the log prints a notice whatever the weather."
+        }
+      ]
+    },
+    "no-crossings": {
+      "steps": [
+        {
+          "active": ["javac", "javac->run", "run"],
+          "note": "The file compiles now, and the log starts."
+        },
+        {
+          "active": ["run"],
+          "note": "On a foggy day there were no crossings, and the average stops the program with a stack trace."
+        },
+        {
+          "active": ["run", "run->log", "log"],
+          "value": { "kind": "array", "label": "averageLoad", "values": ["whole passengers per crossing"] },
+          "note": "A day without crossings gets its own answer, and the log carries on to its last line."
+        }
+      ]
+    }
+  }
+}

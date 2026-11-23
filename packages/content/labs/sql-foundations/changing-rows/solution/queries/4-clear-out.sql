@@ -1,0 +1,15 @@
+-- Task 4: Rosamund may move every visit from before 2026 to the paper files. She wants to know
+-- what would be left, without losing anything yet. Inside a transaction:
+--   delete every visit dated before 2026-01-01
+--   count the visits that are left with a SELECT
+--   undo the delete
+-- When the file has run, every visit is still there.
+--   node run.mjs queries/4-clear-out.sql
+
+BEGIN;
+
+DELETE FROM visits WHERE visit_date < '2026-01-01';
+
+SELECT COUNT(*) AS visits_left FROM visits;
+
+ROLLBACK;

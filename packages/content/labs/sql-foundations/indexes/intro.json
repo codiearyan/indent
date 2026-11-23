@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "title": "Winnie",
+      "say": "Which visits were on this day?",
+      "note": "She asks many times a day."
+    },
+    {
+      "title": "visits",
+      "text": "Every search reads every visit, one by one.",
+      "note": "Years of records are coming."
+    },
+    {
+      "title": "Your indexes",
+      "mine": true,
+      "file": "1-visit-dates.sql",
+      "gap": "A way to skip to the rows",
+      "tasks": ["Visits by date", "Animals by owner", "One vet's visits", "The unused index"]
+    }
+  ],
+  "ticket": {
+    "label": "Day's visits",
+    "wrong": "all read",
+    "why": "No index",
+    "right": "one lookup"
+  },
+  "captions": [
+    "Winnie looks up one day's visits many times a day, and years more records are coming.",
+    "SQLite reads every visit to find that day's: fine today, slow with years of them.",
+    "You make indexes, read query plans and drop an index nobody uses, in four tasks.",
+    "Now the plan says SEARCH, and the day's visits are found in one lookup.",
+    "Same tables, same answers, found without reading every row."
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "id": "indexes",
+  "title": "Making a query fast",
+  "files": [
+    "queries/1-visit-dates.sql",
+    "queries/2-animals-by-owner.sql",
+    "queries/3-vet-and-date.sql",
+    "queries/4-unused-index.sql",
+    "practice-queries.sql",
+    "schema.sql",
+    "seed.sql"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace: node run.mjs <file> runs every statement in that file on a fresh copy of the practice's database, prints each query plan you ask for, and saves nothing.",
+    "suggestedCommand": "node run.mjs queries/1-visit-dates.sql"
+  },
+  "tasks": [
+    {
+      "id": "index-by-date",
+      "title": "Index the visits by date",
+      "file": "queries/1-visit-dates.sql",
+      "description": "Winnie looks up the visits of one day many times a day, and today SQLite reads every visit to find them.\n\nIn `queries/1-visit-dates.sql`, above the plan that is already there, write a `CREATE INDEX` so that a search on `visits` by `visit_date` uses it: for one date, and for a range of dates.\n\nCheck runs only your `CREATE INDEX` and `DROP INDEX` statements, on its own fresh copy of the database. Then it asks SQLite for the plan of two searches of its own, one for a single date and one for a range, and looks for your index in each plan.",
+      "nextSteps": [
+        "Run the file as it is and read the plan: what does `SCAN visits` mean?",
+        "Write a `CREATE INDEX` with a name of your own, on the table and the column the search looks up.",
+        "Run the file again and read the plan: it should name your index."
+      ],
+      "hints": [
+        "Read the lesson's parts \"Reading a plan\" and \"Making an index\". Which column does Winnie's search look up?",
+        "An index is on one table, and on the columns a search compares. After `ON` come the table and, in brackets, the column.",
+        "The statement has the shape `CREATE INDEX visits_by_date ON visits (...);`."
+      ],
+      "docs": [
+        { "title": "CREATE INDEX", "url": "https://www.sqlite.org/lang_createindex.html" },
+        { "title": "EXPLAIN QUERY PLAN", "url": "https://www.sqlite.org/eqp.html" }
+      ],
+      "videos": [
+        { "title": "How a database index works", "url": "https://www.youtube.com/watch?v=fsG1XaZEa78" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "index-by-owner",
+      "title": "Index the animals by owner",
+      "file": "queries/2-animals-by-owner.sql",
+      "description": "Finding an owner's animals reads every row of `animals`, whether the search is on its own or a join from `owners`.\n\nIn `queries/2-animals-by-owner.sql`, write a `CREATE INDEX` on `animals` that both use, and an `EXPLAIN QUERY PLAN` of your own to read the plan before and after.\n\nCheck runs only your `CREATE INDEX` and `DROP INDEX` statements on its own fresh copy, then asks SQLite for the plan of a search for one owner's animals and of a join from the owners of one town to their animals, and looks for your index in each.",
+      "nextSteps": [
+        "Write `EXPLAIN QUERY PLAN` in front of a query for one owner's animals, and run it.",
+        "Which column of `animals` holds the owner? Make an index on it.",
+        "Run it again, and try the plan of a join from `owners` to `animals` too."
+      ],
+      "hints": [
+        "Read the lesson's part \"Reading a plan\". In a join from owners to animals, what does SQLite look up in `animals` for each owner?",
+        "A column that points at another table is the one a join looks up, so it is the one to index.",
+        "The statement has the shape `CREATE INDEX animals_by_owner ON animals (...);`."
+      ],
+      "docs": [
+        { "title": "CREATE INDEX", "url": "https://www.sqlite.org/lang_createindex.html" },
+        { "title": "How the query planner uses indexes", "url": "https://www.sqlite.org/queryplanner.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "index-vet-and-date",
+      "title": "Index one vet's visits by date",
+      "file": "queries/3-vet-and-date.sql",
+      "description": "Ifan and Mabel each look at their own visits from a date on: one vet, and every date after a day.\n\nIn `queries/3-vet-and-date.sql`, write one `CREATE INDEX` that SQLite uses for both parts of that search, the vet and the date, and read its plan with `EXPLAIN QUERY PLAN`.\n\nCheck runs only your `CREATE INDEX` and `DROP INDEX` statements on its own fresh copy, then asks SQLite for the plan of a search for one vet's visits from a date on, and looks for your index searching on both the vet and the date.",
+      "nextSteps": [
+        "Write `EXPLAIN QUERY PLAN` in front of the search in the file's comment, and run it.",
+        "Make one index on both columns, and read the plan: what is in the brackets after its name?",
+        "If only one column is in the brackets, change the order of the columns in your index."
+      ],
+      "hints": [
+        "Read the lesson's part \"An index on two columns\". Which part of the search compares with `=`, and which with `>=`?",
+        "An index on two columns is ordered by the first, then by the second within each first. Put the column compared with `=` first, so all of one vet's visits sit together in date order.",
+        "The statement has the shape `CREATE INDEX visits_by_vet_and_date ON visits (vet, ...);`."
+      ],
+      "docs": [
+        { "title": "Indexes on more than one column", "url": "https://www.sqlite.org/queryplanner.html#_multi_column_indices" },
+        { "title": "EXPLAIN QUERY PLAN", "url": "https://www.sqlite.org/eqp.html" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "drop-unused-index",
+      "title": "Remove the index nobody uses",
+      "file": "queries/4-unused-index.sql",
+      "description": "Every index costs: it takes room, and every `INSERT`, `UPDATE` and `DELETE` on its table has to change it too. `schema.sql` has three indexes, and `practice-queries.sql` holds the queries the practice runs every day.\n\nIn `queries/4-unused-index.sql`, read the plan of each query in `practice-queries.sql`, find the index that none of them uses, and remove that one with `DROP INDEX`. Leave the other two.\n\nCheck runs only your `CREATE INDEX` and `DROP INDEX` statements on its own fresh copy, and looks at which indexes are left.",
+      "nextSteps": [
+        "Copy each query from `practice-queries.sql` into the file with `EXPLAIN QUERY PLAN` in front of it, and run it.",
+        "Note which index each plan names. Which index of `schema.sql` is never named?",
+        "Remove that one, and run the file again: the plans of the other queries should not change."
+      ],
+      "hints": [
+        "Read the lesson's part \"What an index costs\". A plan that says `SCAN` uses no index at all.",
+        "An index on a column does not help a `LIKE` pattern that starts with `%`: the start of the value is unknown, so its order is no use.",
+        "The statement has the shape `DROP INDEX visits_by_...;`."
+      ],
+      "docs": [
+        { "title": "DROP INDEX", "url": "https://www.sqlite.org/lang_dropindex.html" },
+        { "title": "The LIKE optimization", "url": "https://www.sqlite.org/optoverview.html#the_like_optimization" }
+      ],
+      "points": 10
+    }
+  ]
+}

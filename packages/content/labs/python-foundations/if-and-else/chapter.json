@@ -1,0 +1,129 @@
+{
+  "id": "if-and-else",
+  "title": "Decisions with if",
+  "files": ["route_in.py"],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the route, the warning and the way off the hill.",
+    "suggestedCommand": "python3 route_in.py"
+  },
+  "tasks": [
+    {
+      "id": "route",
+      "title": "Bridge or ford?",
+      "file": "route_in.py",
+      "description": "Under `# Task 1` in `route_in.py`, make a variable called `route`: the text `bridge` when `river_level` is above `ford_limit`, and the text `ford` otherwise. Print it to see it.\n\nCheck runs your file with other rivers and limits, including a river exactly at the limit, and reads `route` after the lines under `# Task 1`.",
+      "nextSteps": [
+        "Read tonight's callout near the top of the file.",
+        "Write an `if` that asks whether the river is above the limit, ending with a colon.",
+        "Give `route` its word on a line moved in under the `if`, and the other word under an `else`.",
+        "Print `route`, then change `river_level` at the top and run the file again."
+      ],
+      "hints": [
+        "Two answers, one question: is the river above the limit? The lesson's heating example has the same shape.",
+        "\"Above\" leaves out the equal case. The lines under `if` and `else` are moved in by the same few spaces, and both lines with a keyword end with a colon.",
+        "The shape is `if river_level ... ford_limit:`, a line under it that gives `route` one word, then `else:` and a line under it that gives the other."
+      ],
+      "docs": [
+        {
+          "title": "if statements in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#if-statements"
+        },
+        {
+          "title": "The if statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-if-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "wind",
+      "title": "How bad is the wind?",
+      "file": "route_in.py",
+      "description": "Under `# Task 2`, make a variable called `wind_warning` from `wind_speed`:\n\n- `stay low` when the wind is 50 or more\n- `take care` when it is 30 or more\n- `clear` otherwise\n\nPrint it to see it. Check tries gales, calm nights, and winds of exactly 50 and exactly 30.",
+      "nextSteps": [
+        "Read the part of the lesson on `elif`.",
+        "Decide which question to ask first: Python stops at the first branch that is True.",
+        "Write the `if`, the `elif` and the `else`, each giving `wind_warning` its words.",
+        "Print it, then try a wind of 60 and a wind of 10 at the top."
+      ],
+      "hints": [
+        "Three answers need three branches: `if`, `elif` and `else`, in that order, each lined up under the other.",
+        "A gale of 60 is also 30 or more. Since only the first True branch runs, the strictest question has to come first. \"Or more\" includes the equal case.",
+        "The shape is `if wind_speed >= ...:` with the words for the strongest wind, then `elif wind_speed >= ...:`, then `else:`."
+      ],
+      "docs": [
+        {
+          "title": "if statements in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#if-statements"
+        },
+        {
+          "title": "The if statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-if-statement"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "helicopter",
+      "title": "Helicopter or stretcher?",
+      "file": "route_in.py",
+      "description": "Under `# Task 3`, print one line:\n\n```\nCall the helicopter\n```\n\nwhen it is daylight (`daylight` is `True`) and `wind_speed` is below 40, and this line otherwise:\n\n```\nCarry the stretcher\n```\n\nCheck tries daylight and darkness, light winds and gales, and a wind of exactly 40, and looks for exactly one of the two lines among the lines Task 3 prints.",
+      "nextSteps": [
+        "List the two things the helicopter needs.",
+        "Pick the word that is True only when both sides are.",
+        "Write one `if` that asks both questions, and an `else` for every other case.",
+        "Run the file, then set `daylight` to `False` at the top and run it again."
+      ],
+      "hints": [
+        "One question with two parts: is it light, and is the wind low enough? If either answer is no, the team carries.",
+        "`and` is True only when both sides are. `daylight` is already True or False, so it can stand on its own as one side.",
+        "The shape is `if daylight and wind_speed ... 40:`, a `print` of the helicopter line under it, then `else:` and a `print` of the stretcher line."
+      ],
+      "docs": [
+        {
+          "title": "Boolean operations, and, or, not",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#boolean-operations-and-or-not"
+        },
+        {
+          "title": "if statements in the Python tutorial",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#if-statements"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "name",
+      "title": "Is there a name?",
+      "file": "route_in.py",
+      "description": "Under `# Task 4`, `casualty_name` holds the casualty's name, or empty text (`\"\"`) when the radio did not catch it, or `None` when nobody has asked yet. When it holds a name, print `Casualty:` and the name, like this:\n\n```\nCasualty: Morven Gow\n```\n\nOtherwise print this line:\n\n```\nCasualty: name not known\n```\n\nCheck tries two names, empty text and `None`.",
+      "nextSteps": [
+        "Read the part of the lesson on what counts as true.",
+        "Ask yourself which of the three kinds of value count as false.",
+        "Write one `if` that is True only when there is a name, and an `else`.",
+        "Run the file with a name, with `\"\"` and with `None` at the top."
+      ],
+      "hints": [
+        "Empty text and `None` both mean \"no name\", and both count as false in an `if`.",
+        "An `if` does not need a comparison: it can ask about a variable on its own, and then it asks whether the value counts as true. Text is never the same as `True`, so comparing it with `True` is always False.",
+        "The shape is `if casualty_name:` with a `print` of `Casualty:` and the name under it, then `else:` with a `print` of the not known line."
+      ],
+      "docs": [
+        {
+          "title": "Truth value testing",
+          "url": "https://docs.python.org/3/builtins/stdtypes.html#truth-value-testing"
+        },
+        {
+          "title": "The if statement",
+          "url": "https://docs.python.org/3/reference/compound_stmts.html#the-if-statement"
+        }
+      ],
+      "videos": [
+        {
+          "title": "if, elif, else and what counts as true",
+          "url": "https://www.youtube.com/watch?v=DZwmZ8Usvnk"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

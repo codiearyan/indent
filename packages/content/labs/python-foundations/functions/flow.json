@@ -1,0 +1,50 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "teams", "label": "Teams on the radio", "kind": "story" },
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "log", "label": "Callout log", "kind": "data" }
+    ],
+    "edges": [
+      { "from": "teams", "to": "ailsa", "label": "call in" },
+      { "from": "ailsa", "to": "functions", "label": "values" },
+      { "from": "functions", "to": "log", "label": "given back" }
+    ],
+    "note": "Ailsa hands your functions whatever each team says, and each function gives its answer back for the log."
+  },
+  "tasks": {
+    "clean": {
+      "steps": [
+        { "active": ["teams", "teams->ailsa", "ailsa"], "note": "Each team gives its call sign, with stray spaces and small letters." },
+        { "active": ["ailsa", "ailsa->functions", "functions"], "note": "Ailsa calls clean_call_sign with the call sign as it was heard." },
+        { "active": ["functions", "functions->log", "log"], "note": "The tidy call sign comes back to the line that called the function, ready for the log." }
+      ]
+    },
+    "crew": {
+      "steps": [
+        { "active": ["teams", "teams->ailsa", "ailsa"], "note": "Each team says how many crew went out." },
+        { "active": ["ailsa", "ailsa->functions", "functions"], "note": "crew_text decides which words fit the number, and gives them back." },
+        { "active": ["functions", "functions->log", "log"], "note": "Every path through the function ends by giving something back." }
+      ]
+    },
+    "battery": {
+      "steps": [
+        {
+          "active": ["ailsa", "ailsa->functions", "functions"],
+          "value": { "kind": "array", "label": "what battery_hours is given", "values": ["charge", "drain per hour", "low mark"] },
+          "note": "Any radio's charge, drain and low mark go in, in that order."
+        },
+        { "active": ["functions"], "note": "Inside, a loop counts the hours on the values the function was given." },
+        { "active": ["functions", "functions->log", "log"], "note": "Only once the loop has finished does the count come back." }
+      ]
+    },
+    "log": {
+      "steps": [
+        { "active": ["ailsa", "ailsa->functions", "functions"], "note": "log_line is given a call sign as heard and a number of crew." },
+        { "active": ["functions"], "note": "It calls the two functions from before, one for each part of the line." },
+        { "active": ["functions", "functions->log", "log"], "note": "One whole log line comes back, the same shape for every team." }
+      ]
+    }
+  }
+}

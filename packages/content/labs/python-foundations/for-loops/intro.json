@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "Same job, again and again.", "note": "Kit night at the base." },
+    { "title": "Thursday's kit", "rows": [["Radios out", "6"], ["Pitches", "4"], ["Label", "Team stretcher"]] },
+    {
+      "title": "Your code",
+      "file": "kit_check.py",
+      "mine": true,
+      "gap": "Done by hand, one by one",
+      "tasks": ["Number the radios", "Add up the rope", "Spell the label", "Count the stencils"]
+    },
+    { "title": "Kit store", "text": "Every radio ticked and the rope packed." }
+  ],
+  "ticket": { "label": "Kit check", "wrong": "lost his place", "why": "By hand", "right": "done" },
+  "captions": [
+    "Thursday is kit night. Dougie checks the store one thing at a time.",
+    "Today he does it all by hand, loses his place, and starts again.",
+    "You write for loops that repeat each small job for him.",
+    "Now every radio, pitch and letter is done, in order, every time.",
+    "Loops with for and range, running totals, and text letter by letter."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "child", "label": "Young driver", "kind": "story" },
+      { "id": "cab", "label": "Cab", "kind": "function", "mine": true },
+      { "id": "refs", "label": "Kept, not shown", "kind": "data", "mine": true },
+      { "id": "state", "label": "Shown values", "kind": "data", "mine": true },
+      { "id": "bell", "label": "Bell and log", "kind": "story" },
+      { "id": "screen", "label": "Cab screen", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "child", "to": "cab", "label": "presses" },
+      { "from": "cab", "to": "refs", "label": "keep" },
+      { "from": "cab", "to": "state", "label": "set" },
+      { "from": "cab", "to": "bell", "label": "ring, log" },
+      { "from": "state", "to": "screen", "label": "draw again" },
+      { "from": "refs", "to": "screen", "label": "name box" }
+    ],
+    "note": "The cab keeps what it never shows in refs, and what the screen shows in state."
+  },
+  "tasks": {
+    "rings": {
+      "steps": [
+        { "active": ["child", "child->cab", "cab", "cab->bell", "bell"], "note": "A child presses Ring the bell, and the real bell rings." },
+        { "active": ["cab", "cab->refs", "refs"], "value": { "kind": "map", "label": "Kept in a ref", "entries": [{ "key": "rings", "value": "number" }] }, "note": "The cab adds one to its count, and nothing is drawn." },
+        { "active": ["screen"], "note": "The screen stays exactly as it was: no count for the children to race." },
+        { "active": ["child", "child->cab", "cab", "cab->bell", "bell"], "note": "At the end of the ride, the count goes to Wilf's log and starts again." }
+      ]
+    },
+    "driver": {
+      "steps": [
+        { "active": ["child", "child->cab", "cab"], "note": "A new child climbs in and presses New driver." },
+        { "active": ["cab", "cab->state", "state", "state->screen", "screen"], "note": "The old name goes, and the badge says nobody yet." },
+        { "active": ["refs", "refs->screen", "screen"], "note": "The cab reaches its own name box through a ref, and the cursor waits there." }
+      ]
+    },
+    "stop": {
+      "steps": [
+        { "active": ["child", "child->cab", "cab"], "note": "A child presses Next stop." },
+        { "active": ["cab", "cab->state", "state"], "value": { "kind": "map", "label": "In state", "entries": [{ "key": "stop", "value": "a place on the line" }] }, "note": "The stop is something the screen shows, so the cab sets it in state." },
+        { "active": ["state", "state->screen", "screen"], "note": "React draws the cab again, and the next stop shows at once." }
+      ]
+    }
+  }
+}

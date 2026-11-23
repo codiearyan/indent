@@ -1,0 +1,131 @@
+{
+  "id": "references-and-const",
+  "title": "References and const",
+  "files": [
+    "src/drawer.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the parts drawer here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/drawer.cpp -o drawer && ./drawer"
+  },
+  "tasks": [
+    {
+      "id": "use",
+      "title": "Take parts out of the drawer",
+      "file": "src/drawer.cpp",
+      "description": "Under `// Task 1` in `src/drawer.cpp`, write a function called `useParts` that takes the number of parts in the drawer as a reference to an `int`, and the number Kasimir uses as an `int`. It takes the parts used from the caller's own count and gives nothing back. When the drawer has fewer parts than he uses, the count becomes 0. With 12 in the drawer and 3 used, the caller's count is 9 afterwards.\n\nCheck calls `useParts` from code of its own with its own variables, and reads them after the call.",
+      "nextSteps": [
+        "Write the first line with `void`, and an `&` after the type of the count.",
+        "Inside, take the parts used from the count.",
+        "Add the case of too few parts in the drawer.",
+        "In `main`, make a count, call `useParts`, and print the count afterwards."
+      ],
+      "hints": [
+        "Without `&`, a parameter is a copy, and changing it leaves the caller's variable as it was.",
+        "With `int& inDrawer`, the parameter is another name for the caller's own variable, so `inDrawer -= used;` changes it. Ask first whether there are enough.",
+        "The shape is `void useParts(int& inDrawer, int used) { if (used > inDrawer) { inDrawer = 0; } else { inDrawer -= used; } }`."
+      ],
+      "docs": [
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        },
+        {
+          "title": "Function parameters",
+          "url": "https://en.cppreference.com/w/cpp/language/function#Parameter_list"
+        }
+      ],
+      "videos": [
+        {
+          "title": "References in C++",
+          "url": "https://www.youtube.com/watch?v=IzoFn3dfsPA"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "split",
+      "title": "Split the minutes into hours",
+      "file": "src/drawer.cpp",
+      "description": "Under `// Task 2`, write a function called `splitMinutes` that takes the total minutes as an `int` called `total` and two references to an `int`, `hours` and `minutes`, and gives nothing back. It puts the whole hours in the caller's `hours` and the minutes left over in the caller's `minutes`: 135 minutes is 2 hours and 15 minutes.\n\nCheck calls `splitMinutes` with its own variables and reads all three after the call.",
+      "nextSteps": [
+        "Write the first line: one `int` in, then two references to an `int`.",
+        "Inside, give the hours their value from the total.",
+        "Give the minutes what is left over.",
+        "In `main`, make two variables, pass them in, and print them afterwards."
+      ],
+      "hints": [
+        "A reference parameter can carry a result back to the caller, so one function can give back two things at once.",
+        "Whole numbers divided give whole numbers, so `total / 60` is the whole hours. `%` gives what is left over.",
+        "The shape is `void splitMinutes(int total, int& hours, int& minutes) { hours = total / 60; minutes = total % 60; }`."
+      ],
+      "docs": [
+        {
+          "title": "Reference declaration",
+          "url": "https://en.cppreference.com/w/cpp/language/reference"
+        },
+        {
+          "title": "Arithmetic operators",
+          "url": "https://en.cppreference.com/w/cpp/language/operator_arithmetic"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "label",
+      "title": "Write the drawer's label",
+      "file": "src/drawer.cpp",
+      "description": "Under `// Task 3`, write a function called `drawerLabel` that takes the part's name as a reference to a `const std::string` and the count as an `int`, and gives back the label as a `std::string`: the name, ` x ` and the count:\n\n```\nmainspring x 12\n```\n\nCheck calls `drawerLabel` with a part name that is `const`, so it must not change, and reads what it gives back and what it prints. It gives the label back; it prints nothing.",
+      "nextSteps": [
+        "Write the first line: `const std::string&` for the name, `int` for the count, `std::string` back.",
+        "Inside, join the name, the ` x ` and the count.",
+        "Give the label back.",
+        "Call it from `main` with a quoted name, print it, build and run."
+      ],
+      "hints": [
+        "A reference does not copy the text, and `const` promises the function only reads it.",
+        "The count is a number, so it has to become text before it joins the name: `std::to_string` from the text issue does that.",
+        "The shape is `std::string drawerLabel(const std::string& part, int count) { return part + \" x \" + std::to_string(count); }`."
+      ],
+      "docs": [
+        {
+          "title": "cv (const and volatile) type qualifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/cv"
+        },
+        {
+          "title": "std::to_string",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/to_string"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "note",
+      "title": "Add a note to the bench log",
+      "file": "src/drawer.cpp",
+      "description": "Under `// Task 4`, write a function called `addNote` that takes the bench log as a reference to a `std::string` and a new note as a reference to a `const std::string`, and gives nothing back. It adds the note to the end of the caller's log, with `; ` between it and what was there. An empty log becomes just the note:\n\n```\ncleaned; oiled\n```\n\nCheck calls `addNote` with a log of its own and a note that is `const`, and reads the log after the call.",
+      "nextSteps": [
+        "Write the first line: which parameter is changed, and which is only read?",
+        "Inside, ask whether the log is empty.",
+        "Change the caller's log in each case.",
+        "In `main`, make a log, add two notes, and print it."
+      ],
+      "hints": [
+        "The log is changed, so it is a reference that is not `const`. The note is only read, so it is a `const` reference.",
+        "`log.size() == 0` asks whether the log is empty. `+=` adds text to the end of a `std::string`.",
+        "The shape is `void addNote(std::string& log, const std::string& note)`, then `if (log.size() == 0) { log = note; } else { log += \"; \" + note; }`."
+      ],
+      "docs": [
+        {
+          "title": "cv (const and volatile) type qualifiers",
+          "url": "https://en.cppreference.com/w/cpp/language/cv"
+        },
+        {
+          "title": "std::basic_string::operator+=",
+          "url": "https://en.cppreference.com/w/cpp/string/basic_string/operator%2B%3D"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

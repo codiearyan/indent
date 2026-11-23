@@ -1,0 +1,47 @@
+{
+  "stations": [
+    {
+      "title": "Imogen",
+      "say": "Can we start selling 500 g tins?",
+      "note": "One change to the tin, she hopes."
+    },
+    {
+      "title": "Rafe's copies",
+      "text": "Each copies a tin by hand, and stays old."
+    },
+    {
+      "title": "Your code",
+      "file": "catalogue.ts",
+      "mine": true,
+      "gap": "Types copied by hand",
+      "tasks": [
+        "Name a tin's fields",
+        "Read a tin's size",
+        "Change any part",
+        "Some, or all but one"
+      ]
+    },
+    {
+      "title": "Stock form",
+      "rows": [
+        ["Hearth Assam", "125 g"],
+        ["Frost Sencha", "50 g"],
+        ["New blend", "500 g"]
+      ],
+      "mark": 2
+    }
+  ],
+  "ticket": {
+    "label": "500 g tins",
+    "wrong": "refused",
+    "why": "Old copies",
+    "right": "on sale"
+  },
+  "captions": [
+    "Imogen wants to sell 500 g tins at Oakhollow, changing the type of a tin once.",
+    "Rafe's copies of the tin type still list the old sizes, so the stock form refuses them.",
+    "You make every type around a tin from Tin itself: its names, its size, its parts.",
+    "Imogen adds the size to Tin once, and every type around it takes it in.",
+    "A tin changes in one place now, and the copies that drifted apart are gone."
+  ]
+}
