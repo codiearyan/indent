@@ -3889,6 +3889,13 @@ function part8Cause(errors, ctx, spec) {
   if (fromCheck && unknownName && (spec.templates ?? []).includes(unknownName)) {
     return `Check cannot find a function template called ${unknownName} under // ${ctx.label}. Write it there, above main, with exactly that name: capital letters count.`
   }
+  if (fromCheck && unknownName && (spec.writes ?? []).includes(unknownName)) {
+    return `Check cannot find ${unknownName} under // ${ctx.label}. Write it there, above main, with exactly that name: capital letters count.`
+  }
+  const notCallable = /called object type '([^']+)' is not a function or function pointer|'(\w+)' cannot be used as a function|no match for call to '\((?:const )?(int|double|bool|void)\)/.exec(text)
+  if (fromCheck && notCallable && (spec.writes ?? []).length) {
+    return `Check calls what ${spec.writes.join(' or ')} gives back, as the task says, and it cannot be called: it is ${niceType(notCallable[1] ?? notCallable[3] ?? 'a value')}, not a function. The task asks for a lambda to be given back, which the caller can call later as often as it likes.`
+  }
 
   const conflict = /deduced conflicting types for parameter '(\w+)' \('([^']+)' (?:vs\.|and) '([^']+)'\)/.exec(all)
   if (conflict && /no matching function for call to/.test(text)) {
@@ -4053,6 +4060,20 @@ function templateLink(said, { cuts }, spec) {
   return `The linker cannot find ${said.symbol.replace(/\s+const$/, '')} (${linkWords('undefined')}). The compiler makes ${C}<int>'s ${member} only in a file that sees the whole body of ${C}<T>::${member}, and a file that includes the header sees only what the header holds. So every body of a class template lives in its header, below the class or inside it${where ? `, and never in a .cpp file such as ${where}` : ''}.`
 }
 
+function part8Warning(warnings) {
+  const gone = warnings.find((w) => /address of stack memory associated with (?:local variable|parameter) '\w+' returned|reference to local variable '\w+' returned|address of local variable '\w+' returned/.test(w.text))
+  if (!gone) return null
+  const name = /'(\w+)'/.exec(gone.text)[1]
+  return {
+    warning: gone,
+    message: `The compiler warns that what the function gives back refers to ${name}, a variable of that function, which ends when it returns. A lambda that captures ${name} by reference keeps no copy of its own: every later call reads a variable that is gone, and what it reads there has no promised value. What outlives the function that made it keeps copies of what it needs.`
+  }
+}
+
+/** C++ that calls `fn` with `args` and writes what it gives back as `key`, or `${key}Void` when it gives back nothing. */
+export const callPut = (key, fn, args) =>
+  `[&](auto&& indent_f_) { if constexpr (std::is_void_v<decltype(indent_f_(${args}))>) { indent_f_(${args}); indent_::put_("${key}Void", 1); } else { indent_::put_("${key}", indent_f_(${args})); } }(${fn});`
+
 /**
  * Judges a task of part 8 with judgeFault(). Spec, besides what judgeFault() takes:
  * - tools: [{ fn, uses, lambda }] the algorithms a function must use (see toolRule)
@@ -4069,6 +4090,7 @@ export async function judgeRule(t, spec) {
     ...spec,
     helpers: [...PART8_HELPERS, ...(spec.helpers ?? [])],
     cause: (errors, ctx) => part8Cause(errors, ctx, spec) ?? spec.cause?.(errors, ctx) ?? null,
-    link: (said, ctx) => templateLink(said, ctx, spec) ?? spec.link?.(said, ctx) ?? null
+    link: (said, ctx) => templateLink(said, ctx, spec) ?? spec.link?.(said, ctx) ?? null,
+    warning: (warnings) => part8Warning(warnings) ?? spec.warning?.(warnings) ?? null
   })
 }
