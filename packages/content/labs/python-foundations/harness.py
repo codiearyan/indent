@@ -27,6 +27,10 @@
 # the call, as exact bytes in UTF-8, takes {"@path": "..."} arguments as pathlib.Path, notes every
 # file the function opens and how, and afterwards reports which of them it left open and what each
 # file named in `read` holds, its line ends read the same on every system.
+#
+# Every error reported says whether a `raise` line of the learner's file raised it (`own`), or it
+# came from somewhere else: Python itself, a module, or Check's own code. A spec with `compare`
+# ({starter, names}) also reports which of those functions differ from the starter's.
 import _thread
 import ast
 import builtins
@@ -52,6 +56,8 @@ MAX_SENT = 20000
 # grows a value without end reaches gigabytes well inside the time limit.
 MAX_GROWTH = 512 * 1024 * 1024
 TASK_LINE = re.compile(r'\s*#\s*Task\s+(\d+)\b')
+# The lines of the learner's file that belong to a raise statement.
+RAISE_LINES = set()
 
 channel = sys.stdout
 
@@ -294,6 +300,17 @@ def names_in(ns):
     }
 
 
+def raised_here(error, shown):
+    """Whether the error was raised by a raise line of the learner's file: the last place it
+    passed through is one, not a line where Python, a module or Check's code stopped."""
+    tb = error.__traceback__
+    if tb is None:
+        return False
+    while tb.tb_next is not None:
+        tb = tb.tb_next
+    return tb.tb_frame.f_code.co_filename == shown and tb.tb_lineno in RAISE_LINES
+
+
 def error_of(error, shown):
     frames = [f for f in traceback.extract_tb(error.__traceback__) if f.filename == shown]
     line = frames[-1].lineno if frames else None
@@ -305,7 +322,8 @@ def error_of(error, shown):
         'message': str(error),
         'line': line,
         'name': getattr(error, 'name', None) if isinstance(error, NameError) else None,
-        'shown': text
+        'shown': text,
+        'own': raised_here(error, shown)
     }
 
 
@@ -352,6 +370,16 @@ def task_starts(lines):
         if match and number - 1 not in marked and number + 1 not in marked:
             starts[int(match.group(1))] = number
     return starts
+
+
+def changed_defs(tree, starter, names):
+    """The names of `names` whose top-level function is not the same as in the starter file,
+    comments, blank lines and spacing aside. A function that is gone counts as changed."""
+    with open(starter, 'rb') as f:
+        before = ast.parse(f.read(), starter)
+    defs = lambda t: {n.name: ast.dump(n) for n in t.body if isinstance(n, ast.FunctionDef)}
+    mine, theirs = defs(tree), defs(before)
+    return [name for name in names if mine.get(name) != theirs.get(name)]
 
 
 def check_path(rel):
@@ -531,6 +559,11 @@ def main():
         emit({'kind': 'comments', 'list': comments_in(source)})
 
     tree = ast.parse(source, shown)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Raise):
+            RAISE_LINES.update(range(node.lineno, node.end_lineno + 1))
+    if spec.get('compare'):
+        emit({'kind': 'compare', 'changed': changed_defs(tree, spec['compare']['starter'], spec['compare']['names'])})
     for name, value in (spec.get('given') or {}).items():
         line = next(
             (s for s in tree.body if isinstance(s, ast.Assign) and len(s.targets) == 1

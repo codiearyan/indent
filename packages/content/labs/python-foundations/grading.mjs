@@ -100,7 +100,8 @@ export const lines = (text) =>
  * `blocks` is for files with if, loops and functions: each task's lines may run PART_SECONDS and
  * print so much before they alone are stopped (`part.stopped`), and the words for mistakes cover
  * blocks. With it, `define` is Python run right before Task `upto`, and `call` ({ name, args,
- * kwargs }) calls a function after it (`result.call`).
+ * kwargs }) calls a function after it (`result.call`). `compare` ({ names }) reports in
+ * `result.changed` which of those functions differ from the ones in the issue's starter.
  * Returns { parts: Map(task => { lines, error, values, names }), comments, ... } or a problem.
  */
 export async function runFile(
@@ -115,7 +116,8 @@ export async function runFile(
     blocks = false,
     define,
     call,
-    data = false
+    data = false,
+    compare
   } = {}
 ) {
   const bin = await python()
@@ -135,6 +137,9 @@ export async function runFile(
     inject,
     names,
     comments,
+    ...(compare && {
+      compare: { starter: join(t.chapter, 'starter', ...file.split('/')), names: compare.names }
+    }),
     ...(blocks && { part_seconds: PART_SECONDS, define, call: data && call ? { ...call, data } : call })
   }
   const child = spawn(bin, ['-I', '-B', HARNESS], { cwd: dir, env: childEnv(), windowsHide: true })
@@ -158,6 +163,7 @@ export async function runFile(
     else if (record.kind === 'start') running = record.task
     else if (record.kind === 'flood') result.stopped = { task: record.task, why: 'flood' }
     else if (record.kind === 'done') result.done = true
+    else if (record.kind === 'compare') result.changed = record.changed
     else if (record.kind === 'made') Object.assign(result.blocks, { made: record.list, defs: record.defs })
     else if (record.kind === 'call') {
       result.call = { ...record, lines: lines(record.printed ?? '') }
@@ -338,6 +344,7 @@ const BUILTINS = [
 function blockRunCause(error, blocks) {
   const m = error.message
   let found
+  if (blocks.raising && (found = blocks.explain?.(error) ?? raiseRunCause(error))) return found
   if (
     blocks.data &&
     (found =
@@ -1227,11 +1234,13 @@ const typeOfData = (x) =>
           ? 'str'
           : Array.isArray(x)
             ? 'list'
-            : '@tuple' in x
-              ? 'tuple'
-              : '@set' in x
-                ? 'set'
-                : 'dict'
+            : '@float' in x
+              ? 'float'
+              : '@tuple' in x
+                ? 'tuple'
+                : '@set' in x
+                  ? 'set'
+                  : 'dict'
 
 /** A call as the learner would write it, with lists and dictionaries: kit_lines(["rope"]). */
 export const dataCallText = (fn, c) =>
@@ -1266,6 +1275,9 @@ function fileProblem(fn, c, call, csv) {
   const elsewhere = call.opened.find((o) => !given.has(o.path))
   if (elsewhere) {
     return `${fn} opened ${elsewhere.path}, a file Check did not give it. ${c.pathHint ?? 'Open the file at the path the function is given: a path written into the code, such as the name of a file in your workspace, opens the wrong file.'}`
+  }
+  if (call.left_open.length && c.raises && call.error) {
+    return `${fn} left ${call.left_open[0]} open when it stopped with ${call.error.type}. A file opened on a with line is closed as soon as the lines moved in under it end, even when one of them stops with an error; a file closed by hand at the end is never closed when a line before it stops.`
   }
   if (call.left_open.length) {
     return `${fn} left ${call.left_open[0]} open after it returned. A file opened on a with line is closed when the lines moved in under it end, even when something goes wrong; a file left open may not hold what was written to it yet.`
@@ -1313,7 +1325,8 @@ function wroteProblem(fn, c, call) {
 /**
  * Like callCases, for functions that take and give back lists, tuples, sets and dictionaries.
  * Each case has `args`, `expected` (what the function gives back, compared as a value; left out,
- * it is not judged) and `after` ({ index: value }), what an argument must hold after the call.
+ * it is not judged; `accept` lists other values that are as right) and `after`
+ * ({ index: value }), what an argument must hold after the call.
  * Every argument that `after` does not name must be left as it was. So a function that changes
  * the caller's list where the task says not to fails, and so does one that gives back a new list
  * where the task says to change the caller's. A failing case gets the first message that fits:
@@ -1328,6 +1341,9 @@ function wroteProblem(fn, c, call) {
  * arguments themselves, where the task asks for a new list.
  * `text` adds the words for the errors of text, files, CSV and JSON. A case with `files` is a file
  * task: see fileProblem and wroteProblem.
+ * A case with `raises` expects the call to stop with an error: see raiseResult. `raising` adds the
+ * words for the errors of raise and assert. `compare` ({ names, judge(changed) }) fails the task
+ * once, with what `judge` says, on which of those functions differ from the starter's.
  */
 export async function dataCases(t, {
   file,
@@ -1339,7 +1355,9 @@ export async function dataCases(t, {
   define,
   errors,
   text = false,
-  csv = false
+  csv = false,
+  raising = false,
+  compare
 }) {
   const runs = await Promise.all(
     list.map((c) =>
@@ -1353,12 +1371,14 @@ export async function dataCases(t, {
           args: c.args ?? [],
           kwargs: c.kwargs ?? {},
           ...(c.files && { files: c.files, read: Object.keys(c.wrote ?? {}) })
-        }
+        },
+        compare
       })
     )
   )
   for (const r of runs) {
     if (!r.blocks) continue
+    if (raising) r.blocks.raising = true
     if (errors) r.blocks.explain = errors
     if (text || list.some((c) => c.files)) r.blocks.text = true
   }
@@ -1392,19 +1412,27 @@ export async function dataCases(t, {
       )
     ]
   }
+  const changedDefs = compare && runs.find((r) => r.changed)?.changed
+  const unlike = changedDefs && compare.judge(changedDefs)
+  if (unlike) return [unlike]
   const ran = (i) => !ends[i] && runs[i].call?.returned
-  const mistake = mistakes.find((m) =>
-    list.every(
-      (c, i) =>
-        ran(i) &&
-        (!m.value || equalData(runs[i].call.returned.data, m.value(c))) &&
-        (!m.after || equalData(runs[i].call.after[0], m.after(c)))
-    )
+  // Cases that expect an error give back nothing, so only the others show a typed-in result.
+  const plain = list.map((c, i) => i).filter((i) => !list[i].raises)
+  const mistake = mistakes.find(
+    (m) =>
+      plain.length > 0 &&
+      plain.every(
+        (i) =>
+          ran(i) &&
+          (!m.value || equalData(runs[i].call.returned.data, m.value(list[i]))) &&
+          (!m.after || equalData(runs[i].call.after[0], m.after(list[i])))
+      )
   )
   const reads = runs.map((r, i) => ran(i) && r.call.returned)
+  const plainReads = plain.map((i) => reads[i])
   const stuck =
-    reads.every((v) => v && v.repr === reads[0].repr) &&
-    list.some((c) => !equalData(c.expected, list[0].expected))
+    plainReads.every((v) => v && v.repr === plainReads[0].repr) &&
+    plain.some((i) => !equalData(list[i].expected, list[plain[0]].expected))
   // A function that never changes its first argument, in any case where it should.
   const neverChanges = list.every(
     (c, i) =>
@@ -1428,11 +1456,14 @@ export async function dataCases(t, {
       const what = call.error ? call.error.shown : `It gave back: ${call.returned.repr}`
       return fail(c.name, opened, [`Check called ${shown}`, what, ...held].join('\n'))
     }
+    if (c.raises) return raiseResult(fn, c, call, shown, held, told, runs[i].blocks)
     if (call.error) {
       const at = call.error.line ? ` at line ${call.error.line}` : ''
       return fail(
         c.name,
-        `When Check calls ${shown}, it stops${at} with ${call.error.type}: ${runCause(call.error, call.names, runs[i].blocks)}.`,
+        raising && call.error.own
+          ? `${shown} raises ${call.error.type} with your raise line${at}${call.error.message ? `: ${call.error.message}` : ''}. ${c.ownHint ?? 'For these values the task asks for a value back, not an error: look at the condition that decides when to raise.'}`
+          : `When Check calls ${shown}, it stops${at} with ${call.error.type}: ${runCause(call.error, call.names, runs[i].blocks)}.`,
         `Check called ${shown}\n${call.error.shown}`
       )
     }
@@ -1453,7 +1484,10 @@ export async function dataCases(t, {
       )
       .filter(Boolean)
     const output = [`Check called ${shown}`, `It gave back: ${v.repr}`, ...afterLines, ...held, told].join('\n')
-    const wrongResult = c.expected !== undefined && !equalData(v.data, c.expected)
+    const wrongResult =
+      c.expected !== undefined &&
+      !equalData(v.data, c.expected) &&
+      !(c.accept ?? []).some((other) => equalData(v.data, other))
     const k = wrongAfter.findIndex(Boolean)
     const wrote = !wrongResult && k < 0 && c.files && wroteProblem(fn, c, call)
     if (wrote) return fail(c.name, wrote, output)
@@ -1495,4 +1529,112 @@ export async function dataCases(t, {
     }
     return fail(c.name, message, output)
   })
+}
+
+// From the errors issues on, a task may have to raise an error, let one reach the caller, or put
+// things back whatever happens.
+
+/** What an error usually means in code that catches, raises and asserts, or null. */
+function raiseRunCause(error) {
+  const m = error.message
+  if (error.type === 'TypeError' && /^exceptions must derive from BaseException$/.test(m)) {
+    return 'raise takes an error, such as ValueError with a message in its round brackets, not a text on its own'
+  }
+  if (error.type === 'RuntimeError' && /^No active exception to re-?raise$/.test(m)) {
+    return 'raise on its own sends on the error being handled, so it works only inside an except block'
+  }
+  if (error.type === 'AssertionError') {
+    return 'an assert line found that what follows it is false for these values'
+  }
+  if (error.own) {
+    return 'your own raise line raised it. A line under the task that calls a function with a value it refuses stops the file there too: make that call inside a try, and handle the error in its except'
+  }
+  return null
+}
+
+const article = (type) => (/^[AEIOU]/.test(type) ? `an ${type}` : `a ${type}`)
+
+/** Where the error a call stopped with came from, in plain words, for a check's output. */
+function fromWhere(error) {
+  if (error.own) return `That error came from your raise line, line ${error.line}.`
+  if (error.line) return `That error came from line ${error.line}, where Python stopped by itself.`
+  return 'That error came from outside your file.'
+}
+
+/**
+ * Judges a case with `raises`: { type (or types), own, has, names, message, swallowed, wrongType,
+ * hasHint, messageHint }. The call must stop with that error: raised by a raise line of the
+ * learner's file when `own`, its message holding each text of `has` (what it must name, said as
+ * `names`) or equal to `message`. What the arguments and files hold afterwards is judged as for a
+ * call that returns: `after` and `wrote`, every argument `after` does not name left as it was.
+ * `swallowed` is the words for a call that gave back a value instead: a string or a function of
+ * the value and the call.
+ */
+function raiseResult(fn, c, call, shown, held, told, blocks) {
+  const want = c.raises
+  const types = want.types ?? [want.type]
+  const wanted = article(types[0])
+  const error = call.error
+  const args = c.args ?? []
+  const afterLines = args
+    .map((a, k) =>
+      (c.after && k in c.after) || !equalData(call.after[k], a)
+        ? `Afterwards, the ${noun(a)} it was given is ${call.after_repr[k]}`
+        : null
+    )
+    .filter(Boolean)
+  const what = error
+    ? [`It stopped with ${error.type}${error.message ? `: ${error.message}` : ''}`, fromWhere(error)]
+    : [`It gave back: ${call.returned.repr}`]
+  const output = [`Check called ${shown}`, ...what, ...afterLines, ...held, told].join('\n')
+  const no = (message) => fail(c.name, message, output)
+  if (!error) {
+    const v = call.returned
+    if (typeof want.swallowed === 'function') return no(want.swallowed(v, call))
+    if (want.swallowed) return no(want.swallowed)
+    return no(
+      call.lines.length
+        ? `${shown} printed a line and gave back ${v.repr}. print only shows a line, and the code that called ${fn} carries on as if all were well. For these values the task asks ${fn} to stop with ${wanted}: raise stops the function and hands the error to the caller.`
+        : `${shown} gave back ${v.repr}. For these values the task asks ${fn} to stop with ${wanted}.`
+    )
+  }
+  const at = error.line ? ` at line ${error.line}` : ''
+  // A raise of something that is not an error stops on the raise line, with Python's TypeError.
+  const own = error.own && !(error.type === 'TypeError' && /^exceptions must derive/.test(error.message))
+  if (!types.includes(error.type)) {
+    const how = own
+      ? `${shown} raises ${error.type} with your raise line${at}`
+      : `When Check calls ${shown}, it stops${at} with ${error.type}: ${runCause(error, call.names, blocks)}`
+    return no(`${how}. ${want.wrongType ?? `For these values the task asks for ${wanted}.`}`)
+  }
+  if (want.own && !error.own) {
+    return no(
+      `${shown} stops with ${error.type}, but not from a raise line of yours: Python stopped${at} by itself. The task asks ${fn} to refuse these values itself, before it does any work, with raise and a message that names ${want.names}.`
+    )
+  }
+  if (want.has && !want.has.every((part) => error.message.includes(part))) {
+    if (want.hasHint) return no(want.hasHint(error.message))
+    return no(
+      error.message === ''
+        ? `${shown} raises ${error.type} with no message. Put a text in its round brackets that names ${want.names}, so the person who reads it knows what to put right.`
+        : `${shown} raises ${error.type}, but its message does not name ${want.names}. A person reads that message to put things right, so it says what was wrong, with the value itself.`
+    )
+  }
+  if (want.message !== undefined && error.message !== want.message) {
+    return no(want.messageHint ?? `${shown} stops with ${error.type}, but not with the message the task asks for.`)
+  }
+  const wrongAfter = args.findIndex(
+    (a, k) => !equalData(call.after[k], c.after && k in c.after ? c.after[k] : a)
+  )
+  if (wrongAfter >= 0) {
+    const thing = noun(args[wrongAfter])
+    if (typeof c.afterHint === 'function') return no(c.afterHint(call.after[wrongAfter], call))
+    if (c.afterHint) return no(c.afterHint)
+    return no(
+      `${shown} stops with ${error.type} as the task asks, but it changed the ${thing} Check gave it first. Refuse bad values before the work, so the caller's ${thing} is left as it was when ${fn} raises.`
+    )
+  }
+  const wrote = c.files && wroteProblem(fn, c, call)
+  if (wrote) return no(wrote)
+  return pass(c.name, output)
 }
