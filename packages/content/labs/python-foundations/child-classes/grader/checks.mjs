@@ -131,13 +131,13 @@ export const checks = {
             ...madeRope('rope = Rope("static line", 4.5, 50)'),
             label('rope.label()', 'static line (4.5 kg), 50 m', null, 'static line (4.5 kg)'),
             {
-              code: 'Kit("map", 0.25).label()',
-              want: 'map (0.25 kg)',
+              code: 'Kit("compass", 0.25).label()',
+              want: 'compass (0.25 kg)',
               hint: "Kit's own label changed. Give Rope a label of its own, moved in under Rope, and leave Kit's as it was."
             },
             {
-              code: 'Battery("radio battery", 0.5, 80).label()',
-              want: 'radio battery (0.5 kg)',
+              code: 'Battery("handset battery", 0.5, 80).label()',
+              want: 'handset battery (0.5 kg)',
               hint: "A battery's label changed. Only ropes get the length added: give Rope a label of its own, moved in under Rope."
             }
           ]
@@ -205,11 +205,11 @@ export const checks = {
         {
           name: 'Ropes of two kinds among other kit',
           steps: steps(
-            ['Rope("dynamic rope", 3.75, 60)', 'Battery("radio battery", 0.5, 80)', 'StaticRope("static line", 4.5, 50)', 'Kit("map", 0.25)'],
+            ['Rope("dynamic rope", 3.75, 60)', 'Battery("handset battery", 0.5, 80)', 'StaticRope("static line", 4.5, 50)', 'Kit("compass", 0.25)'],
             ['dynamic rope', 'static line']
           )
         },
-        { name: 'No ropes at all', steps: steps(['Kit("map", 0.25)', 'Battery("spare battery", 0.5, 20)'], []) },
+        { name: 'No ropes at all', steps: steps(['Kit("compass", 0.25)', 'Battery("spare battery", 0.5, 20)'], []) },
         {
           name: 'Only ropes',
           steps: steps(['StaticRope("abseil rope", 5.25, 70)', 'Rope("throw line", 0.75, 20)'], ['abseil rope', 'throw line'])
@@ -260,7 +260,7 @@ export const checks = {
           name: 'Every item ready',
           steps: [
             ...base,
-            { code: 'kit = [Rope("dynamic rope", 3.75, 60), Battery("radio battery", 0.5, 80), Flare("red flare", 0.25, False), Kit("map", 0.25)]' },
+            { code: 'kit = [Rope("dynamic rope", 3.75, 60), Battery("handset battery", 0.5, 80), Flare("red flare", 0.25, False), Kit("compass", 0.25)]' },
             {
               code: 'check_kit(kit)',
               want: 4.75,
@@ -274,10 +274,10 @@ export const checks = {
             }
           ]
         },
-        { name: 'A flat battery', steps: refused(['Rope("dynamic rope", 3.75, 60)', 'Battery("radio battery", 0.5, 30)', 'Flare("red flare", 0.25, True)'], 'radio battery', undefined, 4.5) },
+        { name: 'A flat battery', steps: refused(['Rope("dynamic rope", 3.75, 60)', 'Battery("handset battery", 0.5, 30)', 'Flare("red flare", 0.25, True)'], 'handset battery', undefined, 4.5) },
         {
           name: 'A used flare, a kind of kit check_kit has never seen',
-          steps: refused(['Kit("map", 0.25)', 'Flare("red flare", 0.25, True)', 'Battery("spare battery", 0.5, 20)'], 'red flare', 'spare battery', 1)
+          steps: refused(['Kit("compass", 0.25)', 'Flare("red flare", 0.25, True)', 'Battery("spare battery", 0.5, 20)'], 'red flare', 'spare battery', 1)
         },
         {
           name: 'Nothing to check',

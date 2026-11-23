@@ -1871,7 +1871,7 @@ function classRunCause(error, blocks) {
         ? `${found[1]} has no method ${found[2]} yet, and the code of this task uses it. ${found[2]} is Task ${owner}: write it first, or do this task without it`
         : (blocks.methods ?? []).includes(found[2])
           ? `${found[1]} has no method ${found[2]}. A method is a def moved in under the class, lined up with __init__, and its def line starts with self`
-          : `a ${found[1]} object has no attribute ${found[2]}. Check how ${found[2]} is spelt where it is read and where it is made. An attribute is made on the object by a line such as self.${found[2]} = ..., usually in __init__, or by a field of a dataclass; a name given a value without self. in front belongs to the method alone, and is gone when the method ends`
+          : `a ${found[1]} object has no attribute ${found[2]}. Check how ${found[2]} is spelt where it is read and where it is made. An attribute is made on the object itself, through self, usually in __init__, or by a field of a dataclass; a name given a value without self. in front belongs to the method alone, and is gone when the method ends`
   }
   if ((found = /^name '(\w+)' is not defined/.exec(m))) {
     if (found[1] === 'self') {

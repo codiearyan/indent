@@ -898,7 +898,14 @@ def main():
         import_module(spec, watchdog, upto or 0)
         emit({'kind': 'done'})
         return
-    ns = {'__name__': spec.get('name') or '__main__', '__builtins__': builtins, '__file__': shown}
+    ns = {'__name__': '__main__', '__builtins__': builtins, '__file__': shown}
+    if spec.get('name'):
+        # Registered as a module, as an imported file is: a dataclass looks up its own module.
+        named = importlib.util.module_from_spec(importlib.machinery.ModuleSpec(spec['name'], None))
+        named.__builtins__ = builtins
+        named.__file__ = shown
+        sys.modules[spec['name']] = named
+        ns = named.__dict__
     wanted = spec.get('names') or []
     for task in [0] + order:
         if task == upto:

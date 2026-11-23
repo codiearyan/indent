@@ -15,7 +15,7 @@ const STORY = ['Alpha', 'Bravo', 'Charlie', 'Kirsty', 'Iain', 'Shona']
 /** The words for an attribute read back that is not the one Check gave. */
 const attrHint = (attr, given, other) => (v) =>
   v === other
-    ? `After a second team was made, the first team's ${attr} is the second team's. The value is kept on the class, shared by every team, not on each object: a line such as self.${attr} = ... keeps it on the new object itself.`
+    ? `After a second team was made, the first team's ${attr} is the second team's. The value is kept on the class, shared by every team, not on each object. Keep it on the new object itself, the one __init__ is given first.`
     : STORY.includes(v)
       ? `Team keeps ${JSON.stringify(v)}, a value from the story, whatever it is given. Keep the value the call gives, through the parameter of __init__.`
       : `The team's ${attr} is not the ${attr} Check made it with, ${JSON.stringify(given)}. __init__ keeps each value it is given in the attribute of that name.`
