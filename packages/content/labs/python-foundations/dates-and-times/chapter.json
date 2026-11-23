@@ -49,9 +49,6 @@
         { "title": "date.fromisoformat()", "url": "https://docs.python.org/3/library/datetime.html#datetime.date.fromisoformat" },
         { "title": "timedelta objects", "url": "https://docs.python.org/3/library/datetime.html#timedelta-objects" }
       ],
-      "videos": [
-        { "title": "Dates, datetimes and timedeltas", "url": "https://www.youtube.com/watch?v=eirjjyP2qcQ", "end": 600 }
-      ],
       "points": 10
     },
     {

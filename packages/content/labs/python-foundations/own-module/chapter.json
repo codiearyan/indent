@@ -11,7 +11,7 @@
       "id": "move",
       "title": "Move the reading functions",
       "file": "callouts.py",
-      "description": "Move `parts_of`, `hill_of` and `hours_of` from the top of `report.py` into `callouts.py`, so that they live in `callouts.py` only. Then, under `# Task 1` in `report.py`, import `hill_of` and `hours_of` from `callouts` with `from`. Running `python3 report.py` prints the same four lines as before.\n\nCheck imports `callouts.py` the way an import line does, calls its `hill_of` and `hours_of` with lines of its own, looks at whether `report.py` still has functions of its own by those names, and runs `report.py` to see where its `hill_of` and `hours_of` come from.",
+      "description": "Move `parts_of`, `hill_of` and `hours_of` from the top of `report.py` into `callouts.py`, so that they live in `callouts.py` only. Then, under `# Task 1` in `report.py`, import `hill_of` and `hours_of` from `callouts`, with `from` as the lesson shows (`import callouts` works too). Running `python3 report.py` prints the same four lines as before.\n\nCheck imports `callouts.py` the way an import line does, calls its `hill_of` and `hours_of` with lines of its own, looks at whether `report.py` still has functions of its own by those names, and runs `report.py` to see where its `hill_of` and `hours_of` come from.",
       "nextSteps": [
         "Read the parts of the lesson on a module of your own and on a circle of imports.",
         "Cut the three functions from report.py and paste them into callouts.py, above crew_of.",
@@ -58,7 +58,7 @@
       "id": "hours",
       "title": "Hours on one hill",
       "file": "callouts.py",
-      "description": "In `callouts.py`, write a function called `hill_hours` that takes a list of lines of the callout log and a hill, and gives back the hours of every callout on that hill, added up, a whole number: `0` when there is none. Use `hill_of` and `hours_of`. Then, under `# Task 3` in `report.py`, import `hill_hours` from `callouts` and print what it gives back for `month` and `\"Scarth Fell\"`.\n\nCheck imports `callouts.py`, with its own `parts_of`, `hill_of` and `hours_of` set in it first so that this task does not wait on Task 1, and calls `hill_hours` with lines and hills of its own.",
+      "description": "In `callouts.py`, write a function called `hill_hours` that takes a list of lines of the callout log and a hill, and gives back the hours of every callout on that hill, added up, a whole number: `0` when there is none. Use `hill_of` and `hours_of`. Then, under `# Task 3` in `report.py`, import `hill_hours` from `callouts` and print what it gives back for `month` and `\"Scarth Fell\"`.\n\nCheck imports `callouts.py`, with its own `parts_of`, `hill_of` and `hours_of` set in it first so that this task does not wait on Task 1, and calls `hill_hours` with lines and hills of its own, and looks at whether it called `hill_of` and `hours_of`.",
       "nextSteps": [
         "Write the def line of hill_hours in callouts.py, above Ailsa's try-out lines.",
         "Go through the lines, and add the hours of each line whose hill is the one asked for.",

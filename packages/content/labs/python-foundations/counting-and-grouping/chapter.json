@@ -71,9 +71,6 @@
         { "title": "collections.defaultdict", "url": "https://docs.python.org/3/library/collections.html#collections.defaultdict" },
         { "title": "defaultdict examples", "url": "https://docs.python.org/3/library/collections.html#defaultdict-examples" }
       ],
-      "videos": [
-        { "title": "defaultdict and Counter", "url": "https://www.youtube.com/watch?v=I3ZnopcpYY0" }
-      ],
       "points": 10
     },
     {

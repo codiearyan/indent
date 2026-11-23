@@ -143,6 +143,8 @@ export const checks = {
             const got = v.data?.['@tuple']?.map((x) => x?.['@float'] ?? x)
             if (!got || got.length !== 2) return 'hours_summary does not give back a tuple of two numbers, the mean and the median.'
             const [m, md] = got
+            if (m === median && md === mean && mean !== median)
+              return 'hours_summary gives back the median first and the mean second. The task asks for the mean first, then the median.'
             const h = hours.length
             const middle = h % 2 ? hours[Math.floor(h / 2)] : (hours[h / 2 - 1] + hours[h / 2]) / 2
             if (m === Math.floor(hours.reduce((a, b) => a + b, 0) / h) && m !== mean)
@@ -164,8 +166,8 @@ export const checks = {
       task: 4,
       fn: 'duty_rota',
       list: [
-        ['Seed 11', ['Morag', 'Fergus', 'Kirsty', 'Iain', 'Shona', 'Calum', 'Eilidh'], 11],
-        ['Seed 2041', ['Morag', 'Fergus', 'Kirsty', 'Iain', 'Shona', 'Calum', 'Eilidh'], 2041],
+        ['Seed 11', ['Morag', 'Fergus', 'Kirsty', 'Iain', 'Shona', 'Calum', 'Eilidh', 'Ewan', 'Ishbel'], 11],
+        ['Seed 2041', ['Morag', 'Fergus', 'Kirsty', 'Iain', 'Shona', 'Calum', 'Eilidh', 'Ewan', 'Ishbel'], 2041],
         ['Another team, seed 90', ['Ruaridh', 'Isla', 'Hamish', 'Catriona', 'Euan'], 90]
       ].map(([name, team, seed]) => ({ name, args: [team, seed] })),
       judge: (c, got) => {
@@ -196,7 +198,8 @@ export const checks = {
         ['Seven nights, seed 5', ['Morag', 'Fergus', 'Kirsty', 'Iain', 'Shona'], 7, 5],
         ['Seven nights, seed 2063', ['Morag', 'Fergus', 'Kirsty', 'Iain', 'Shona'], 7, 2063],
         ['More nights than volunteers, seed 12', ['Ruaridh', 'Isla', 'Hamish'], 9, 12],
-        ['One night, seed 31', ['Euan', 'Catriona'], 1, 31]
+        ['One night, seed 31', ['Euan', 'Catriona'], 1, 31],
+        ['A month of nights, three volunteers, seed 77', ['Ruaridh', 'Isla', 'Hamish'], 30, 77]
       ].map(([name, team, nights, seed]) => ({ name, args: [team, nights, seed] })),
       errors: (e) =>
         /^Sample larger than population/.test(e.message)
@@ -210,6 +213,14 @@ export const checks = {
         if (stranger !== undefined) return `drivers gives back ${pyLiteral(stranger)}, who is not on the list it was given.`
         if (nights > 2 && got.every((n) => n === got[0]))
           return 'drivers gives back the same volunteer for every night. Setting the seed again before each draw starts the same run of chance again, so every draw comes out the same: set it once, before the loop.'
+        // Thirty nights from three volunteers: a fair draw leaves one out, or never repeats a night,
+        // about once in a hundred thousand seeds, and the seed here is fixed.
+        if (nights >= 30) {
+          const left = team.find((n) => !got.includes(n))
+          if (left) return `In thirty nights drivers never draws ${pyLiteral(left)}. Each night is drawn by chance from the whole list it was given.`
+          if (got.every((n, i) => i === 0 || n !== got[i - 1]))
+            return 'In thirty nights drivers never gives anyone two nights running, so the nights are not drawn by themselves: each night is drawn by chance from the whole list, whoever drove the night before.'
+        }
         return null
       },
       across: (gots) =>

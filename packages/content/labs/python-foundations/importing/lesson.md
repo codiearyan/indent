@@ -26,9 +26,9 @@ print(string.capwords("scarth fell north top"))
 print(string.ascii_uppercase)
 ```
 
-This prints `Scarth Fell North Top` and `ABCDEFGHIJKLMNOPQRSTUVWXYZ`. `import string` runs once, usually at the top of the file, and makes one name, `string`, that stands for the whole module. Everything in it is then `string.` and a name. The import line must run before the line that uses it: without it, Python stops with `NameError: name 'string' is not defined`.
+This prints `Scarth Fell North Top` and `ABCDEFGHIJKLMNOPQRSTUVWXYZ`. `import string` runs once, usually at the top of the file, and makes one name, `string`, that stands for the whole module. Everything in it is then `string.` and a name. The import line must run before the line that uses it: without it, Python stops with `NameError: name 'string' is not defined`, and Python 3.14 asks whether you forgot to import it.
 
-Modules made by other people, outside the standard library, are installed with a separate tool first. This repo needs none of them: everything here comes with Python.
+Modules outside the standard library are installed with a separate tool first. This repo needs none of them.
 
 ## Taking one name with from
 
@@ -40,7 +40,7 @@ from string import capwords
 print(capwords("lowther crag"))
 ```
 
-Now `capwords` works on its own, and the name `string` is not made at all. Each way has its use: `string.capwords` says where the function comes from every time you read it, `capwords` is shorter. What does not work is mixing them up. After `import string`, a bare `capwords(...)` stops with `NameError: name 'capwords' is not defined`, because only `string` was made.
+Now `capwords` works on its own, and the name `string` is not made at all. `string.capwords` says where the function comes from every time you read it; `capwords` is shorter. What does not work is mixing them up. After `import string`, a bare `capwords(...)` stops with `NameError: name 'capwords' is not defined`, because only `string` was made.
 
 `as` gives what you import a name of your own:
 
@@ -60,9 +60,9 @@ When nothing is found, Python stops with `ModuleNotFoundError: No module named '
 
 ## Reading a module's page
 
-Every module of the standard library has a page in Python's documentation. You do not need to read it all. Near the top a sentence says what the module is for. Then each function has its own entry: its name, what it takes in round brackets, and a few sentences on what it gives back. A value after `=` in the brackets, such as `width=70`, has a default and can be left out.
+Every module of the standard library has a page in Python's documentation. Near the top a sentence says what the module is for. Then each function has its own entry: its name, what it takes in round brackets, and a few sentences on what it gives back. A value after `=` in the brackets, such as `width=70`, has a default and can be left out.
 
-Look for the job in those sentences, not for a name you expect. When an entry looks right, try it on a small value in your file and print what comes back before you build on it.
+Look for the job in those sentences, not for a name you expect, and try an entry on a small value before you build on it.
 
 ## Your work in this issue
 

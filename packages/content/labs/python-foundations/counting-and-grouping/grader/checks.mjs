@@ -1,4 +1,4 @@
-import { dataCases, tuple } from '../../grading.mjs'
+import { dataCases, dataKind, tuple } from '../../grading.mjs'
 
 const FILE = 'callout_counts.py'
 
@@ -43,8 +43,8 @@ export const checks = {
       modules: true,
       errors: KEY_ERROR,
       forbid: (watched, c, call) =>
-        call.returned?.type === 'dict'
-          ? 'hill_counts gives back a plain dictionary. The task asks for a Counter, which counts for you and gives 0 for a hill it has not seen.'
+        call.returned && ['dict', 'defaultdict', 'OrderedDict'].includes(call.returned.type)
+          ? `hill_counts gives back ${call.returned.type === 'dict' ? 'a plain dictionary' : dataKind(call.returned.type)}. The task asks for a Counter, which counts for you and gives 0 for a hill it has not seen.`
           : null,
       typed: 'hill_counts gives back the same counts whatever hills Check gives it. Count the list it is given.',
       list: list.map(([name, hills]) => ({
@@ -79,6 +79,8 @@ export const checks = {
           expected: want.map(([hill, count]) => tuple(hill, count)),
           hint: (v) => {
             const got = Array.isArray(v.data) ? v.data : []
+            if (got.length && got.every((item) => typeof item === 'string'))
+              return 'busiest gives back the hills without their counts. The task asks for each hill with its count, as a tuple (hill, count).'
             if (got.some((item) => Array.isArray(item)))
               return 'busiest gives back each hill and its count as a list. The task asks for a tuple (hill, count).'
             if (got.length !== want.length)

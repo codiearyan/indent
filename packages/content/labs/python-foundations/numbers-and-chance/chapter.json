@@ -55,7 +55,7 @@
       "id": "summary",
       "title": "Average and middle hours",
       "file": "callout_numbers.py",
-      "description": "Under `# Task 3`, write the line that imports `statistics`. Then write a function called `hours_summary` that takes a list of the hours of callouts, numbers in any order, and gives back a tuple of two numbers: their mean, then their median. For `hours` it gives back `(5.333333333333333, 4.5)`. Print what it gives back for `hours`.\n\nCheck calls `hours_summary` with lists of its own, some not in order, some with an even number of hours, and looks at the tuple it gives back. A whole number may come back as `3` or `3.0`.",
+      "description": "Under `# Task 3`, write the line that imports `statistics`. Then write a function called `hours_summary` that takes a list of the hours of callouts, numbers in any order, and gives back a tuple of two numbers: their mean, then their median. Leave the list it is given as it was. For `hours` it gives back `(5.333333333333333, 4.5)`. Print what it gives back for `hours`.\n\nCheck calls `hours_summary` with lists of its own, some not in order, some with an even number of hours, and looks at the tuple it gives back and at whether the list is as it was. A whole number may come back as `3` or `3.0`.",
       "nextSteps": [
         "Read the part of the lesson on the statistics module.",
         "Write the import line, then the def line.",

@@ -125,6 +125,8 @@ export const checks = {
           `After the lines under # Task 3 have run, shorten gives back ${v.repr} for ${sign}: it is no longer Ailsa's function. An import that brings in a name the file already uses puts the new one over the old. Import textwrap's shorten under a name of its own.`
       }))
     })
-    return [...summaries, ...ailsa]
+    // A stop under # Task 3 fails both lists with one detail: show it once.
+    const all = [...summaries, ...ailsa]
+    return all.filter((d, i) => all.findIndex((e) => e.name === d.name && e.message === d.message) === i)
   }
 }

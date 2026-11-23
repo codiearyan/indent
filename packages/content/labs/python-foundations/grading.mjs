@@ -1175,7 +1175,7 @@ function moduleRunCause(error) {
   }
   if (error.hides) {
     const name = error.hides.replace(/\.py$/, '')
-    return `your workspace has a file called ${error.hides}, the same name as Python's own ${name} module, so the import found your file instead: Python looks in the folder of the file it runs before its own modules. Give your file another name`
+    return `your workspace has a file called ${error.hides}, the same name as Python's own ${name} module, so the import found your file instead: Python looks in the folder of the file it runs before its own modules. Give your file another name in the terminal, such as mv ${error.hides} my_${error.hides}`
   }
   if (error.type === 'ModuleNotFoundError' && (found = /^No module named '([\w.]+)'/.exec(m))) {
     return `Python found no module called ${found[1]}, neither in the folder of the file it runs nor among the modules that come with Python. Check the spelling of the import line, capitals included: a module of your own is its file name without .py`

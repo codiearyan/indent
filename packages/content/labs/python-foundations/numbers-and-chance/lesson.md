@@ -11,7 +11,7 @@ You have done sums with `+`, `/` and `//` since the first part. Three modules of
 
 ## The request from Rhona
 
-> **Rhona:** I need four answers before the training weekend. How many people it takes to pass a message by hand radio to a team out of range. Which search square a team is in. What a typical callout costs us in hours. And the duty rota: drawn fairly, by chance, but nobody can say I fixed it, so I want to draw it again in front of them and get the same.
+> **Rhona:** I need four answers before the training weekend. How many people it takes to pass a message by hand radio to a team out of range. Which search square a team is in. What a typical callout costs us in hours. And the duty rota: drawn fairly, by chance, but nobody can say I fixed it, so I want to draw it again in front of them and get the same. The drivers for the week too.
 
 All five tasks are in `callout_numbers.py`.
 

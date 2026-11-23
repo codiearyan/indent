@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Dates look easy until you count with them: months have 28 to 31 days, a leap year has one more, and a date written as text is only letters to Python. The `datetime` module knows all of it. In this issue you read dates, count days between them, add days to them and write them out for a report. By the end of it you will be able to:
+Dates look easy until you count with them: months have 28 to 31 days, a leap year has one more, and a date written as text is only letters to Python. The `datetime` module knows all of it. In this issue you read dates, count and add days, and write dates out for a report. By the end of it you will be able to:
 
 - make a date or a date with a time, from its parts or from text
 - find the days between two dates, and the date some days after another
@@ -32,7 +32,7 @@ This prints `2026-05-06` and `2026-05-06 19:30:00`. A part that does not exist, 
 
 Mind the names. The module is called `datetime`, and so is one of the types inside it. After `from datetime import datetime`, the name `datetime` is the type, and `datetime.datetime(...)` stops with `AttributeError: type object 'datetime.datetime' has no attribute 'datetime'`. After `import datetime`, the name is the module, and `datetime(2026, 5, 6)` stops with `TypeError: 'module' object is not callable`; Python 3.14 adds a guess at what you meant. Pick one way per file. This issue uses `from`.
 
-These dates know nothing of time zones: they are the time on the clock at the base. Time zones exist, and Python can handle them, but not here.
+These dates know nothing of time zones: they are the time on the clock at the base. Python can handle time zones, but not here.
 
 ## From text to a date
 
@@ -52,7 +52,7 @@ print(datetime.strptime("06.05.2026 19:30", "%d.%m.%Y %H:%M"))
 
 ## Counting days
 
-Take one date from another and you get a `timedelta`. Its `.days` is the whole number of days between them, months and leap years counted for you:
+One date taken from another gives a `timedelta`. Its `.days` is the whole number of days between them, months and leap years counted for you:
 
 ```python
 gap = date(2026, 11, 28) - date(2026, 5, 6)
@@ -70,7 +70,7 @@ This prints `206`, then `2026-05-20`: a date plus a gap of 14 days. Taking one d
 
 `training.weekday()` gives the day of the week as a number, Monday as 0 and Sunday as 6, so here it gives `2` for a Wednesday. A list of day names in that order turns it into a name, and the same works for months, which count from 1 while a list counts from 0. `.day`, `.month` and `.year` are plain numbers.
 
-For the rest, a format writes a date as text, with the same codes as `strptime`. In an f-string it goes after a colon: `f"{start:%d/%m/%Y at %H:%M}"` gives `06/05/2026 at 19:30`, and `start.strftime("%H:%M")` gives `19:30`. `%d` always writes two digits, so the 6th comes out as `06`; for no 0 in front, use `.day`.
+For the rest, a format writes a date as text, with the same codes as `strptime`. In an f-string it goes after a colon: `f"{start:%d/%m/%Y at %H:%M}"` gives `06/05/2026 at 19:30`, and `start.strftime("%H:%M")` gives `19:30`. `%d` always writes two digits, so the 6th comes out as `06`; for no 0 in front, use `.day`. `%-d` drops the 0 on some computers and stops with an error on others, so Check does not take it.
 
 ## Your work in this issue
 

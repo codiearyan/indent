@@ -1,4 +1,6 @@
-import { dataCases } from '../../grading.mjs'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { dataCases, fail } from '../../grading.mjs'
 
 const FILE = 'kit_dates.py'
 
@@ -12,7 +14,10 @@ const CLOCK = [
   'datetime.datetime.now',
   'datetime.datetime.utcnow',
   'time.time',
-  'time.localtime'
+  'time.time_ns',
+  'time.localtime',
+  'time.gmtime',
+  'time.ctime'
 ]
 const STOOD_IN = 946728000
 
@@ -122,7 +127,21 @@ export const checks = {
     })
   },
 
-  line(t) {
+  async line(t) {
+    // %-d works on some systems and stops with an error on others, so it is refused by name.
+    const code = (await readFile(join(t.workspace, FILE), 'utf8').catch(() => ''))
+      .split('\n')
+      .filter((l) => !l.trim().startsWith('#'))
+      .join('\n')
+    const loose = /%[-#][a-zA-Z]/.exec(code)
+    if (loose) {
+      return [
+        fail(
+          'The format works on every computer',
+          `kit_dates.py uses ${loose[0]} in a format. It drops the 0 in front on some computers, and stops with an error on others, such as Windows. Write the day of the month with .day, which is a plain number everywhere.`
+        )
+      ]
+    }
     const list = [
       ['A Monday morning, early in the month', [2041, 3, 4, 9, 5]],
       ['A Sunday night in December', [1987, 12, 27, 23, 59]],

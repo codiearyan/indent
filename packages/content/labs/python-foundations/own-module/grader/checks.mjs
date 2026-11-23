@@ -23,13 +23,17 @@ def hours_of(line):
     return int(parts_of(line)[2])
 `
 
-/** Which module each name of report.py comes from, after the lines under # Task 1. */
+/**
+ * Which module each name of report.py comes from, after the lines under # Task 1. After
+ * import callouts (or import callouts as c), report.py reaches them through the module.
+ */
 const JUDGE = `
 def _judge():
     found = {}
+    whole = any(getattr(v, "__name__", None) == "callouts" and hasattr(v, "__file__") for v in list(globals().values()))
     for name in ("hill_of", "hours_of"):
         value = globals().get(name)
-        found[name] = getattr(value, "__module__", None) if callable(value) else None
+        found[name] = getattr(value, "__module__", None) if callable(value) else ("callouts" if whole else None)
     return found
 `
 
@@ -50,6 +54,10 @@ const CIRCLE =
 
 const hidden = (fn) => (watched, c, call) =>
   call.loaded?.includes('report') ? `When ${fn} ${CIRCLE}` : null
+
+/** One detail for one cause: an import that fails fails every function of the module alike. */
+const distinct = (details) =>
+  details.filter((d, i) => details.findIndex((e) => e.name === d.name && e.message === d.message) === i)
 
 export const checks = {
   async move(t) {
@@ -82,7 +90,7 @@ export const checks = {
         hint: 'hours_of in callouts.py does not give back the hours of the line as a whole number. Move it as it was in report.py.'
       }))
     })
-    const found = [...hills, ...hours]
+    const found = distinct([...hills, ...hours])
     if (found.some((d) => !d.passed)) return found
 
     const text = await readFile(join(t.workspace, REPORT), 'utf8')
@@ -124,8 +132,8 @@ export const checks = {
         ...found,
         fail(
           name,
-          `After the lines under # Task 1 of report.py, ${own.join(' and ')} ${own.length > 1 ? 'do' : 'does'} not come from callouts. Import ${own.length > 1 ? 'them' : 'it'} with from, from the module callouts, the file name without .py.`,
-          `Check ran report.py up to # Task 2\nWhere each name comes from: ${made.map(([k, v]) => `${k}: ${v ?? 'not there'}`).join(', ')}`
+          `After the lines under # Task 1 of report.py, ${own.join(' and ')} ${own.length > 1 ? 'do' : 'does'} not come from callouts. Import ${own.length > 1 ? 'them' : 'it'} from the module callouts, the file name without .py.`,
+          `Check ran the lines of report.py up to # Task 3\nWhere each name comes from: ${made.map(([k, v]) => `${k}: ${v ?? 'not there'}`).join(', ')}`
         )
       ]
     }
@@ -144,10 +152,13 @@ export const checks = {
         part.lines.length ? 'prints lines' : '',
         part.calls?.length ? `calls ${part.calls.join(', ')}` : ''
       ].filter(Boolean).join(' and ')
+      const hers = part.lines.includes('Trying crew_of on one line:') || part.calls?.length
       details.push(
         fail(
           quiet,
-          `Importing callouts.py ${what}: Ailsa's try-out lines run every time a file imports it, in the middle of the report. Put them under a main guard, so they run only when callouts.py is run by itself.`,
+          hers
+            ? `Importing callouts.py ${what}: Ailsa's try-out lines run every time a file imports it, in the middle of the report. Put them under a main guard, so they run only when callouts.py is run by itself.`
+            : `Importing callouts.py ${what}: a print at the top of the file, outside any def and outside the guard, runs every time a file imports it, in the middle of the report. Move it in under the guard, or take it out.`,
           `Check imported callouts.py\nIt printed:\n${part.lines.length ? firstLines(part.lines).join('\n') : '(nothing)'}`
         )
       )
@@ -197,7 +208,19 @@ export const checks = {
       task: 3,
       fn: 'hill_hours',
       define: READERS,
-      forbid: hidden('hill_hours'),
+      watch: ['callouts.hill_of', 'callouts.hours_of'],
+      forbid: (watched, c, call) => {
+        const circle = hidden('hill_hours')(watched, c, call)
+        if (circle) return circle
+        // hours_of is only reached for a line on the hill, so a case with no such line asks only for hill_of.
+        const skipped = [
+          c.args[0].length && !watched.includes('callouts.hill_of') && ['hill_of', 'the hill'],
+          c.expected && !watched.includes('callouts.hours_of') && ['hours_of', 'the hours']
+        ].find(Boolean)
+        return skipped
+          ? `hill_hours reads ${skipped[1]} of a line by itself, without ${skipped[0]}. The task asks it to use hill_of and hours_of: they are in the same file, so it calls them by their names, and the module keeps one way of reading a line.`
+          : null
+      },
       typed: 'hill_hours gives back the same number whatever Check gives it. Add up the lines it is given.',
       list: list.map(([name, lines, hill, want]) => ({
         name,

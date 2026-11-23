@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
 ## When an import finds the wrong file
 
-Because the folder of your program comes first, a file of yours with the same name as one of Python's modules hides that module. Save some notes as `random.py`, and in the same folder `import random` finds your notes:
+Because the folder of your program comes first, a file of yours with the same name as one of Python's modules hides that module. Save a file of your own as `random.py`, and in the same folder `import random` finds your file:
 
 ```python
 import random
@@ -67,11 +67,11 @@ import random
 print(random.choice(["Rhona", "Dougie"]))
 ```
 
-This stops with `AttributeError: module 'random' has no attribute 'choice'`. Python 3.14 adds advice to rename your file; Python 3.9 says nothing more. When a module of Python's own seems to have lost a function it surely has, look in your folder for a file of that name, and rename it.
+This stops with `AttributeError: module 'random' has no attribute 'choice'`. Python 3.14 adds advice to rename your file; Python 3.9 says nothing more. When a module of Python's own seems to have lost a function it surely has, look in your folder for a file of that name, and give it another name in the terminal: `mv random.py rota_notes.py`.
 
 ## Two files that import each other
 
-An import should go one way: the program imports the module, and the module needs nothing from the program. Say `weather.py` began with `from briefing import round_to`. Running `briefing.py` starts its import of `weather`, `weather` starts importing `briefing` again, and that second `briefing` asks `weather` for `feels_like` before the `def` of `feels_like` has run. This goes round in a circle and stops with `ImportError: cannot import name 'feels_like' from 'weather'`. Python 3.9 goes on to say the module is partially initialized, most likely due to a circular import. Python 3.14 may suggest renaming the file instead, which is the wrong lead here.
+An import should go one way: the program imports the module, and the module needs nothing from the program. Say `weather.py` began with `from briefing import round_to`. Running `briefing.py` starts its import of `weather`, `weather` starts importing `briefing` again, and that second `briefing` asks `weather` for `feels_like` before the `def` of `feels_like` has run. This goes round in a circle and stops with something like `ImportError: cannot import name 'feels_like' from 'weather'`. Python 3.9 says the module is partially initialized, most likely due to a circular import. Python 3.14 may suggest renaming the file instead, which is the wrong lead here.
 
 Moving the import inside a function only hides the circle: the import then runs the whole program again each time the function is called. The mend is to move what both files need into the module.
 
