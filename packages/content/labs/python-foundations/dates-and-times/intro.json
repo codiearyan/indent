@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Dougie", "say": "When is the stretcher due a check?", "note": "Every check is 90 days apart." },
+    { "title": "Kit sheet", "text": "Dates as text, counted on fingers." },
+    {
+      "title": "Your code",
+      "file": "kit_dates.py",
+      "mine": true,
+      "gap": "Text the laptop cannot count",
+      "tasks": ["Read the time out", "Days since a check", "Next check due", "A line for the report"]
+    },
+    { "title": "Dougie", "say": "Due in April. No fingers needed.", "note": "And the council gets it in full." }
+  ],
+  "ticket": { "label": "Stretcher", "wrong": "A guess", "why": "Counted", "right": "Due date" },
+  "captions": [
+    "In the kit store, Dougie asks when the stretcher is next due a check.",
+    "Today the dates are text on a sheet, and Dougie counts the days on his fingers.",
+    "You turn the text into dates, count days between them, add days and write report lines.",
+    "Now the laptop counts the days since the stretcher's check and gives the date it is due.",
+    "Dougie knows when every check is due, and the council gets each date written out in full."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "One copy of these, not two.", "note": "Ailsa is copying them out." },
+    { "title": "Radio desk", "text": "Has its own copy of the reading functions." },
+    {
+      "title": "Your module",
+      "file": "callouts.py",
+      "mine": true,
+      "gap": "No file both can import",
+      "tasks": ["Move the functions", "Nothing runs on import", "Hours on one hill"]
+    },
+    { "title": "Rhona", "say": "Same lines, both desks. Good.", "note": "And a total for each hill." }
+  ],
+  "ticket": { "label": "Reading code", "wrong": "Two copies", "why": "Copied out", "right": "One module" },
+  "captions": [
+    "At the base, Rhona asks for one copy of the code that reads the callout log.",
+    "Today Ailsa is copying the functions out of the report, so two copies will drift apart.",
+    "You move them into callouts.py, keep its try-out lines quiet on import, and add to it.",
+    "Now the report and the radio desk import the same functions from one module.",
+    "Rhona's report reads the log just as Ailsa's desk does, and shows the hours on each hill."
+  ]
+}

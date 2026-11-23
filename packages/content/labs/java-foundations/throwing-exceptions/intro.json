@@ -1,0 +1,41 @@
+{
+  "stations": [
+    {
+      "title": "Bridie",
+      "say": "Why did an age of -4 get a ticket?",
+      "note": "And a booking for 0 seats."
+    },
+    {
+      "title": "Booking desk",
+      "text": "Takes any number it is handed"
+    },
+    {
+      "title": "Your refusals",
+      "file": "BookingDesk.java",
+      "mine": true,
+      "gap": "Nothing is ever refused",
+      "tasks": [
+        "An age that cannot be",
+        "Refuse, then book",
+        "Gale on the notice"
+      ]
+    },
+    {
+      "title": "Notice board",
+      "text": "Says boarding, whatever the weather."
+    }
+  ],
+  "ticket": {
+    "label": "Age -4",
+    "wrong": "child ticket",
+    "why": "Let through",
+    "right": "refused"
+  },
+  "captions": [
+    "The booking desk. Bridie wants it to refuse what cannot be, and to say why.",
+    "Today an age of -4 gets a child ticket, and nobody hears about it.",
+    "You throw exceptions that refuse bad values, and one the compiler makes callers plan for.",
+    "Now a bad value is refused with a message, before anything changes.",
+    "The desk says no when it must. Next, the hut is closed up whatever goes wrong."
+  ]
+}

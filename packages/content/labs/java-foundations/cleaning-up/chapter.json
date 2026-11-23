@@ -1,0 +1,101 @@
+{
+  "id": "cleaning-up",
+  "title": "Cleaning up: finally and try with resources",
+  "files": ["ClosingUp.java"],
+  "terminal": {
+    "description": "A shell in your workspace. Run the hut's closing up here, and try your classes from main.",
+    "suggestedCommand": "java ClosingUp.java"
+  },
+  "tasks": [
+    {
+      "id": "shutter",
+      "title": "Lower the shutter whatever happens",
+      "file": "ClosingUp.java",
+      "description": "Under `// Task 1`, write a class `Hut` with a method `static int sell(Shutter shutter, TicketPrinter printer, String[] tickets)`. It raises the shutter, prints each ticket on the printer, and gives back how many it printed. The shutter is lowered again, once, whatever happens: when the printer fails, its exception reaches the caller with the shutter down. `sell` does not switch the printer off: whoever handed it over does that.\n\nCheck runs `sell` with a shutter and a printer of its own, which write down everything done to them. Its printer runs out of paper, or refuses a blank ticket, when Check says. It reads what `sell` gives back, which exception reached it, and what was done to the shutter and the printer, in order.",
+      "nextSteps": [
+        "Read the part of the lesson about finally.",
+        "Write the class and the first line of sell exactly as the task gives it.",
+        "Raise the shutter, then print the tickets inside a try, and lower the shutter where it runs on every way out.",
+        "Take the // off the first group of lines in main, then try more tickets than the printer has paper for."
+      ],
+      "hints": [
+        "A line after the loop is skipped when the printer throws. The shutter needs a place that runs whether the try finishes or fails.",
+        "finally needs no catch: the exception goes on to the caller once finally has run. Give back the count from inside the try, never from finally.",
+        "The shape: `shutter.raise();`, then `try { ... return printed; } finally { shutter.lower(); }`."
+      ],
+      "docs": [
+        {
+          "title": "The finally block",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html"
+        },
+        {
+          "title": "The try statement",
+          "url": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-14.html#jls-14.20"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "printer",
+      "title": "Switch the printer off whatever happens",
+      "file": "ClosingUp.java",
+      "description": "Under `// Task 2`, write a class `Day` with a method `static int printAll(String[] tickets)`. It makes its own `TicketPrinter`, prints each ticket and gives back how many it printed. The printer is switched off, once, whatever happens: when it fails, its exception reaches the caller with the printer off.\n\nCheck runs `printAll` with a printer of its own in place of the starter's, which writes down everything done to it, and runs out of paper, refuses a blank ticket or will not start when Check says. It reads what `printAll` gives back, which exception reached it, and what was done to the printer, in order.",
+      "nextSteps": [
+        "Read the part of the lesson about try with resources.",
+        "Make the printer in the round brackets after try.",
+        "Print the tickets and give back the count inside the block.",
+        "Try it from main with more tickets than the starter's printer has paper for, and read what it prints."
+      ],
+      "hints": [
+        "TicketPrinter implements AutoCloseable, so a try can switch it off for you, on every way out.",
+        "A printer made in the round brackets after try is closed by the try; a close() of your own as well switches it off twice.",
+        "The first line of the block: `try (TicketPrinter printer = new TicketPrinter(\"the hut\")) {`, with the loop and the return inside."
+      ],
+      "docs": [
+        {
+          "title": "The try-with-resources statement",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html"
+        },
+        {
+          "title": "AutoCloseable",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Try with resources and AutoCloseable",
+          "url": "https://www.youtube.com/watch?v=F2gWqAy--yI"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "till",
+      "title": "Close the printer, then the till",
+      "file": "ClosingUp.java",
+      "description": "Under `// Task 3`, write a class `Sale` with a method `static int sellAll(String[] tickets, int[] fares)`. It opens a `Till`, then a `TicketPrinter`. For each ticket it adds the fare at the same position to the till, then prints the ticket, and it gives back the pence it added. Whatever happens, the printer is switched off and then the till is shut, each once, and an exception reaches the caller.\n\nCheck runs `sellAll` with a till and a printer of its own, which write down everything done to them. Its till refuses a fare below 0, and its printer runs out of paper or will not start when Check says. It reads what `sellAll` gives back, which exception reached it, and what was done to the till and the printer, in order.",
+      "nextSteps": [
+        "Read the part of the lesson about what is closed, and in which order.",
+        "Open both in the round brackets of one try, in the order the task gives.",
+        "In the loop, add each fare, keep the total, and print each ticket.",
+        "Try it from main with a fare below 0, and read the order things were closed in."
+      ],
+      "hints": [
+        "Things are closed in the opposite order to the one they were opened in, and a try with resources does that by itself.",
+        "Write both in the round brackets after try, separated by a semicolon: the till first, the printer second.",
+        "The first line of the block: `try (Till till = new Till(); TicketPrinter printer = new TicketPrinter(\"the hut\")) {`."
+      ],
+      "docs": [
+        {
+          "title": "The try-with-resources statement",
+          "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html"
+        },
+        {
+          "title": "AutoCloseable.close()",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html#close()"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

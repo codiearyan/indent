@@ -1,0 +1,156 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bridie",
+        "label": "Bridie",
+        "kind": "story"
+      },
+      {
+        "id": "noroom",
+        "label": "NoRoomException",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "booking",
+        "label": "Booking",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "lines",
+        "label": "Lines",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "badline",
+        "label": "BadLineException",
+        "kind": "data",
+        "mine": true
+      },
+      {
+        "id": "ledger",
+        "label": "Ledger",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bridie",
+        "to": "booking",
+        "label": "places wanted"
+      },
+      {
+        "from": "booking",
+        "to": "noroom",
+        "label": "seats free"
+      },
+      {
+        "from": "ledger",
+        "to": "lines",
+        "label": "a line"
+      },
+      {
+        "from": "lines",
+        "to": "badline",
+        "label": "line and cause"
+      }
+    ],
+    "note": "A full boat and a smudged line get exceptions with the hut's own names, carrying what the caller needs to know."
+  },
+  "tasks": {
+    "no-room": {
+      "steps": [
+        {
+          "active": [
+            "noroom"
+          ],
+          "value": {
+            "kind": "map",
+            "label": "what it carries",
+            "entries": [
+              {
+                "key": "message",
+                "value": "for people"
+              },
+              {
+                "key": "seats free",
+                "value": "for code"
+              }
+            ]
+          },
+          "note": "A full boat has its own exception, with a message and the seats still free."
+        },
+        {
+          "active": [
+            "noroom"
+          ],
+          "note": "It is checked, so every caller has to plan for a full boat."
+        }
+      ]
+    },
+    "booking": {
+      "steps": [
+        {
+          "active": [
+            "bridie",
+            "bridie->booking",
+            "booking"
+          ],
+          "note": "A booking asks for some places on a boat."
+        },
+        {
+          "active": [
+            "booking",
+            "booking->noroom",
+            "noroom"
+          ],
+          "note": "When there is no room, the exception carries how many seats are free."
+        },
+        {
+          "active": [
+            "booking"
+          ],
+          "note": "The answer is caught by its own name, and offers the seats that are left."
+        }
+      ]
+    },
+    "bad-line": {
+      "steps": [
+        {
+          "active": [
+            "ledger",
+            "ledger->lines",
+            "lines"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "a ledger line",
+            "values": [
+              "time",
+              "boat",
+              "seats"
+            ]
+          },
+          "note": "A ledger line is read for its seats."
+        },
+        {
+          "active": [
+            "lines",
+            "lines->badline",
+            "badline"
+          ],
+          "note": "A line that cannot be read becomes a bad line exception, which names the line."
+        },
+        {
+          "active": [
+            "badline"
+          ],
+          "note": "Inside it the first exception is kept as its cause, so nothing about what went wrong is lost."
+        }
+      ]
+    }
+  }
+}

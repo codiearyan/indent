@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Ailsa", "say": "Callouts per hill, for the council?", "note": "The busiest, and their dates." },
+    { "title": "Callout log", "text": "A year of lines, counted off with a pencil." },
+    {
+      "title": "Your code",
+      "file": "callout_counts.py",
+      "mine": true,
+      "gap": "Counted by hand each January",
+      "tasks": ["Count each hill", "The busiest hills", "Dates by hill", "One hill's count"]
+    },
+    { "title": "Council return", "rows": [["Callouts per hill"], ["Busiest hills"], ["Dates on each hill"]] }
+  ],
+  "ticket": { "label": "Council return", "wrong": "By pencil", "why": "Hand count", "right": "Sent" },
+  "captions": [
+    "At the radio desk, Ailsa asks for the callouts per hill for the council's yearly return.",
+    "Today she counts a whole year of the log off by hand, with a pencil, every January.",
+    "You count with a Counter, rank the busiest, and group dates by hill with a defaultdict.",
+    "Now the return fills itself in: callouts per hill, the busiest, and the dates on each.",
+    "Ailsa sends the council its answers in minutes, and her pencil stays in the drawer."
+  ]
+}

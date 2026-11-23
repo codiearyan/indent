@@ -1,0 +1,48 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "log", "label": "This year's log", "kind": "data" },
+      { "id": "counts", "label": "callout_counts.py", "kind": "file", "mine": true },
+      { "id": "groups", "label": "Dates by hill", "kind": "data" },
+      { "id": "ailsa", "label": "Ailsa", "kind": "story" },
+      { "id": "council", "label": "Council return", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "log", "to": "counts", "label": "callouts" },
+      { "from": "counts", "to": "groups", "label": "grouped" },
+      { "from": "counts", "to": "ailsa", "label": "counts" },
+      { "from": "ailsa", "to": "council", "label": "the answers" }
+    ],
+    "note": "The year's log is counted and grouped by Python's own dictionaries, not by pencil every January."
+  },
+  "tasks": {
+    "counts": {
+      "steps": [
+        { "active": ["log", "log->counts", "counts"], "value": { "kind": "array", "label": "what goes in", "values": ["a hill for each callout"] }, "note": "The hill of every callout goes in, in the order they came." },
+        { "active": ["counts"], "note": "A Counter counts them all at once, every hill starting at nothing." },
+        { "active": ["counts", "counts->ailsa", "ailsa"], "value": { "kind": "map", "label": "what comes out", "entries": [{ "key": "hill", "value": "how many callouts" }] }, "note": "Ailsa gets each hill with how many callouts it had." }
+      ]
+    },
+    "busiest": {
+      "steps": [
+        { "active": ["log", "log->counts", "counts"], "value": { "kind": "array", "label": "what goes in", "values": ["a hill for each callout", "how many to name"] }, "note": "The hills go in, with how many of the busiest to name." },
+        { "active": ["counts"], "note": "The counts are ranked, the most first, and a tie keeps the order the hills first came in." },
+        { "active": ["counts", "counts->ailsa", "ailsa"], "value": { "kind": "array", "label": "what comes out", "values": ["(hill, count)", "(hill, count)", "..."] }, "note": "Ailsa gets the busiest hills, each with its count." }
+      ]
+    },
+    "groups": {
+      "steps": [
+        { "active": ["log", "log->counts", "counts"], "value": { "kind": "array", "label": "what goes in", "values": ["(date, hill)", "(date, hill)", "..."] }, "note": "Each callout's date and hill go in." },
+        { "active": ["counts"], "note": "Each date is added to the list of its hill, and a hill's list is made the first time it comes." },
+        { "active": ["counts", "counts->groups", "groups"], "value": { "kind": "map", "label": "what comes out", "entries": [{ "key": "hill", "value": "its dates, in order" }] }, "note": "Out comes every hill with the dates the team was out on it." }
+      ]
+    },
+    "on": {
+      "steps": [
+        { "active": ["groups", "counts"], "value": { "kind": "array", "label": "what goes in", "values": ["the dates by hill", "a hill"] }, "note": "The grouped dates and one hill go in." },
+        { "active": ["counts"], "note": "It looks whether the hill is there before it reads, so a hill with no callouts is not added." },
+        { "active": ["counts", "counts->ailsa", "ailsa", "ailsa->council", "council"], "note": "The council gets the callouts on that hill, and the groups stay as they were." }
+      ]
+    }
+  }
+}
