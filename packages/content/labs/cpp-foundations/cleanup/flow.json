@@ -1,0 +1,185 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "bench",
+        "label": "Kasimir's bench",
+        "kind": "story"
+      },
+      {
+        "id": "open",
+        "label": "openWithParts()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "fit",
+        "label": "fitPart()",
+        "kind": "function"
+      },
+      {
+        "id": "loupe",
+        "label": "fitWithLoupe()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "borrowed",
+        "label": "Borrowed",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "drawer",
+        "label": "The tool drawer",
+        "kind": "data"
+      }
+    ],
+    "edges": [
+      {
+        "from": "bench",
+        "to": "open",
+        "label": "ticket, parts"
+      },
+      {
+        "from": "open",
+        "to": "fit",
+        "label": "each part"
+      },
+      {
+        "from": "loupe",
+        "to": "fit",
+        "label": "each part"
+      },
+      {
+        "from": "loupe",
+        "to": "borrowed",
+        "label": "the loupe"
+      },
+      {
+        "from": "borrowed",
+        "to": "drawer",
+        "label": "takes, puts back"
+      }
+    ],
+    "note": "Whatever a fitting takes, a repair or a tool, is given back on every way out, a part that does not fit included."
+  },
+  "tasks": {
+    "open": {
+      "steps": [
+        {
+          "active": [
+            "bench",
+            "bench->open",
+            "open"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "ticket",
+              "item",
+              "parts"
+            ]
+          },
+          "note": "A repair is opened with the parts it needs."
+        },
+        {
+          "active": [
+            "open->fit",
+            "fit"
+          ],
+          "note": "Each part is fitted in turn, and one may not fit."
+        },
+        {
+          "active": [
+            "open"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "the owner of the repair, or the exception"
+            ]
+          },
+          "note": "Either the repair comes back with its owner, or the exception goes on and the repair is gone."
+        }
+      ]
+    },
+    "borrow": {
+      "steps": [
+        {
+          "active": [
+            "borrowed",
+            "borrowed->drawer",
+            "drawer"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the drawer",
+              "a tool's name"
+            ]
+          },
+          "note": "A tool is borrowed from the drawer."
+        },
+        {
+          "active": [
+            "drawer"
+          ],
+          "note": "With none left, the borrowing is refused before anything is taken."
+        },
+        {
+          "active": [
+            "borrowed",
+            "drawer"
+          ],
+          "note": "When the borrowing ends, however it ends, the tool goes back once."
+        }
+      ]
+    },
+    "loupe": {
+      "steps": [
+        {
+          "active": [
+            "loupe",
+            "loupe->borrowed",
+            "borrowed"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the drawer",
+              "a repair",
+              "the parts"
+            ]
+          },
+          "note": "Kasimir borrows the loupe before he starts."
+        },
+        {
+          "active": [
+            "loupe->fit",
+            "fit"
+          ],
+          "note": "Every part is fitted while the loupe is held, and one may not fit."
+        },
+        {
+          "active": [
+            "borrowed->drawer",
+            "drawer"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "how many parts were fitted, or the exception"
+            ]
+          },
+          "note": "The loupe is back in the drawer, whatever happened to the parts."
+        }
+      ]
+    }
+  }
+}

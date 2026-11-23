@@ -1,0 +1,202 @@
+{
+  "scene": {
+    "nodes": [
+      {
+        "id": "counter",
+        "label": "Dorrit's counter",
+        "kind": "story"
+      },
+      {
+        "id": "line",
+        "label": "chargeLine()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "add",
+        "label": "addCharge()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "quote",
+        "label": "quoteParts()",
+        "kind": "function",
+        "mine": true
+      },
+      {
+        "id": "book",
+        "label": "The price book",
+        "kind": "data"
+      },
+      {
+        "id": "till",
+        "label": "The till",
+        "kind": "story"
+      }
+    ],
+    "edges": [
+      {
+        "from": "counter",
+        "to": "line",
+        "label": "a charge"
+      },
+      {
+        "from": "line",
+        "to": "add",
+        "label": "a charge"
+      },
+      {
+        "from": "line",
+        "to": "till",
+        "label": "added charge"
+      },
+      {
+        "from": "quote",
+        "to": "book",
+        "label": "each part"
+      },
+      {
+        "from": "line",
+        "to": "counter",
+        "label": "one line"
+      }
+    ],
+    "note": "Each problem is thrown where it is found and caught only where someone can do something about it."
+  },
+  "tasks": {
+    "refuse": {
+      "steps": [
+        {
+          "active": [
+            "line->add",
+            "add"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the bill",
+              "a charge in cents"
+            ]
+          },
+          "note": "A charge arrives for Ambrose's bill."
+        },
+        {
+          "active": [
+            "add"
+          ],
+          "note": "A charge that makes no sense is refused before the bill changes, and the refusal says which charge it was."
+        },
+        {
+          "active": [
+            "add"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "the bill, one charge longer, or a refusal"
+            ]
+          },
+          "note": "A charge that makes sense goes on the end of the bill."
+        }
+      ]
+    },
+    "quote": {
+      "steps": [
+        {
+          "active": [
+            "quote"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the parts",
+              "the list of missing parts"
+            ]
+          },
+          "note": "Ambrose wants a quote for a list of parts."
+        },
+        {
+          "active": [
+            "quote->book",
+            "book"
+          ],
+          "note": "Each part is priced from the book; a part not in it is noted, and the quote goes on."
+        },
+        {
+          "active": [
+            "book",
+            "quote"
+          ],
+          "note": "A broken list or a locked book is not a missing part: that goes on up to whoever asked."
+        },
+        {
+          "active": [
+            "quote"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "the total",
+              "the missing parts"
+            ]
+          },
+          "note": "The quote adds up every part that has a price."
+        }
+      ]
+    },
+    "line": {
+      "steps": [
+        {
+          "active": [
+            "counter",
+            "counter->line",
+            "line"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "goes in",
+            "values": [
+              "the bill",
+              "a charge in cents"
+            ]
+          },
+          "note": "A charge is typed at the counter."
+        },
+        {
+          "active": [
+            "line->add",
+            "add"
+          ],
+          "note": "The charge is added, or refused with a reason."
+        },
+        {
+          "active": [
+            "line->till",
+            "till"
+          ],
+          "note": "An added charge goes to the till; a till that is off is Ambrose's problem, not the counter's."
+        },
+        {
+          "active": [
+            "line",
+            "line->counter",
+            "counter"
+          ],
+          "value": {
+            "kind": "array",
+            "label": "comes out",
+            "values": [
+              "an added line, or a not-added line with the reason"
+            ]
+          },
+          "note": "The counter reads what happened, in words someone can act on."
+        }
+      ]
+    }
+  }
+}

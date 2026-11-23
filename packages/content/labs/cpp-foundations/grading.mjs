@@ -2228,6 +2228,10 @@ export async function buildTypes(t, spec) {
     const swapped = swapType(cuts[spec.files[0]], spec.files[0], spec.swap)
     if (swapped) return { problem: [swapped] }
   }
+  if (spec.edit) {
+    const edited = spec.edit(cuts)
+    if (edited) return { problem: [edited] }
+  }
   const taskCode = Object.values(cuts).map(cutCode).join('\n')
   const balanced = Object.values(cuts).every((c) => !unbalanced(cutCode(c)))
 
@@ -2419,7 +2423,7 @@ export async function buildTypes(t, spec) {
         fail(
           `${label} builds`,
           inLibrary ?? `The compiler could not build ${label}. Build the files in the terminal with the issue's command and read the first error.`,
-          clip(made.stderr.split('\n').filter((l) => l && !l.startsWith('/') && !l.includes(dir)).slice(0, 6).join('\n'))
+          spec.libraryOutput?.(made.stderr, cuts) ?? clip(made.stderr.split('\n').filter((l) => l && !l.startsWith('/') && !l.includes(dir)).slice(0, 6).join('\n'))
         )
       ]
     }
@@ -2489,7 +2493,7 @@ export async function buildTypes(t, spec) {
               ? `${fn ? `${who}, under ${label},` : `The code of ${label}`} did not finish within ${RUN_SECONDS} seconds, so Check stopped it. A loop in it never ends: look at what changes each time round, and whether it moves toward the end.`
               : `${fn ? `${who}, under ${label},` : `The code of ${label}`} printed far more than the task asks for, so Check stopped it. Look for a loop that prints without end.`
         : spec.classCrashed?.(r, label) ?? crashedWhy(r, who, label)
-    const call = fn ? `${describeCall(fn, spec, spec.cases[broken])}\n` : ''
+    const call = fn ? `${spec.describe?.(broken) ?? describeCall(fn, spec, spec.cases[broken])}\n` : ''
     return { problem: [fail(`${who} runs to the end`, why, `${call}${(r.stdout ?? '').trim() ? printedText(firstLines(clip(r.stdout))) : ''}`.trim())] }
   }
   const sig = (runs[0].got.sig ?? '').split(SPLIT)
@@ -3482,4 +3486,346 @@ export async function judgeMemory(t, spec) {
     const out = [c.output?.(got), message ? counts(got) : ''].filter(Boolean).join('\n')
     return { name: c.name, passed: !message, message: message ?? undefined, output: out }
   })
+}
+
+// ---------- Part 7: when it goes wrong ----------
+//
+// Check calls the learner's code inside a try of its own, so an exception that comes out is caught
+// and written down (its kind, and what() for a standard one) instead of ending the program. Two
+// things end a program by the language's own rules whatever Check catches: an exception that
+// leaves a destructor, and a second one thrown while the first is still on its way out. Check's
+// terminate handler writes that down and ends the run quietly, so it is named with its task like
+// any other fault. With spec.asserts, the line #include <cassert> becomes a header of Check's whose
+// assert writes the learner's condition and line and ends the run the same way, and which a case
+// can switch off, as NDEBUG would in a shop build. Given functions and classes above Task 1 can be
+// swapped for Check's own (spec.swaps), so a task that calls one can make it throw on purpose.
+
+const FAULT_HELPERS = (own) => [
+  '#include <exception>',
+  '#include <stdexcept>',
+  '#include <typeinfo>',
+  '#include <optional>',
+  '#include <memory>',
+  String.raw`namespace indent_ {
+template <class T> struct opt7_ : std::false_type {};
+template <class E> struct opt7_<std::optional<E>> : std::true_type { using elem = E; };
+template <class T> struct up7_ : std::false_type {};
+template <class E, class D> struct up7_<std::unique_ptr<E, D>> : std::true_type { using elem = E; };
+template <class T> void ft_() {
+  using N = std::remove_reference_t<T>;
+  using B = std::remove_cv_t<N>;
+  if constexpr (std::is_const_v<N> && !std::is_pointer_v<B>) std::cerr << "const ";
+  if constexpr (std::is_pointer_v<B>) { ft_<std::remove_pointer_t<B>>(); std::cerr << "*"; }
+  ${own.map((n) => `else if constexpr (std::is_same_v<B, ${n}>) std::cerr << "${n}";`).join('\n  ')}
+  else if constexpr (opt7_<B>::value) { std::cerr << "std::optional<"; ft_<typename opt7_<B>::elem>(); std::cerr << ">"; }
+  else if constexpr (up7_<B>::value) { std::cerr << "std::unique_ptr<"; ft_<typename up7_<B>::elem>(); std::cerr << ">"; }
+  else if constexpr (vec_<B>::value) { std::cerr << "std::vector<"; ft_<typename vec_<B>::elem>(); std::cerr << ">"; }
+  else if constexpr (map_<B>::value) { std::cerr << "std::map<"; ft_<typename map_<B>::key>(); std::cerr << ", "; ft_<typename map_<B>::mapped>(); std::cerr << ">"; }
+  else type_<B>();
+  if constexpr (std::is_lvalue_reference_v<T>) std::cerr << "&";
+  else if constexpr (std::is_rvalue_reference_v<T>) std::cerr << "&&";
+}
+template <class T> struct fs7_ { static void say(const char* n) { std::cerr << "\036" << n << "\037overloaded\036"; } };
+template <class R, class... A> struct fs7_<R (*)(A...)> {
+  static void say(const char* n) { std::cerr << "\036" << n << "\037"; ft_<R>(); ((std::cerr << "\037", ft_<A>()), ...); std::cerr << "\036"; }
+};
+template <class R, class... A> struct fs7_<R (*)(A...) noexcept> : fs7_<R (*)(A...)> {};
+template <class F, class R, class... A> constexpr bool fits7_() {
+  if constexpr (std::is_invocable_v<F, A...>) return std::is_same_v<std::invoke_result_t<F, A...>, R>;
+  else return false;
+}
+inline const char* kind_(const std::exception& e) {
+  const std::type_info& t = typeid(e);
+  ${own.map((n) => `if constexpr (std::is_base_of_v<std::exception, ${n}>) { if (t == typeid(${n})) return "${n}"; }`).join('\n  ')}
+  if (t == typeid(std::invalid_argument)) return "std::invalid_argument";
+  if (t == typeid(std::out_of_range)) return "std::out_of_range";
+  if (t == typeid(std::runtime_error)) return "std::runtime_error";
+  if (t == typeid(std::logic_error)) return "std::logic_error";
+  if (t == typeid(std::length_error)) return "std::length_error";
+  if (t == typeid(std::domain_error)) return "std::domain_error";
+  if (t == typeid(std::range_error)) return "std::range_error";
+  if (t == typeid(std::overflow_error)) return "std::overflow_error";
+  if (t == typeid(std::bad_optional_access)) return "std::bad_optional_access";
+  if (t == typeid(std::bad_alloc)) return "std::bad_alloc";
+  if (t == typeid(std::exception)) return "std::exception";
+  if (dynamic_cast<const std::invalid_argument*>(&e)) return "a kind of std::invalid_argument";
+  if (dynamic_cast<const std::out_of_range*>(&e)) return "a kind of std::out_of_range";
+  if (dynamic_cast<const std::logic_error*>(&e)) return "a kind of std::logic_error";
+  if (dynamic_cast<const std::runtime_error*>(&e)) return "a kind of std::runtime_error";
+  return "a kind of std::exception";
+}
+inline void threw_(const std::exception& e) { put_("threw", kind_(e)); put_("what", e.what()); }
+[[noreturn]] inline void ended_() {
+  std::cout.flush();
+  std::cerr << "\036terminated\0371\036";
+  if (std::exception_ptr p = std::current_exception()) {
+    try { std::rethrow_exception(p); } catch (const std::exception& e) { threw_(e); } catch (...) { put_("threw", "other"); }
+  }
+  std::cerr.flush();
+  std::_Exit(0);
+}
+}
+#define INDENT_CATCH_ catch (const std::exception& indent_e_) { indent_::threw_(indent_e_); } \
+  catch (const std::exception*) { indent_::put_("threw", "pointer"); } \
+  ${own.map((n) => `catch (const ${n}&) { indent_::put_("threw", "${n}"); }`).join(' \\\n  ')} \
+  catch (const char*) { indent_::put_("threw", "text"); } \
+  catch (const std::string&) { indent_::put_("threw", "string"); } \
+  catch (int) { indent_::put_("threw", "number"); } \
+  catch (long) { indent_::put_("threw", "number"); } \
+  catch (double) { indent_::put_("threw", "number"); } \
+  catch (...) { indent_::put_("threw", "other"); }`
+]
+
+const ASSERT_HEADER = String.raw`#pragma once
+#include <cassert>
+#include <algorithm>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <numeric>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#undef assert
+namespace indent_ {
+inline bool asserts_ = true;
+[[noreturn]] inline void afail_(const char* cond, const char* file, int line) {
+  std::cout.flush();
+  std::cerr << "\036asserted\037" << cond << "\036\036assertLine\037" << line << "\036\036assertFile\037" << file << "\036";
+  std::cerr.flush();
+  std::_Exit(0);
+}
+}
+#define assert(c) (!indent_::asserts_ || static_cast<bool>(c) ? static_cast<void>(0) : indent_::afail_(#c, __FILE__, __LINE__))
+`
+const ASSERT_INCLUDE = /^\s*#\s*include\s*<(?:cassert|assert\.h)>/
+
+/** Puts Check's own version of each given function or class above Task 1 in its place. */
+function swapGiven(cut, file, swaps) {
+  for (const s of swaps) {
+    if (s.kind === 'class') {
+      const problem = swapType(cut, file, s)
+      if (problem) return problem
+      continue
+    }
+    const def = cut.fns.find((f) => f.name === s.name && f.kind === 'def' && !f.nested && f.startLine < cut.first)
+    if (!def) {
+      return fail(
+        `${file} keeps ${s.name}`,
+        `Check cannot find the function ${s.name} above // Task 1 in ${file}, whole, as the starter gives it. The tasks use it: put it back as it was, or Reset the issue to get the starter back.`
+      )
+    }
+    for (let i = def.startLine; i <= def.endLine; i++) {
+      cut.kept[i] = i === def.startLine ? s.lines : ''
+      cut.providedAt.add(i)
+    }
+  }
+  return null
+}
+
+const KIND_WORDS = {
+  pointer: 'a pointer to an exception, which is what throw new makes',
+  text: 'a text in double quotes, not an exception',
+  string: 'a std::string, not an exception',
+  number: 'a number, not an exception',
+  other: 'something that is not an exception of the standard library'
+}
+
+/** What a thrown kind Check wrote down is, as a person reads it. */
+export const kindWords = (kind) => KIND_WORDS[kind] ?? (kind.startsWith('a kind of') ? kind : `a ${kind}`)
+
+/** The kind and message of what came out, as a person reads it. */
+export const thrownText = (got) => `${kindWords(got.threw)}${got.what !== undefined ? ` with what() "${got.what}"` : ''}`
+
+/** The causes of a build error that part 7 teaches, tried before those of parts 1 to 6. */
+function faultCause(errors, ctx, spec) {
+  const all = errors.length ? errors.map((e) => e.text).join('\n') : (ctx.stderr ?? '')
+  const fromCheck = ctx.where === 'added' || ctx.where === 'provided'
+  const compared = /invalid operands to binary expression \('(?:const )?(\w+)' and '(?:const )?([\w ]+)'\)|no match for 'operator==' \(operand types are '(?:const )?(\w+)' and '(?:const )?([\w ]+)'\)/.exec(all)
+  if (!errors.length && compared) {
+    const [a, b] = [compared[1] ?? compared[3], compared[2] ?? compared[4]]
+    return `The first error is inside the standard library's own file, and it says a ${a} is compared with ${article(b)} ${b} with ==, which nothing in the program says how to do. The line of yours that asked for it is the one marked "requested here" or "required from here": there, the library is handed ${article(a)} ${a} to compare with a value of another kind. The other lines of the message are the compiler's guesses at what else it could have meant.`
+  }
+  const printed = /invalid operands to binary expression \('(?:std::)?(?:basic_)?ostream'(?: \(aka '[^']*'\))? and '(?:const )?([^']+)'\)|no match for 'operator<<' \(operand types are 'std::ostream'(?: \{aka '[^']*'\})? and '(?:const )?([^']+)'(?: \{aka '[^']*'\})?\)/.exec(all)
+  if (printed && !fromCheck) {
+    const what = printed[1] ?? printed[2]
+    return `The first line of the message is the one that matters: << cannot print ${article(what)} ${what}. std::cout prints numbers, characters and texts, one at a time, and has no way to print a whole vector or a struct of yours. Every line after it is the compiler listing each kind of value << can print and why it does not fit: you can stop reading after the first. Print the parts you need, each with its own <<.`
+  }
+  if (fromCheck && spec.fn && new RegExp(`(?:undeclared identifier|was not declared in this scope)[^\\n]*'${spec.fn}'|'${spec.fn}' was not declared`).test(all)) {
+    return `Check cannot find a function called ${spec.fn} under // ${ctx.label}. Write it there, above main, with exactly that name: capital letters count.`
+  }
+  if (/cannot throw|expected expression[^\n]*throw|'throw' (?:expected|requires)/.test(all)) return null
+  if (/no viable conversion from 'std::(?:__1::)?nullopt_t'|could not convert 'std::nullopt'/.test(all)) {
+    return `A line gives back std::nullopt where the function's type has no room for "nothing". Only a std::optional can hold nothing: compare what the function gives back with the task.`
+  }
+  if (/no member named '(\w+)' in 'std::(?:__1::)?optional|'class std::optional<[^']*>' has no member named/.test(all)) {
+    return `A line uses a dot on a std::optional to reach a member of what it holds. The optional is a box around the value: ask it whether it holds one first, then reach the value inside with -> or *.`
+  }
+  if (/invalid argument type '[^']*optional[^']*' to unary expression|no match for 'operator!'|value of type 'std::(?:__1::)?optional<[^']*>' is not contextually convertible|cannot convert 'std::optional/.test(all)) return null
+  if (/no matching function for call to '(?:std::(?:__cxx11::)?)?stoi\b/.test(all)) {
+    return `std::stoi takes the text to read as a std::string. Look at what the line hands it.`
+  }
+  return null
+}
+
+const CATCH_VALUE = /\bcatch\s*\(\s*(?:const\s+)?(std::\w+|[A-Z]\w*)\s*(\w+)?\s*\)/
+
+function faultWarning(warnings, { code = '', file, from = 0 } = {}) {
+  const sliced = warnings.find((w) => /catching polymorphic type [^\n]* by value/.test(w.text))
+  const loose = CATCH_VALUE.exec(code)
+  if (sliced || loose) {
+    // clang gives no warning for this, so the line is the task's own.
+    const line = loose ? from + code.slice(0, loose.index).split('\n').length : 0
+    return {
+      warning: sliced ?? { file, line, kind: 'note', text: 'the exception is caught by value, as a copy' },
+      message: `A catch takes the exception by value, as a copy: catch (${loose ? loose[1] : 'std::out_of_range'} e). A copy can lose what a kind built on top of it carries, and GCC warns about it. Catch by const reference, with const in front and & after the kind, as the lesson does.`
+    }
+  }
+  const dtor = warnings.find((w) => /has a non-throwing exception specification but can still throw|'throw' will always call 'terminate'|in C\+\+11 destructors default to 'noexcept'/.test(w.text))
+  if (dtor) {
+    return {
+      warning: dtor,
+      message: `The compiler warns that a throw sits where nothing may come out: a destructor, or a function marked noexcept. An exception that leaves such a function ends the program on the spot, whoever catches. A destructor puts things back and lets no exception out.`
+    }
+  }
+  return null
+}
+
+function faultCrashed(r, label, optional) {
+  const text = r.stderr ?? ''
+  if (/Assertion '[^']*' failed|__glibcxx_assert|out of bounds|_M_range_check|disengaged|_M_is_engaged/.test(text) || r.signal === 'SIGTRAP' || r.signal === 'SIGILL' || r.signal === 'SIGABRT') {
+    const at = optional
+      ? 'and it stops a program at two mistakes: * or -> on a std::optional that holds nothing, and [] with a position past the end of a vector or a text'
+      : 'and it stops a program at [] with a position past the end of a vector or a text, such as the first of an empty vector'
+    return `The program stopped while the code of ${label} ran, at a guard of the standard library. Check builds your code with that guard on, ${at}. Built without it, as in your terminal, the program reads whatever is in memory there and may seem to work.`
+  }
+  if (r.signal === 'SIGFPE') return `The system stopped the program while the code of ${label} ran: a whole number was divided by zero.`
+  if (r.signal === 'SIGSEGV' || r.signal === 'SIGBUS') {
+    return `The system stopped the program while the code of ${label} ran: a line reached memory the program does not own, through a pointer to nothing or to something that has ended, or a function called itself without end.`
+  }
+  if (r.signal) return `The system stopped the program while the code of ${label} ran, before it could finish.`
+  return `The program stopped with an error while the code of ${label} ran, before the end of Check's code.`
+}
+
+/** The lines of the learner's file that a long error inside the library came from. */
+function faultLibraryOutput(stderr, cuts) {
+  for (const [file, cut] of Object.entries(cuts)) {
+    const here = requestedHere(stderr, file, cut.lines)
+    if (here) {
+      const first = stderr.split('\n').find((l) => /\b(?:fatal )?error: /.test(l))
+      return `${first ? `The first error: ${first.replace(/^.*?\berror: /, '')}\n\n` : ''}${here}`
+    }
+  }
+  return undefined
+}
+
+/** A failed assert Check wrote down, as a person reads it. */
+export const assertText = (got) => `assert(${got.asserted}) on line ${got.assertLine} of ${got.assertFile}`
+
+/**
+ * Judges a task of part 7. Spec, besides what buildTypes() takes:
+ * - fn, sig and callWith as judgeMemory(); or, for a class task, no fn and className
+ * - own: the names of the learner's types and Check's own that its code names and catches
+ * - swaps: [{ name, lines, kind }] the given functions (or a class, kind 'class') above Task 1
+ *   that Check builds with its own version in their place
+ * - counted: Check's counting Repair of part 6 in place of the starter's, read after each case
+ * - asserts: Check's own assert, which writes asserted, assertLine and assertFile
+ * - cases: [{ name, code, judge(got, stdout) => message or null, output(got, stdout), throws, asserts,
+ *   noAsserts }]
+ *   code runs inside Check's try: what comes out is got.threw (a kind) and got.what. Without
+ *   throws, anything that comes out fails the case; without asserts, so does a failed assert.
+ *   noAsserts runs the case with every assert switched off; escaped(got) words what came out
+ * - crashed(r, label): words for a run the system stopped, or null for the usual ones
+ */
+export async function judgeFault(t, spec) {
+  const { fn, task } = spec
+  const file = spec.files[0]
+  const whole = (await readFile(join(t.workspace, file), 'utf8').catch(() => null))?.replace(/\r\n/g, '\n')
+  if (whole === null || whole === undefined) {
+    return [fail(`${file} is there`, `Check cannot find ${file}. Every file of this issue is in the starter; Reset brings it back.`)]
+  }
+  const starter = (await readFile(t.chapterPath(`starter/${file}`), 'utf8')).replace(/\r\n/g, '\n')
+  const includes = (text) => new Set(text.split('\n').filter((l) => /^\s*#\s*include/.test(l)).map((l) => l.replace(/\s+/g, '').replace('<assert.h>', '<cassert>')))
+  const now = includes(whole)
+  const gone = [...includes(starter)].find((l) => !now.has(l))
+  if (gone) {
+    return [fail(`${file} keeps its #include lines`, `The line ${gone.replace('#include', '#include ')} is gone from the top of ${file}, and the file uses what it brings in. Put it back.`)]
+  }
+  const lines = whole.split('\n')
+  const { starts } = marks(lines)
+  let section = ''
+  let sectionFrom = 0
+  if (starts.has(task)) {
+    const from = starts.get(task)
+    sectionFrom = from
+    const next = Math.min(lines.length, ...[...starts.values()].filter((i) => i > from), ...lines.map((l, i) => (i > from && /\bint\s+main\s*\(/.test(l) ? i : Infinity)))
+    section = codeOnly(lines.slice(from, next).join('\n'))
+    if (unbalanced(section)) return [fail(`${label(task)} builds`, PART2.braces(label(task)))]
+  }
+  const own = spec.own ?? []
+  const sigCase = fn ? { name: `${fn} takes and gives back what the task says`, code: `indent_::fs7_<decltype(&${fn})>::say("msig");`, sig: true } : null
+  const wrap = (c) => {
+    const body = `${c.noAsserts ? 'indent_::asserts_ = false; indent_::put_("assertsOff", 1); ' : ''}try { ${c.code} } INDENT_CATCH_ indent_::put_("ran", 1);`
+    const guarded = !fn || spec.callWith === undefined ? `{ ${body} }` : `[&](auto ${fn}) { if constexpr (indent_::fits7_<decltype(${fn}), ${spec.sig.returns}${spec.callWith ? `, ${spec.callWith}` : ''}>()) { ${body} } }(&${fn});`
+    return `std::set_terminate(indent_::ended_); ${guarded}${spec.counted ? ' indent_mem_::report_();' : ''}`
+  }
+  const cases = [...(sigCase ? [sigCase] : []), ...spec.cases]
+  const header = join(dirname(file), 'indent_assert_.h').replaceAll('\\', '/')
+  const edit = (cuts) => {
+    const cut = cuts[file]
+    if (spec.swaps?.length) {
+      const problem = swapGiven(cut, file, spec.swaps)
+      if (problem) return problem
+    }
+    if (spec.asserts) cut.kept = cut.kept.map((l) => (ASSERT_INCLUDE.test(l) ? `#include "indent_assert_.h"` : l))
+    return null
+  }
+  const built = await buildTypes(t, {
+    ...spec,
+    ownCode: true,
+    swap: spec.counted ? { name: 'Repair', lines: REPAIR_LINES } : undefined,
+    edit,
+    replaced: spec.asserts ? { [header]: ASSERT_HEADER } : undefined,
+    cases: cases.map((c) => ({ code: c.sig ? c.code : wrap(c) })),
+    helpers: [...(spec.counted ? MEMORY_HELPERS : []), ...FAULT_HELPERS(own), ...(spec.helpers ?? [])],
+    classCause: (errors, ctx) =>
+      faultCause(errors, ctx, spec) ??
+      (spec.counted ? memoryCause(errors, ctx, spec) : null) ??
+      classCause(errors, ctx, { ...spec, className: spec.className ?? 'Repair', members: spec.members ?? [], functions: spec.functions ?? ['getTicket', 'getItem', 'getMinutes', 'addMinutes'] }),
+    classLink: () => null,
+    classWarning: (warnings) => faultWarning(warnings, { code: section, file, from: sectionFrom }) ?? (spec.counted ? memoryWarning(warnings) : null) ?? classWarning(warnings),
+    classCrashed: (r, l) =>
+      spec.crashed?.(r, l) ??
+      ((r.stderr ?? '').includes(`${START}assertsOff${SPLIT}1`)
+        ? `With every assert switched off, as a shop build does, the program stopped while the code of ${l} ran, where it runs to the end with them on. The code inside an assert does not run at all then: an assert only looks, and the work the function needs goes on lines of their own.`
+        : faultCrashed(r, l, /\boptional\b/.test(codeOnly(whole)))),
+    libraryOutput: faultLibraryOutput,
+    describe: (i) => (sigCase && i === 0 ? `Check read what ${fn} takes and gives back` : `The case: ${cases[i].name}`)
+  })
+  if (built.problem) return built.problem
+  const runs = sigCase ? built.runs.slice(1) : built.runs
+  if (sigCase) {
+    const problem = pointerSig(built.runs[0].got, fn, spec.sig)
+    if (problem) return [fail(sigCase.name, problem)]
+  }
+  const who = fn ?? `the code of ${label(task)}`
+  const Who = fn ?? `The code of ${label(task)}`
+  const results = spec.cases.map((c, k) => {
+    const { got, eof, stdout = '' } = runs[k]
+    let message = null
+    if (eof) message = `${Who} went on reading after the end of what Check typed. Nothing in this task reads what people type: in the terminal it would sit and wait.`
+    else if (got.terminated === '1') {
+      message = `While Check ran ${who}, the program was ended by the language itself, not by Check: an exception left a destructor, or a second exception was thrown while the first was still on its way out. Both end a program on the spot, whatever catch is waiting. In your terminal it ends with a line like "terminate called after throwing an instance of ...".${got.threw ? ` What was thrown: ${thrownText(got)}.` : ''}`
+    } else if (got.asserted !== undefined && !c.asserts) {
+      message = `${assertText(got)} failed while Check ran ${who} with values that are fine, so the program stopped there. An assert states what must always be true at that line; look at whether that condition is what the task says.`
+    } else if (got.ran !== '1' && got.asserted === undefined) message = `Check could not call ${who} with what ${label(task)} gives it. Compare the types in its round brackets with the task.`
+    else if (got.threw !== undefined && !c.throws) {
+      message = c.escaped?.(got) ?? `${Who} let ${thrownText(got)} out, and nothing in this case should throw. Check caught it; in your terminal it would end the program with a line like "terminate called after throwing an instance of ...".`
+    } else message = (spec.counted ? memoryFault(got, { who, ...spec.say, ...c.say }) : null) ?? c.judge(got, stdout)
+    const out = [c.output?.(got, stdout), message && spec.counted ? counts(got) : ''].filter(Boolean).join('\n')
+    return { name: c.name, passed: !message, message: message ?? undefined, output: out || undefined }
+  })
+  return [...results, ...(spec.probes ?? []).map((p, i) => probeDetail(p, i, built.probed))]
 }

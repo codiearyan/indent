@@ -1,0 +1,40 @@
+{
+  "stations": [
+    {
+      "title": "Ambrose",
+      "say": "Who let a minus charge on a bill?"
+    },
+    {
+      "title": "The bill",
+      "text": "Takes any charge, a minus one too."
+    },
+    {
+      "title": "Your billing",
+      "file": "billing.cpp",
+      "mine": true,
+      "gap": "Every problem looks the same",
+      "tasks": [
+        "Refuse bad charges",
+        "Quote what has prices",
+        "Say what happened"
+      ]
+    },
+    {
+      "title": "The counter",
+      "text": "Each problem answered where it belongs."
+    }
+  ],
+  "ticket": {
+    "label": "Minus charge",
+    "wrong": "on the bill",
+    "why": "No refusal",
+    "right": "refused"
+  },
+  "captions": [
+    "Ambrose finds a charge of minus 250 cents on last month's bill, and nothing stopped it.",
+    "The bill takes any charge, and every other problem ends up looking just the same.",
+    "You throw each problem where it is found and catch it only where it can be handled.",
+    "Now the minus charge is refused, with a reason the counter can read out.",
+    "Problems travel to whoever can deal with them. Next, cleaning up after them."
+  ]
+}
