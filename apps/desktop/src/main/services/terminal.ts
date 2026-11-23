@@ -12,6 +12,11 @@ import { workspaceDir } from '../paths'
 
 const terminals = new Map<string, IPty>()
 
+// A shell can print thousands of small chunks a second. They go to the page together, a few
+// times a frame at most, instead of one message each.
+const BATCH_MS = 8
+const BATCH_MAX = 64 * 1024
+
 // The npm tarball of node-pty 1.1.0 ships prebuilds/darwin-*/spawn-helper without the executable
 // bit, and every spawn fails with "posix_spawnp failed" until it is set.
 function ensureSpawnHelperExecutable(): void {
@@ -34,7 +39,7 @@ function size(value: number, fallback: number): number {
   return Number.isInteger(value) && value > 0 ? value : fallback
 }
 
-/** Ends every shell; each one reports its exit to the renderer as usual. */
+/** Ends every shell; each one reports its exit to the renderer as usual. Also when the window goes. */
 export function killAll(): void {
   for (const pty of terminals.values()) pty.kill()
 }
@@ -62,12 +67,21 @@ export function register(): void {
       terminals.set(id, pty)
       // Goes in front of the shell's first output: anything sent before the renderer has the id is lost.
       const problem = labModelProblem(labId)
-      let notice = problem ? `\x1b[2m${problem}\x1b[0m\r\n` : ''
+      let pending = problem ? `\x1b[2m${problem}\x1b[0m\r\n` : ''
+      let timer: ReturnType<typeof setTimeout> | undefined
+      const send = (): void => {
+        clearTimeout(timer)
+        timer = undefined
+        if (pending) emit(EVENTS.terminalData, id, pending)
+        pending = ''
+      }
       pty.onData((data) => {
-        emit(EVENTS.terminalData, id, notice + data)
-        notice = ''
+        pending += data
+        if (pending.length >= BATCH_MAX) send()
+        else timer ??= setTimeout(send, BATCH_MS)
       })
       pty.onExit(({ exitCode }) => {
+        send()
         terminals.delete(id)
         emit(EVENTS.terminalExit, id, exitCode)
       })
