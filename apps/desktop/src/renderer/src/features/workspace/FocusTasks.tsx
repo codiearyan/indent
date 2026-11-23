@@ -1,18 +1,22 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Loader2 } from 'lucide-react'
 import type { Chapter } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useChapterProgress } from '@/stores/progress'
+import { useRuntime } from '@/stores/runtime'
 import { useSettings } from '@/stores/settings'
 import { useWorkspace } from '@/stores/workspace'
 import { focusTasks } from './taskCard'
 import { IconButton } from './IconButton'
 import { StatusIcon } from './TaskItem'
+import { checkAll } from './useWorkspaceShortcuts'
 
 /** Focus mode hides the lesson; this card keeps the tasks and why a check failed in sight. */
 export function FocusTasks({ chapter }: { chapter: Chapter }): React.JSX.Element {
   const progress = useChapterProgress(chapter.labId, chapter.id)
   const checking = useWorkspace((s) => s.checking)
+  const toolsInstalling = useRuntime((s) => !!s.status?.installing)
+  const toolsBroken = useRuntime((s) => !!s.status?.error)
   const open = useSettings((s) => s.panels.focusTasks)
   const setPanel = useSettings((s) => s.setPanel)
   const tasks = focusTasks(chapter.tasks, progress)
@@ -93,6 +97,19 @@ export function FocusTasks({ chapter }: { chapter: Chapter }): React.JSX.Element
           </li>
         ))}
       </ol>
+      {/* Outline: the editor's Run checks stays the view's one filled button. */}
+      <footer className="shrink-0 border-t border-rule p-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          disabled={checking !== null || toolsBroken}
+          onClick={checkAll}
+        >
+          {checking && <Loader2 className="animate-spin motion-reduce:animate-none" />}
+          {checking ? (toolsInstalling ? 'Getting ready...' : 'Running...') : 'Run checks'}
+        </Button>
+      </footer>
     </section>
   )
 }
