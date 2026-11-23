@@ -8,7 +8,8 @@
 // - runs it with Node and compares what it gives back or prints.
 // So one task is judged on its own, whatever state the others are in.
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 
 const DRIVER = `
@@ -256,6 +257,15 @@ const pass = (name, output) => ({ name, passed: true, output })
  * - a case with throws: true passes when the call stops with an error instead of giving back;
  *   throws: 'text' also wants that text in the error's message
  * - messages.real: what to do instead, at the end of the message about any, as and @ts-
+ * - messages.compiles: in place of the general message when the compiler refuses a line of the task
+ * - flags: compiler flags after Check's own (a later one wins), in place of t.typecheck; a
+ *   tsconfig.json in the workspace is not read
+ * - swaps: { path: chapter-relative file } put in every sandbox in place of the learner's file
+ * - follow: { type, with } replaces the shared declaration of `type` with the text `with`, or
+ *   { swaps } replaces files; then uses must compile and misuses be refused, so a type made from
+ *   another follows it and a copy written out by hand does not; name and message for the result
+ * - tsconfig: { need, messages }: the learner's tsconfig.json can be read, checks the file, has
+ *   each setting of `need` on (strict for all of STRICT), and accepts the task's lines
  */
 export async function judge(t, spec) {
   const { file, task } = spec
@@ -323,6 +333,13 @@ export async function judge(t, spec) {
   if (spec.uses) extra['.grader/uses.ts'] = t.chapterPath(spec.uses)
   if (spec.misuse) extra['.grader/misuse.ts'] = t.chapterPath(spec.misuse)
   if (spec.runner) extra['.grader/run.mjs'] = t.chapterPath(spec.runner)
+  const swaps = Object.fromEntries(
+    Object.entries(spec.swaps ?? {}).map(([rel, source]) => [rel, t.chapterPath(source)])
+  )
+  Object.assign(extra, swaps)
+  const typecheck = spec.flags
+    ? (at, files) => compile(t, at, files, spec.flags)
+    : (at, files) => t.typecheck(at, files)
   const dir = await t.sandbox(Object.fromEntries(Object.entries(extra).filter(([, v]) => v)))
   await mkdir(join(dir, '.grader'), { recursive: true })
   const fill = (at, text) =>
@@ -338,7 +355,7 @@ export async function judge(t, spec) {
   const runCase = async (c) => {
     let at = dir
     if (c.given) {
-      at = await t.sandbox()
+      at = await t.sandbox(swaps)
       await mkdir(join(at, '.grader'), { recursive: true })
       await fill(at, withGiven({ ...spec.given, ...c.given }).text)
     }
@@ -351,16 +368,23 @@ export async function judge(t, spec) {
 
   const grownText = spec.grow ? grow(main.text.split('\n'), p.first, spec.grow) : null
   const grownRun = grownText
-    ? t.sandbox().then(async (at) => {
+    ? t.sandbox(swaps).then(async (at) => {
         await writeFile(join(at, file), grownText)
-        return t.typecheck(at, [file])
+        return typecheck(at, [file])
       })
+    : null
+  const followRun = spec.follow ? follow(t, spec.follow, swaps, main.text, p.first, file, typecheck) : null
+  const settingsRun = spec.tsconfig
+    ? Promise.all([
+        tsc(t, dir, ['--showConfig', '-p', 'tsconfig.json']),
+        tsc(t, dir, ['--noEmit', '-p', 'tsconfig.json'])
+      ])
     : null
 
   const hidden = ['.grader/uses.ts', '.grader/misuse.ts'].filter((f) => extra[f])
   const cases = spec.cases ?? []
   const [compiled, runs, usesText, misuseText] = await Promise.all([
-    t.typecheck(dir, [file, ...hidden]),
+    typecheck(dir, [file, ...hidden]),
     Promise.all(cases.map(runCase)),
     spec.uses ? readFile(t.chapterPath(spec.uses), 'utf8') : '',
     spec.misuse ? readFile(t.chapterPath(spec.misuse), 'utf8') : ''
@@ -435,7 +459,8 @@ export async function judge(t, spec) {
     details.push(
       fail(
         `${label} compiles`,
-        `The compiler refuses a line of ${label}. Run npm run types, read the message for that line, and fix what it points at.`,
+        spec.messages?.compiles ??
+          `The compiler refuses a line of ${label}. Run npm run types, read the message for that line, and fix what it points at.`,
         explainOwn(mine, lines)
       )
     )
@@ -551,7 +576,176 @@ export async function judge(t, spec) {
     )
   }
 
+  if (followRun && !crashed && !absent && shared.length === 0 && mine.length === 0) {
+    const f = await followRun
+    if (f) details.push(followed(f, spec.follow))
+  }
+
+  if (settingsRun) {
+    const refused = crashed || shared.length > 0 || mine.length > 0
+    details.push(...settings(await settingsRun, spec.tsconfig, { file, p, lines, label, refused }))
+  }
+
   if (cases.length) details.push(...behaviour(cases, runs, file, label))
+  return details
+}
+
+const COMPILE = [
+  '--noEmit',
+  '--target',
+  'es2022',
+  '--module',
+  'nodenext',
+  '--allowImportingTsExtensions',
+  '--erasableSyntaxOnly',
+  '--skipLibCheck',
+  '--types',
+  'node'
+]
+
+/** Runs the compiler of the repo tools in `dir`, found the way learner code finds it. */
+async function tsc(t, dir, args) {
+  const require = createRequire(join(dir, 'noop.js'))
+  const bin = join(dirname(require.resolve('typescript/package.json')), 'bin/tsc')
+  const r = await t.node(dir, [bin, ...args], { timeoutMs: 30000 })
+  return { passed: r.code === 0 && !r.timedOut, output: r.stdout + r.stderr }
+}
+
+/**
+ * Compiles `files` with Check's settings and `flags` after them (a later flag wins), whatever a
+ * tsconfig.json in the workspace says: `['--strict', '--verbatimModuleSyntax']`.
+ */
+export const compile = (t, dir, files, flags) =>
+  tsc(t, dir, [...COMPILE, '--ignoreConfig', ...flags, ...files])
+
+/** The lines with the declaration of type `type` above the first task replaced by `text`. */
+function replaceType(lines, first, type, text) {
+  const code = codeOnly(lines.join('\n')).split('\n')
+  const re = new RegExp(`(?:^|[^\\w$.])type\\s+${type}\\b`)
+  const at = code.findIndex((l, i) => i < first && re.test(l))
+  if (at === -1) return null
+  const end = typeEnd(code, at)
+  return lines.map((line, i) => (i === at ? text : i > at && i <= end ? '' : line)).join('\n')
+}
+
+/**
+ * Compiles the task with the source type changed (`type` replaced by `with` in the shared lines,
+ * or files swapped), beside uses that must compile and misuses that must be refused.
+ */
+async function follow(t, f, swaps, text, first, file, typecheck) {
+  const changed = f.type ? replaceType(text.split('\n'), first, f.type, f.with) : text
+  if (changed === null) return null
+  const files = { ...swaps }
+  for (const [rel, source] of Object.entries(f.swaps ?? {})) files[rel] = t.chapterPath(source)
+  if (f.uses) files['.grader/follow.uses.ts'] = t.chapterPath(f.uses)
+  if (f.misuse) files['.grader/follow.misuse.ts'] = t.chapterPath(f.misuse)
+  const at = await t.sandbox(files)
+  await writeFile(join(at, file), changed)
+  const hidden = ['.grader/follow.uses.ts', '.grader/follow.misuse.ts'].filter((x) => files[x])
+  const [compiled, usesText, misuseText] = await Promise.all([
+    typecheck(at, [file, ...hidden]),
+    f.uses ? readFile(t.chapterPath(f.uses), 'utf8') : '',
+    f.misuse ? readFile(t.chapterPath(f.misuse), 'utf8') : ''
+  ])
+  return { compiled, usesText, misuseText }
+}
+
+function followed({ compiled, usesText, misuseText }, f) {
+  const errors = parseErrors(compiled.output)
+  const uses = errors.filter((e) => e.path === '.grader/follow.uses.ts')
+  const misuse = errors.filter((e) => e.path === '.grader/follow.misuse.ts')
+  if (uses.length === 0 && misuse.length === 0) {
+    return compiled.passed || errors.length > 0
+      ? pass(f.name)
+      : fail(f.name, 'The compiler could not run. Try Check again.', compiled.output)
+  }
+  const output = [
+    uses.length ? explainHidden(uses, usesText.split('\n')) : '',
+    misuse.length ? explainHidden(misuse, misuseText.split('\n')) : ''
+  ]
+  return fail(f.name, f.message, output.filter(Boolean).join('\n\n'))
+}
+
+/** What `strict` switches on in the TypeScript of the repo tools; each is on unless set off. */
+export const STRICT = [
+  'noImplicitAny',
+  'strictNullChecks',
+  'strictFunctionTypes',
+  'strictBindCallApply',
+  'strictPropertyInitialization',
+  'strictBuiltinIteratorReturn',
+  'noImplicitThis',
+  'useUnknownInCatchVariables'
+]
+
+/** Whether `name` is on with these compiler options, as the compiler decides it. */
+export const isOn = (options, name) =>
+  options[name] ?? (STRICT.includes(name) ? (options.strict ?? true) : false)
+
+/**
+ * The learner's tsconfig.json, read by the compiler itself: it can be read, it checks `file`,
+ * each setting in `need` is on (`strict` means all of STRICT), and with it the compiler accepts
+ * the shared lines and the lines of the task, said only when Check's own compile did not refuse
+ * them already.
+ */
+function settings([shown, run], { need, messages = {} }, { file, p, lines, label, refused }) {
+  const name = 'tsconfig.json'
+  let config = null
+  try {
+    config = JSON.parse(shown.output.slice(shown.output.indexOf('{')))
+  } catch {}
+  const errors = parseErrors(run.output)
+  const unread = errors.filter((e) => e.path === name)
+  if (!config || unread.length) {
+    return [
+      fail(
+        `${name} can be read`,
+        `The compiler cannot read ${name}, so npm run types stops there. Run it and read the message: it names the line of ${name} and what is wrong with it.`,
+        unread.length
+          ? unread
+              .map((e) => `${name} line ${e.line}: ${e.text}${e.more ? `\n  ${e.more}` : ''}`)
+              .join('\n')
+          : (run.output || shown.output).trim()
+      )
+    ]
+  }
+  const options = config.compilerOptions ?? {}
+  const details = []
+  const checked = (config.files ?? []).map((f) => f.replace(/^\.\//, ''))
+  if (!checked.includes(file)) {
+    details.push(
+      fail(
+        `${name} checks ${file}`,
+        `With your ${name}, the compiler does not read ${file} at all, so it cannot find anything wrong in it. Put back the files it reads ("include") as the starter had them.`
+      )
+    )
+  }
+  for (const setting of need) {
+    const off = (setting === 'strict' ? STRICT : [setting]).filter((s) => !isOn(options, s))
+    details.push(
+      off.length === 0
+        ? pass(`${setting} is on`)
+        : fail(
+            `${setting} is on`,
+            messages[setting] ??
+              `${label} asks for ${setting} on in ${name}, and it is off. Set it in compilerOptions, spelt exactly so, with true and no quotes.`,
+            off.map((s) => `${s}: off`).join('\n')
+          )
+    )
+  }
+  if (refused) return details
+  const mine = errors.filter(
+    (e) => e.path === file && (e.line - 1 < p.first || (e.line - 1 >= p.start && e.line - 1 < p.end))
+  )
+  details.push(
+    mine.length === 0
+      ? pass(`npm run types accepts ${label}`)
+      : fail(
+          `npm run types accepts ${label}`,
+          `With your ${name}, the compiler refuses a line of ${label}. Run npm run types, read the message for that line, and fix what it points at.`,
+          explainOwn(mine, lines)
+        )
+  )
   return details
 }
 
