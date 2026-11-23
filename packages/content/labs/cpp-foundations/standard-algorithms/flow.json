@@ -1,0 +1,109 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "ambrose", "label": "Ambrose", "kind": "story" },
+      { "id": "ledger", "label": "Month's bills", "kind": "data" },
+      { "id": "funcs", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "library", "label": "Standard library", "kind": "story" },
+      { "id": "summary", "label": "Month's summary", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "ambrose", "to": "funcs", "label": "a question" },
+      { "from": "ledger", "to": "funcs", "label": "bills, tickets" },
+      { "from": "funcs", "to": "library", "label": "begin to end" },
+      { "from": "library", "to": "summary", "label": "the answer" }
+    ],
+    "note": "Each question about the month is answered by a tool the standard library already has."
+  },
+  "tasks": {
+    "total": {
+      "steps": [
+        {
+          "active": ["ledger", "ledger->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["bill", "bill", "..."] },
+          "note": "The month's bills go in, with pence and all."
+        },
+        {
+          "active": ["funcs", "funcs->library", "library"],
+          "note": "The whole list is handed to the library's adder, starting from a total that keeps the pence."
+        },
+        {
+          "active": ["library->summary", "summary"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a number"] },
+          "note": "Ambrose gets the month's total."
+        }
+      ]
+    },
+    "largest": {
+      "steps": [
+        {
+          "active": ["ledger", "ledger->funcs", "funcs"],
+          "note": "The bills go in, and an empty month is answered first."
+        },
+        {
+          "active": ["funcs->library", "library"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a position"] },
+          "note": "The library says where the largest bill is, not what it is."
+        },
+        {
+          "active": ["library->summary", "summary"],
+          "note": "The bill at that place is read, and that is the answer."
+        }
+      ]
+    },
+    "find": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the month's tickets", "a ticket"] },
+          "note": "Ambrose asks whether a ticket came back to the workshop."
+        },
+        {
+          "active": ["funcs->library", "library"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a position, or the end"] },
+          "note": "The library looks for it and gives back where it is, or the place past the end."
+        },
+        {
+          "active": ["library->summary", "summary"],
+          "value": { "kind": "array", "label": "answer", "values": ["yes or no"] },
+          "note": "Comparing that place with the end turns it into yes or no."
+        }
+      ]
+    },
+    "count": {
+      "steps": [
+        {
+          "active": ["ambrose", "ambrose->funcs"],
+          "value": { "kind": "array", "label": "goes in", "values": ["the month's tickets", "a ticket"] },
+          "note": "Ambrose asks how often one ticket came in."
+        },
+        {
+          "active": ["funcs->library", "library"],
+          "note": "The library counts the tickets equal to it, from the first to the last."
+        },
+        {
+          "active": ["library->summary", "summary"],
+          "value": { "kind": "array", "label": "comes back", "values": ["a number"] },
+          "note": "A count comes back, 0 when it never came in."
+        }
+      ]
+    },
+    "sorted": {
+      "steps": [
+        {
+          "active": ["ledger", "ledger->funcs"],
+          "note": "The bills go in, only to be read."
+        },
+        {
+          "active": ["funcs", "funcs->library", "library"],
+          "note": "The function puts a list of its own in order, then turns the order round."
+        },
+        {
+          "active": ["library->summary", "summary"],
+          "value": { "kind": "array", "label": "comes back", "values": ["largest bill", "...", "smallest bill"] },
+          "note": "Ambrose gets the bills from the largest down, and the ledger keeps its own order."
+        }
+      ]
+    }
+  }
+}

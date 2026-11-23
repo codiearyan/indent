@@ -1,0 +1,61 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "dougie", "label": "Dougie", "kind": "story" },
+      { "id": "lists", "label": "Readings, bags, kit, ropes", "kind": "data" },
+      { "id": "functions", "label": "Your functions", "kind": "function", "mine": true },
+      { "id": "answers", "label": "Kit night sheet", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "dougie", "to": "lists", "label": "writes down" },
+      { "from": "lists", "to": "functions", "label": "a list" },
+      { "from": "functions", "to": "answers", "label": "new values" }
+    ],
+    "note": "Your functions go through each list item by item and give back something new, leaving the list as it was."
+  },
+  "tasks": {
+    "coldest": {
+      "steps": [
+        {
+          "active": ["lists", "lists->functions", "functions"],
+          "value": { "kind": "array", "label": "summit readings", "values": ["reading", "reading", "..."] },
+          "note": "The thermometer on the tops logs readings through the night, some below freezing."
+        },
+        { "active": ["functions"], "note": "The lowest so far starts as a reading from the list, and only a lower one replaces it." },
+        { "active": ["functions", "functions->answers", "answers"], "note": "Once every reading has been looked at, the coldest comes back." }
+      ]
+    },
+    "load": {
+      "steps": [
+        { "active": ["lists", "lists->functions", "functions"], "note": "The bags going in the vehicle are weighed one by one." },
+        { "active": ["functions"], "note": "Python's own functions count them, add them up, and find the lightest and the heaviest." },
+        { "active": ["functions", "functions->answers", "answers"], "note": "One line for the sheet says it all." }
+      ]
+    },
+    "heaviest": {
+      "steps": [
+        { "active": ["lists", "lists->functions", "functions"], "note": "The heaviest bags go in at the back of the vehicle first." },
+        { "active": ["functions"], "note": "A new list comes out in order, heaviest first, and the weighed list keeps its order." },
+        { "active": ["functions", "functions->answers", "answers"], "note": "Dougie loads from the new list." }
+      ]
+    },
+    "lines": {
+      "steps": [
+        { "active": ["lists", "lists->functions", "functions"], "note": "The kit is a list of names with no numbers." },
+        { "active": ["functions"], "note": "Each item gets its number from 1, and a line goes onto a new list on every round." },
+        {
+          "active": ["functions", "functions->answers", "answers"],
+          "value": { "kind": "array", "label": "each line", "values": ["number", "full stop", "item"] },
+          "note": "The numbered lines come back, one per item."
+        }
+      ]
+    },
+    "ropes": {
+      "steps": [
+        { "active": ["dougie", "dougie->lists"], "note": "A lower on the crag needs ropes of at least some length." },
+        { "active": ["lists", "lists->functions", "functions"], "note": "Each rope is kept only if it is long enough, in one line that builds the new list." },
+        { "active": ["functions", "functions->answers", "answers"], "note": "The ropes that will do come back in the order they hang in the store." }
+      ]
+    }
+  }
+}

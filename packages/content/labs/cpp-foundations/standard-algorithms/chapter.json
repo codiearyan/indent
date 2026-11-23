@@ -1,0 +1,155 @@
+{
+  "id": "standard-algorithms",
+  "title": "The standard algorithms",
+  "files": [
+    "src/ledger.cpp"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Build the month's ledger here and run it, after you call your functions from main.",
+    "suggestedCommand": "g++ -std=c++17 -Wall src/ledger.cpp -o ledger && ./ledger"
+  },
+  "tasks": [
+    {
+      "id": "total",
+      "title": "Add up the month",
+      "file": "src/ledger.cpp",
+      "description": "Under `// Task 1` in `src/ledger.cpp`, write a function called `monthTotal` that takes the bills as a reference to a `const std::vector<double>` and gives back all of them added up, as a `double`, worked out with `std::accumulate`. No bills add up to `0`.\n\nCheck calls `monthTotal` from code of its own with bills of its own, an empty list included, and reads what it gives back. It only reads the bills, so the caller's list must be the same afterwards.",
+      "nextSteps": [
+        "Add the `#include` that `std::accumulate` comes from.",
+        "Write the first line: a `const std::vector<double>&` in, a `double` back.",
+        "Give back the result of `std::accumulate` over the whole list.",
+        "Call it from `main` with `bills`, and compare with the bills there."
+      ],
+      "hints": [
+        "`std::accumulate` comes from `<numeric>`, and takes where to start, where to stop and the value the total starts from.",
+        "The value it starts from also sets the type the adding is done in: `0` adds in whole numbers and loses every fraction. A price total starts from `0.0`.",
+        "The shape is `return std::accumulate(bills.begin(), bills.end(), 0.0);`, with `#include <numeric>` at the top of the file."
+      ],
+      "docs": [
+        {
+          "title": "std::accumulate",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/accumulate"
+        },
+        {
+          "title": "std::vector::begin, std::vector::end",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/begin"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "largest",
+      "title": "Find the largest bill",
+      "file": "src/ledger.cpp",
+      "description": "Under `// Task 2`, write a function called `largestBill` that takes the bills as a reference to a `const std::vector<double>` and gives back the largest of them, as a `double`, found with `std::max_element`, or `0` when there are no bills.\n\nCheck calls `largestBill` with bills of its own, an empty list included, and reads what it gives back. It only reads the bills, so the caller's list must be the same afterwards.",
+      "nextSteps": [
+        "Add the `#include` that `std::max_element` comes from.",
+        "Handle the empty list first.",
+        "Call `std::max_element` over the whole list.",
+        "It gives back a position: read the value there, and give it back."
+      ],
+      "hints": [
+        "`std::max_element` comes from `<algorithm>`, and gives back the place of the largest value, not the value.",
+        "A `*` in front of that place reads the value there. On an empty list the place is `end()`, where there is no value, so ask whether it is empty first.",
+        "The shape is `if (bills.empty()) { return 0; } return *std::max_element(bills.begin(), bills.end());`."
+      ],
+      "docs": [
+        {
+          "title": "std::max_element",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/max_element"
+        },
+        {
+          "title": "std::vector::empty",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/empty"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "find",
+      "title": "Ask whether a ticket came back",
+      "file": "src/ledger.cpp",
+      "description": "Under `// Task 3`, write a function called `cameIn` that takes the month's tickets as a reference to a `const std::vector<int>` and a ticket as an `int`. It gives back `true` when the ticket is in the list and `false` when it is not, found with `std::find`.\n\nCheck calls `cameIn` with tickets of its own, an empty list included, and reads what it gives back. It only reads the tickets, so the caller's list must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<int>&` and an `int` in, a `bool` back.",
+        "Call `std::find` over the whole list for the ticket.",
+        "Compare what it gives back with `end()` of the list.",
+        "Give back the result of that comparison."
+      ],
+      "hints": [
+        "`std::find` gives back a position in the list, not true or false.",
+        "When the ticket is not there, the position it gives back is `tickets.end()`. Any other position means it was found.",
+        "The shape is `return std::find(tickets.begin(), tickets.end(), ticket) != tickets.end();`."
+      ],
+      "docs": [
+        {
+          "title": "std::find",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/find"
+        },
+        {
+          "title": "std::vector::begin, std::vector::end",
+          "url": "https://en.cppreference.com/w/cpp/container/vector/begin"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "count",
+      "title": "Count how often a ticket came in",
+      "file": "src/ledger.cpp",
+      "description": "Under `// Task 4`, write a function called `timesIn` that takes the month's tickets as a reference to a `const std::vector<int>` and a ticket as an `int`, and gives back how many times the ticket is in the list, as an `int`, counted with `std::count`.\n\nCheck calls `timesIn` with tickets of its own, an empty list and a ticket that is not there included, and reads what it gives back. It only reads the tickets, so the caller's list must be the same afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const std::vector<int>&` and an `int` in, an `int` back.",
+        "Call `std::count` over the whole list for the ticket.",
+        "Give back what it gives back.",
+        "Try it in `main` with a ticket that is in `tickets` twice."
+      ],
+      "hints": [
+        "`std::count` gives back a number: how many values in the range are equal to the one asked for.",
+        "It takes where to start, where to stop and the value to count, like `std::find`.",
+        "The shape is `return std::count(tickets.begin(), tickets.end(), ticket);`."
+      ],
+      "docs": [
+        {
+          "title": "std::count",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/count"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sorted",
+      "title": "List the bills, largest first",
+      "file": "src/ledger.cpp",
+      "description": "Under `// Task 5`, write a function called `largestFirst` that takes the bills as a reference to a `const std::vector<double>` and gives back a new `std::vector<double>` with the same bills, from the largest to the smallest, put in order with `std::sort` and `std::reverse`. The caller's bills stay in the order they were.\n\nCheck calls `largestFirst` with bills of its own, an empty list included, and reads what it gives back and the caller's list afterwards.",
+      "nextSteps": [
+        "Write the first line: a `const` vector in, a new vector back.",
+        "Make a copy of the bills inside the function.",
+        "Sort the copy, then reverse it.",
+        "Give the copy back, and print it from `main`."
+      ],
+      "hints": [
+        "`std::sort` and `std::reverse` change the vector they are given, and the caller's bills are `const`. They need a vector of the function's own.",
+        "`std::vector<double> sorted = bills;` makes a copy. `std::sort` puts it smallest first, and `std::reverse` turns that round.",
+        "The shape is `std::vector<double> sorted = bills; std::sort(sorted.begin(), sorted.end()); std::reverse(sorted.begin(), sorted.end()); return sorted;`."
+      ],
+      "docs": [
+        {
+          "title": "std::sort",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/sort"
+        },
+        {
+          "title": "std::reverse",
+          "url": "https://en.cppreference.com/w/cpp/algorithm/reverse"
+        }
+      ],
+      "videos": [
+        {
+          "title": "std::sort and the iterators it takes",
+          "url": "https://www.youtube.com/watch?v=_GHniQ1LG_Y"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

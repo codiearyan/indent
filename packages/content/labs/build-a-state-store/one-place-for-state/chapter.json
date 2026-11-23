@@ -1,0 +1,80 @@
+{
+  "id": "one-place-for-state",
+  "title": "One place for state",
+  "files": ["src/store.js", "src/try.js", "src/old-screen.js", "src/order.js"],
+  "terminal": {
+    "description": "A shell in your workspace where the same changes go to the old order screen and to a screen drawn from your store.",
+    "suggestedCommand": "node src/try.js"
+  },
+  "tasks": [
+    {
+      "id": "create",
+      "title": "Keep the state in one place",
+      "file": "src/store.js",
+      "description": "Implement `nextState(state, part)` and `createStore(initial)` with `getState()` and `setState(part)` in `src/store.js`.\n\n- `nextState(state, part)` returns the state with the part joined in: each key of the part takes its new value, a key the state did not have is added, and every other key keeps the one it had\n- only the top keys are joined: a part's `{ stock: { kind: 'kraft' } }` replaces the old `stock` whole\n- `createStore(initial)` returns a new store whose state starts as `initial`; two stores never share their state\n- `store.getState()` returns the state now\n- `store.setState(part)` joins the part into the state; `nextState` does the joining, so `setState` can call it\n\nThe check makes its own stores with states of its own, changes them and reads them back, and calls `nextState` on its own.",
+      "nextSteps": [
+        "Run `node src/try.js` and read the error under the old screen.",
+        "Write `nextState` first: a new object with the keys of the state, then the keys of the part.",
+        "In `createStore`, keep the state in a variable of that call and return an object with `getState` and `setState`.",
+        "Run the script again: the basket count should match the basket."
+      ],
+      "hints": [
+        "A store is a variable and two functions that can reach it. A function written inside `createStore` keeps that variable for as long as the store exists.",
+        "Spreading two objects into a new one joins them: when both have a key, the one spread last wins. Which one should win here?",
+        "`return { ...state, ...part }` in `nextState`. In `createStore`: `let state = initial`, and return `{ getState: () => state, setState(part) { state = nextState(state, part) } }`."
+      ],
+      "docs": [
+        { "title": "Spread syntax (...)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax" },
+        { "title": "Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures" },
+        { "title": "Working with objects", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_objects" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "updater",
+      "title": "Change it with a function",
+      "file": "src/store.js",
+      "description": "Let `setState` take a function as well as a part, and refuse what is neither.\n\n- `setState(fn)` calls `fn` once with the state now, and joins in the part it returns\n- two changes in a row each start from what the one before left, so two `+1` functions add 2\n- a part, or a part a function returns, that is not an object throws a `TypeError`, and the state stays as it was; `null` is not an object here\n- `createStore` throws a `TypeError` when the first state is not an object\n\nThe check gives its stores functions of its own, notes what each function was called with, and tries `null`, numbers, text and a function that returns nothing.",
+      "nextSteps": [
+        "Look at the lines in `src/try.js` that remove a line from the basket: they hand `setState` a function.",
+        "In `setState`, find out whether the change is a function. If it is, call it to get the part.",
+        "Before joining, make sure the part is an object, and throw a `TypeError` when it is not.",
+        "Do the same check on the first state in `createStore`."
+      ],
+      "hints": [
+        "A change that depends on the state, like one more job, is safest as a function: the store hands it the state as it is at that moment.",
+        "`typeof change === 'function'` tells you which kind you have. For the part, `typeof part === 'object'` is true for `null` too, so check for `null` on its own.",
+        "`const part = typeof change === 'function' ? change(state) : change`, then `if (typeof part !== 'object' || part === null) throw new TypeError('...')` before `state = nextState(state, part)`."
+      ],
+      "docs": [
+        { "title": "typeof", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof" },
+        { "title": "TypeError", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError" },
+        { "title": "Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions" }
+      ],
+      "points": 10
+    },
+    {
+      "id": "fresh",
+      "title": "Never change the old state",
+      "file": "src/store.js",
+      "description": "Make every change build a new state object and leave the old one exactly as it was.\n\n- after a change, `getState()` returns a new object, not the one it returned before; between changes it returns that very same object every time\n- a state someone read before the change keeps every value it had, and gains no new keys\n- the object given to `createStore` is never changed\n- `nextState(state, part)` returns a new object and changes neither `state` nor `part`\n\nThe check keeps the states it read before each change and compares them afterwards, and calls `nextState` with objects it watches.",
+      "nextSteps": [
+        "Read \"An old state never changes\" in the lesson.",
+        "Look at how `nextState` builds its result: does it write into an object it was given?",
+        "Check that `setState` only ever replaces the state, and never writes into it."
+      ],
+      "hints": [
+        "Code elsewhere may still hold a state it read a moment ago. If the store writes into that object, its values change under that code's feet.",
+        "`Object.assign(state, part)` and `state[key] = value` write into the old object. A new object made with `{ }` and spread leaves it alone.",
+        "`return { ...state, ...part }` builds a new object every time, and `state = nextState(state, part)` points the store at it without touching the old one."
+      ],
+      "docs": [
+        { "title": "Object.assign()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign" },
+        { "title": "Spread in object literals", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax#spread_in_object_literals" },
+        { "title": "Strict equality (===)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality" }
+      ],
+      "videos": [{ "title": "Mutability and immutability in JavaScript", "url": "https://www.youtube.com/watch?v=pslr6SWXFjQ" }],
+      "points": 10
+    }
+  ]
+}

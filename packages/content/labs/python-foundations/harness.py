@@ -17,6 +17,11 @@
 # it still run. `define` is Python run right before part `upto`, Check's own versions of what
 # earlier tasks make. `call` calls a function once part `upto` has run, and reports what it gave
 # back and what it printed, apart.
+#
+# A call with `data` takes lists, tuples, sets and dictionaries as arguments, written in JSON with
+# tuples as {"@tuple": [...]} and sets as {"@set": [...]}, and reports what it gave back and what
+# each argument holds after the call in the same form (dictionaries as {"@dict": [[key, value]]}),
+# so Check compares values, never their printed form, and sees a list the function changed.
 import _thread
 import ast
 import builtins
@@ -228,6 +233,47 @@ def value_of(value):
     return out
 
 
+MAX_ITEMS = 1000
+
+
+def encode(value, depth=0):
+    """A value as JSON Check can compare: lists as arrays, tuples, sets and dictionaries tagged."""
+    if depth > 20:
+        return {'@other': type(value).__name__}
+    if value is None or type(value) in (bool, int, str):
+        return value
+    if type(value) is float:
+        return {'@float': value if math.isfinite(value) else repr(value)}
+    inner = lambda items: [encode(v, depth + 1) for v in items[:MAX_ITEMS]] + (
+        [{'@other': 'more'}] if len(items) > MAX_ITEMS else [])
+    if type(value) is list:
+        return inner(value)
+    if type(value) is tuple:
+        return {'@tuple': inner(value)}
+    if type(value) in (set, frozenset):
+        items = inner(list(value))
+        return {'@set': sorted(items, key=lambda v: json.dumps(v, sort_keys=True))}
+    if type(value) is dict:
+        pairs = list(value.items())[:MAX_ITEMS]
+        return {'@dict': [[encode(k, depth + 1), encode(v, depth + 1)] for k, v in pairs]}
+    return {'@other': type(value).__name__, 'repr': repr(value)[:300]}
+
+
+def decode(value):
+    """Check's JSON arguments as Python values, the other way round from encode."""
+    if isinstance(value, list):
+        return [decode(v) for v in value]
+    if isinstance(value, dict):
+        if list(value) == ['@tuple']:
+            return tuple(decode(v) for v in value['@tuple'])
+        if list(value) == ['@set']:
+            return {decode(v) for v in value['@set']}
+        if list(value) == ['@dict']:
+            return {decode(k): decode(v) for k, v in value['@dict']}
+        return {k: decode(v) for k, v in value.items()}
+    return value
+
+
 def names_in(ns):
     return {
         name: type(value).__name__
@@ -308,6 +354,9 @@ def called(watchdog, task, call, ns):
         return record
     args = call.get('args') or []
     kwargs = call.get('kwargs') or {}
+    if call.get('data'):
+        args = decode(args)
+        kwargs = decode(kwargs)
     result, printed, error, stopped = watchdog.run(task, lambda ns: fn(*args, **kwargs), ns)
     record.update({
         'printed': printed.text()[:MAX_SENT],
@@ -315,6 +364,12 @@ def called(watchdog, task, call, ns):
         'stopped': stopped,
         'returned': None if error or stopped else value_of(result)
     })
+    if call.get('data'):
+        record['after'] = [encode(a) for a in args]
+        record['after_repr'] = [repr(a)[:300] for a in args]
+        if record['returned']:
+            record['returned']['data'] = encode(result)
+            record['returned']['same'] = next((i for i, a in enumerate(args) if a is result), None)
     return record
 
 

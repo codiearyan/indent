@@ -1,0 +1,167 @@
+{
+  "id": "looping-over-lists",
+  "title": "Looping over a list",
+  "files": [
+    "kit_night.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the readings, the load and the kit list your functions make.",
+    "suggestedCommand": "python3 kit_night.py"
+  },
+  "tasks": [
+    {
+      "id": "coldest",
+      "title": "The coldest night on the tops",
+      "file": "kit_night.py",
+      "description": "Under `# Task 1` in `kit_night.py`, write a function called `coldest` that takes a list of temperature readings, with at least one reading in it, and gives back the lowest. For tonight's readings it gives back `-5`. Find it by hand, with a `for` loop that keeps the lowest reading so far, not with `min`. Print what it gives back for `summit_readings`.\n\nCheck calls `coldest` with readings of its own, some all above freezing and some all below, and looks at what it gives back. Once every case is right, it looks at your code for `min` and `sorted`.",
+      "nextSteps": [
+        "Read the part of the lesson on keeping the best so far.",
+        "Start the lowest so far as a reading from the list.",
+        "Go through the readings with `for`, and keep any reading lower than the lowest so far.",
+        "Give back the lowest after the loop, and try it on a list of readings above freezing."
+      ],
+      "hints": [
+        "Keep the lowest reading so far in a name of its own, and look at each reading in turn.",
+        "The lowest so far must start as one of the readings, such as the first. A made-up start like 0 is lower than every reading on a warm night, so it would win. Change it only when a reading is lower.",
+        "The shape is `lowest = readings[0]`, then `for reading in readings:` with `if reading < lowest:` and `lowest = reading` inside, and `return lowest` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "for statements",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#for-statements"
+        },
+        {
+          "title": "Comparisons",
+          "url": "https://docs.python.org/3/reference/expressions.html#comparisons"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "load",
+      "title": "What the vehicle carries",
+      "file": "kit_night.py",
+      "description": "Under `# Task 2`, write a function called `load_line` that takes a list of bag weights, two or more, and gives back a line with the number of bags, the total, the lightest and the heaviest, like this one for tonight's bags:\n\n```\n4 bags, 52 kg in all, from 9 to 18 kg\n```\n\nPrint what it gives back for `bag_weights`.\n\nCheck calls `load_line` with weights of its own and looks at the line it gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on functions that work on a whole list.",
+        "Work out the four numbers from the list, each with one function Python already has.",
+        "Put them into the line with an f-string.",
+        "Print it for `bag_weights` and compare it with the task."
+      ],
+      "hints": [
+        "Python has a function for each of the four numbers: how many items, their total, the smallest and the largest.",
+        "`len`, `sum`, `min` and `max` each take the whole list and give back one number. An f-string puts each one in its place in the line.",
+        "The shape is `return f\"{len(weights)} bags, {sum(weights)} kg in all, from {min(weights)} to {max(weights)} kg\"`."
+      ],
+      "docs": [
+        {
+          "title": "sum()",
+          "url": "https://docs.python.org/3/library/functions.html#sum"
+        },
+        {
+          "title": "min()",
+          "url": "https://docs.python.org/3/library/functions.html#min"
+        },
+        {
+          "title": "max()",
+          "url": "https://docs.python.org/3/library/functions.html#max"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "heaviest",
+      "title": "Heaviest bag first",
+      "file": "kit_night.py",
+      "description": "Under `# Task 3`, write a function called `heaviest_first` that takes a list of bag weights and gives back a new list of the same weights, from the heaviest to the lightest. For tonight's bags it gives back `[18, 14, 11, 9]`. It leaves the list it is given as it was, so `bag_weights` prints in its old order after it. Print what it gives back for `bag_weights`, then print `bag_weights`.\n\nCheck calls `heaviest_first` with weights of its own and looks at what it gives back and at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on putting a list in order.",
+        "Choose the one of the two ways that gives back a new list.",
+        "Ask for the order from the heaviest down.",
+        "Print what it gives back, then `bag_weights`, and check the second is unchanged."
+      ],
+      "hints": [
+        "One way to sort changes the list itself and gives back `None`; the other gives back a new list and leaves the old one alone.",
+        "`sorted` gives back a new list from the smallest up. A keyword argument turns the order round.",
+        "The shape is `return sorted(weights, reverse=True)`."
+      ],
+      "docs": [
+        {
+          "title": "sorted()",
+          "url": "https://docs.python.org/3/library/functions.html#sorted"
+        },
+        {
+          "title": "Sorting techniques",
+          "url": "https://docs.python.org/3/howto/sorting.html"
+        },
+        {
+          "title": "list.sort()",
+          "url": "https://docs.python.org/3/library/stdtypes.html#list.sort"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "lines",
+      "title": "A numbered kit list",
+      "file": "kit_night.py",
+      "description": "Under `# Task 4`, write a function called `kit_lines` that takes a list of kit and gives back a new list of lines, one per item, each with its number from 1, a full stop, a space and the item. For tonight's kit it gives back `['1. rope', '2. stretcher', '3. first aid bag', '4. radio']`, and for an empty list an empty list. Build the list in a `for` loop with `enumerate`. It leaves the list it is given as it was. Print each line it gives back for `kit`.\n\nCheck calls `kit_lines` with kit of its own and looks at what it gives back and at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the parts of the lesson on numbering items and on building a new list.",
+        "Make an empty list before the loop.",
+        "Go through the kit with `enumerate`, numbered from 1, and add one line to the new list on each round.",
+        "Give back the new list after the loop."
+      ],
+      "hints": [
+        "A new list starts empty before the loop, gets one item on each round, and is given back after the loop.",
+        "`enumerate` gives each item with its number, as two names after `for`. It counts from 0 unless it is given a start.",
+        "The shape is `lines = []`, then `for number, item in enumerate(items, start=1):` with `lines.append(f\"{number}. {item}\")` inside, and `return lines` after the loop."
+      ],
+      "docs": [
+        {
+          "title": "enumerate()",
+          "url": "https://docs.python.org/3/library/functions.html#enumerate"
+        },
+        {
+          "title": "Looping techniques",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#looping-techniques"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "ropes",
+      "title": "Ropes long enough",
+      "file": "kit_night.py",
+      "description": "Under `# Task 5`, write a function called `long_enough` that takes a list of rope lengths and the length a lower needs, and gives back a new list of the lengths that are at least that long, in the order they came in. For tonight's ropes and 50 it gives back `[50, 60, 70]`. Write it as a list comprehension.\n\nCheck calls `long_enough` with ropes and needs of its own and looks at what it gives back and at the list it gave it afterwards. Once every case is right, it looks at your code for a list comprehension.",
+      "nextSteps": [
+        "Read the part of the lesson on list comprehensions.",
+        "Write it first as a loop that builds a new list, if that helps, and see it work.",
+        "Turn the loop into one pair of square brackets: the value, the `for`, then the `if`.",
+        "Print it for `rope_lengths` and 50, then for 60."
+      ],
+      "hints": [
+        "A list comprehension is a loop that builds a list, written inside the square brackets of the new list.",
+        "It reads: the value to keep, then `for` and the loop, then `if` and the condition a value must meet. At least that long includes exactly that long.",
+        "The shape is `return [length for length in lengths if length >= need]`."
+      ],
+      "docs": [
+        {
+          "title": "List comprehensions",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions"
+        },
+        {
+          "title": "Displays for lists",
+          "url": "https://docs.python.org/3/reference/expressions.html#list-displays"
+        }
+      ],
+      "videos": [
+        {
+          "title": "List comprehensions and how they work",
+          "url": "https://www.youtube.com/watch?v=3dt4OGnU5sM"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

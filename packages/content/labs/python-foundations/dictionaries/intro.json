@@ -1,0 +1,22 @@
+{
+  "stations": [
+    { "title": "Rhona", "say": "How many ropes are left?", "note": "Before the next callout." },
+    { "title": "Store sheet", "text": "Kit signed out and never crossed off." },
+    {
+      "title": "Your functions",
+      "file": "store_counts.py",
+      "mine": true,
+      "gap": "A sheet nobody trusts",
+      "tasks": ["Look up a count", "Sign kit out", "Count what came back", "Low stock and hours"]
+    },
+    { "title": "Store", "say": "Count matches the shelf.", "note": "Every kind by name." }
+  ],
+  "ticket": { "label": "Ropes", "wrong": "nobody knows", "why": "Old sheet", "right": "counted" },
+  "captions": [
+    "Back at the base, Rhona asks Dougie how many ropes are in the store.",
+    "Today the sheet is out of date, because kit goes out and nobody crosses it off.",
+    "You keep the store as a dictionary and look up, change and count kit by name.",
+    "Now the count for ropes is right, and it changes as kit goes out.",
+    "Dictionaries, get, del, items, counting, and a list of records."
+  ]
+}

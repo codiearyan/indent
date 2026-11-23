@@ -1,0 +1,76 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "create", "label": "createStore()", "kind": "function", "mine": true, "fn": "createStore" },
+      { "id": "actions", "label": "orderActions()", "kind": "function", "mine": true, "fn": "orderActions" },
+      { "id": "screen", "label": "Order screen", "kind": "story" },
+      { "id": "state", "label": "Order state", "kind": "data" },
+      { "id": "prices", "label": "Idris's price list", "kind": "story" }
+    ],
+    "edges": [
+      { "from": "create", "to": "actions", "label": "the store" },
+      { "from": "screen", "to": "actions", "label": "by name" },
+      { "from": "actions", "to": "state", "label": "a change" },
+      { "from": "actions", "to": "prices", "label": "ask" },
+      { "from": "prices", "to": "actions", "label": "prices, later" },
+      { "from": "state", "to": "screen", "label": "what to show" }
+    ],
+    "note": "Every change to the order has a name and lives beside the state, including the one that waits for the price list."
+  },
+  "tasks": {
+    "actions": {
+      "steps": [
+        {
+          "active": ["create", "create->actions", "actions"],
+          "note": "createStore calls orderActions once, with the store itself."
+        },
+        {
+          "active": ["actions"],
+          "value": { "kind": "array", "label": "store.actions", "values": ["add", "remove", "reorder", "loadPrices"] },
+          "note": "What it returns is kept beside the state, as the store's actions."
+        },
+        {
+          "active": ["screen", "screen->actions", "actions", "actions->state", "state"],
+          "note": "The screen calls an action by its name, and the action changes the state through the store."
+        }
+      ]
+    },
+    "basket": {
+      "steps": [
+        {
+          "active": ["screen", "screen->actions", "actions"],
+          "note": "A customer orders again what they ordered last month."
+        },
+        {
+          "active": ["actions"],
+          "note": "reorder calls add for each line of the old order, through the store's actions, so the rule for a line is written once."
+        },
+        {
+          "active": ["actions", "actions->state", "state"],
+          "value": { "kind": "map", "label": "each change", "entries": [{ "key": "basket", "value": "a new array" }] },
+          "note": "Each add builds a new basket. An item already there gets more on its own line."
+        }
+      ]
+    },
+    "prices": {
+      "steps": [
+        {
+          "active": ["screen", "screen->actions", "actions", "actions->state", "state"],
+          "note": "The screen opens and loads the prices. At once, the state says it is loading."
+        },
+        {
+          "active": ["actions", "actions->prices", "prices"],
+          "note": "loadPrices asks Idris's price list and waits, while customers keep changing the basket."
+        },
+        {
+          "active": ["prices", "prices->actions", "actions", "actions->state", "state"],
+          "note": "When the answer comes, the action sets only what it changes, so a change made meanwhile stays."
+        },
+        {
+          "active": ["state", "state->screen", "screen"],
+          "note": "The total shows the prices, or the failure in plain words, never a wait that does not end."
+        }
+      ]
+    }
+  }
+}

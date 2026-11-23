@@ -1,0 +1,163 @@
+{
+  "id": "lists",
+  "title": "Lists",
+  "files": [
+    "call_list.py"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Run your file here to see the call-out list change as your functions work on it.",
+    "suggestedCommand": "python3 call_list.py"
+  },
+  "tasks": [
+    {
+      "id": "ends",
+      "title": "First and last on the list",
+      "file": "call_list.py",
+      "description": "Under `# Task 1` in `call_list.py`, write two functions. `first_on_call` takes a list of names and gives back the first name on it. `last_on_call` takes a list of names and gives back the last one. For tonight's list, they give back `Rhona` and `Iain`. Print what each gives back for `call_list`, to see it.\n\nCheck calls both functions with lists of its own, of different lengths, one of them with a single name, and looks at what each gives back.",
+      "nextSteps": [
+        "Read the part of the lesson on positions.",
+        "Write `first_on_call` with one parameter, and give back the name at the first position.",
+        "Write `last_on_call` the same way, reading from the end of the list.",
+        "Print both for `call_list` and run the file."
+      ],
+      "hints": [
+        "A list is read by position, with the position in square brackets after the list. Which number is the first position?",
+        "Positions start at 0, so the first name is at 0. A position below 0 counts from the end, which works for a list of any length.",
+        "The shape is `return names[0]` in one function and `return names[-1]` in the other."
+      ],
+      "docs": [
+        {
+          "title": "Lists",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#lists"
+        },
+        {
+          "title": "Common sequence operations",
+          "url": "https://docs.python.org/3/library/stdtypes.html#common-sequence-operations"
+        },
+        {
+          "title": "IndexError",
+          "url": "https://docs.python.org/3/library/exceptions.html#IndexError"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Lists, tuples and sets in Python",
+          "url": "https://www.youtube.com/watch?v=W8KRzm-HUcc"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "party",
+      "title": "The hill party",
+      "file": "call_list.py",
+      "description": "Under `# Task 2`, write a function called `hill_party` that takes a list of names and a size, and gives back a new list of the first `size` names. For tonight's list and 3, it gives back `['Rhona', 'Dougie', 'Ailsa']`. When the list is shorter than the size, it gives back every name on it. It leaves the list it is given as it was. Print what it gives back for `call_list` and 3.\n\nCheck calls `hill_party` with lists and sizes of its own, one list shorter than its size, and looks at what it gives back and at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on slices.",
+        "Write the `def` line with two parameters.",
+        "Give back a slice of the list that starts at the beginning and stops after `size` names.",
+        "Print it for `call_list` and 3, then try a size bigger than the list."
+      ],
+      "hints": [
+        "A slice gives back a new list cut from another one, and leaves the other one as it was.",
+        "A slice has a start and a stop, with a colon between. With nothing before the colon it starts at the beginning, and it stops just before the stop, so the stop is also how many names you get. A stop past the end is fine.",
+        "The shape is `return names[:size]`."
+      ],
+      "docs": [
+        {
+          "title": "Lists and slices",
+          "url": "https://docs.python.org/3/tutorial/introduction.html#lists"
+        },
+        {
+          "title": "Common sequence operations",
+          "url": "https://docs.python.org/3/library/stdtypes.html#common-sequence-operations"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "join",
+      "title": "Join the call-out list",
+      "file": "call_list.py",
+      "description": "Under `# Task 3`, write a function called `join_list` that takes a list of names and a name. It adds the name to the end of that same list, unless the name is on it already, and then the list stays as it was. It changes the list it is given and gives nothing back. Call it for `call_list` and a new name, then print `call_list` to see the change.\n\nCheck calls `join_list` with lists and names of its own, one of them already on its list, and looks at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on changing a list.",
+        "Ask whether the name is on the list already.",
+        "When it is not, add it to the end of the list the function was given.",
+        "Call it, print `call_list`, and call it again with the same name."
+      ],
+      "hints": [
+        "The function changes the list it is given, so the code that called it sees the new name. There is nothing to give back.",
+        "`in` and `not in` ask whether a value is on a list. A list has a method that adds one item at its end.",
+        "The shape is `if name not in names:` with `names.append(name)` under it."
+      ],
+      "docs": [
+        {
+          "title": "More on lists",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
+        },
+        {
+          "title": "Membership tests",
+          "url": "https://docs.python.org/3/reference/expressions.html#membership-test-operations"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "leader",
+      "title": "The leader goes first",
+      "file": "call_list.py",
+      "description": "Under `# Task 4`, write a function called `leader_first` that takes a list of names and the name of tonight's leader, who is somewhere on it. It moves the leader to the front of that same list, and the others keep their order. When the leader is first already, the list stays as it was. Call it for `call_list` and `\"Kirsty\"`, then print `call_list`.\n\nCheck calls `leader_first` with lists and leaders of its own and looks at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on changing a list.",
+        "Take the leader out of the list.",
+        "Put the leader back in, at the first position.",
+        "Call it for `call_list` and print it."
+      ],
+      "hints": [
+        "Moving is two changes: out of where they are, and in at the front.",
+        "A list has a method that takes out a value by what it is, and one that puts a value in at a position, moving the others along. Putting a value at a position with `=` replaces what was there instead.",
+        "The shape is `names.remove(leader)` and then `names.insert(0, leader)`."
+      ],
+      "docs": [
+        {
+          "title": "More on lists",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
+        },
+        {
+          "title": "Mutable sequence types",
+          "url": "https://docs.python.org/3/library/stdtypes.html#mutable-sequence-types"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "next",
+      "title": "Page the next one",
+      "file": "call_list.py",
+      "description": "Under `# Task 5`, write a function called `next_to_page` that takes a list of names, takes the first name off that same list and gives it back. After Task 4 has moved Kirsty to the front of `call_list`, it gives back `Kirsty`, and the list is one name shorter. When the list is empty, there is nobody to page: it gives back `None` and leaves the list as it is. Call it for `call_list`, print what it gives back, then print `call_list`.\n\nCheck calls `next_to_page` with lists of its own, an empty one too, and looks at what it gives back and at the list it gave it afterwards.",
+      "nextSteps": [
+        "Read the part of the lesson on taking items off a list.",
+        "First deal with the empty list: give back `None`.",
+        "Otherwise take the first name off the list and give it back.",
+        "Call it twice for `call_list` and print the list after each call."
+      ],
+      "hints": [
+        "Taking from an empty list stops with an error, so ask how long the list is before taking from it.",
+        "`len` gives how many items a list holds. A list has a method that takes an item off and gives it back; with nothing in its brackets it takes the last item, with a position it takes the item there.",
+        "The shape is `if len(names) == 0:` with `return None` under it, then `return names.pop(0)`."
+      ],
+      "docs": [
+        {
+          "title": "More on lists",
+          "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists"
+        },
+        {
+          "title": "len()",
+          "url": "https://docs.python.org/3/library/functions.html#len"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}
