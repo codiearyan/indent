@@ -5,7 +5,7 @@ import { dirname, join } from 'path'
 import { spawn, type IPty } from 'node-pty'
 import { EVENTS } from '@shared/types'
 import { emit, handle, listen } from '../ipc'
-import { firstNodeDir, labEnv } from '../labEnv'
+import { firstDirs, labEnv } from '../labEnv'
 import { shellLaunch } from '../shellStart'
 import { labModelProblem } from './labModel'
 import { workspaceDir } from '../paths'
@@ -50,7 +50,7 @@ export function register(): void {
       const base = { ...(await labEnv()), TERM: 'xterm-256color' }
       const { args, env } = windows
         ? { args: [], env: base }
-        : shellLaunch(shell, firstNodeDir(), base)
+        : shellLaunch(shell, firstDirs(), base)
       const pty = spawn(shell, args, {
         name: 'xterm-256color',
         cwd,

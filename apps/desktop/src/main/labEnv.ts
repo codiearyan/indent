@@ -67,6 +67,13 @@ export function firstNodeDir(): string | null {
   return existsSync(ownNodeBin()) ? ownNodeBin() : null
 }
 
+/** The app's own tools that go ahead of the computer's on the PATH: Node, then Java. */
+export function firstDirs(): string[] {
+  // The app's own Java is only downloaded when the computer's is missing or old.
+  const java = existsSync(ownJavaBin()) ? ownJavaBin() : null
+  return [firstNodeDir(), java].filter((dir): dir is string => !!dir)
+}
+
 /** Called once the lab model server is listening. */
 export function setLabModelUrl(url: string): void {
   labModelUrl = url
@@ -81,9 +88,7 @@ export async function shellEnv(): Promise<Record<string, string>> {
   }
   // The shim goes before the Store's `python3`, which only opens the Store.
   const shim = existsSync(join(python3ShimDir(), 'python3.cmd')) ? python3ShimDir() : null
-  // The app's own Java is only downloaded when the computer's is missing or old.
-  const java = existsSync(ownJavaBin()) ? ownJavaBin() : null
-  env.PATH = [firstNodeDir(), java, shim, await shellPath].filter(Boolean).join(delimiter)
+  env.PATH = [...firstDirs(), shim, await shellPath].filter(Boolean).join(delimiter)
   return env
 }
 
