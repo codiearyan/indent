@@ -1,0 +1,71 @@
+{
+  "scene": {
+    "nodes": [
+      { "id": "timetable", "label": "Day's departures", "kind": "data" },
+      { "id": "board", "label": "Board", "kind": "function", "mine": true },
+      { "id": "sheet", "label": "Sheet", "kind": "function", "mine": true },
+      { "id": "slip", "label": "Board at the slip", "kind": "story" },
+      { "id": "phone", "label": "Caller's reference", "kind": "story" },
+      { "id": "refs", "label": "Refs", "kind": "function", "mine": true }
+    ],
+    "edges": [
+      { "from": "timetable", "to": "board", "label": "boat, time, seats" },
+      { "from": "board", "to": "sheet", "label": "a row" },
+      { "from": "sheet", "to": "slip", "label": "whole board" },
+      { "from": "phone", "to": "refs", "label": "typed or pasted" }
+    ],
+    "note": "The chalk board becomes printed rows in straight columns, and a ticket reference is read however it was typed."
+  },
+  "tasks": {
+    "row": {
+      "steps": [
+        {
+          "active": ["timetable", "timetable->board", "board"],
+          "note": "One departure arrives: a boat's name, the hour and minute it leaves, and the seats left."
+        },
+        {
+          "active": ["board"],
+          "value": { "kind": "array", "label": "a row", "values": ["boat", "time", "seats"] },
+          "note": "Each value goes in a column of its own width: the name on the left, the seats on the right."
+        },
+        {
+          "active": ["board", "board->sheet"],
+          "note": "Every row comes out the same length, so the columns line up down the board."
+        }
+      ]
+    },
+    "sheet": {
+      "steps": [
+        {
+          "active": ["board->sheet", "sheet"],
+          "note": "The rows are added one after another to a text that grows, each ending its line."
+        },
+        {
+          "active": ["sheet"],
+          "note": "A line of dashes as long as the longest row goes under them."
+        },
+        {
+          "active": ["sheet", "sheet->slip", "slip"],
+          "note": "The whole board, with its title on top, goes to the slip as one text."
+        }
+      ]
+    },
+    "refs": {
+      "steps": [
+        {
+          "active": ["phone", "phone->refs", "refs"],
+          "note": "A reference arrives with small letters, or with odd spaces round it from an email."
+        },
+        {
+          "active": ["refs"],
+          "value": { "kind": "array", "label": "parts", "values": ["company", "year", "number"] },
+          "note": "The spaces at its ends come off, and it is cut into its parts at each point."
+        },
+        {
+          "active": ["refs"],
+          "note": "Two references are the same whatever their capital letters, and the digits in one can be counted."
+        }
+      ]
+    }
+  }
+}

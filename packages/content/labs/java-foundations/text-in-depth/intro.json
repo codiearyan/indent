@@ -1,0 +1,51 @@
+{
+  "stations": [
+    {
+      "title": "Ossian",
+      "say": "Nobody can read my chalk nines.",
+      "note": "Wants the board printed."
+    },
+    {
+      "title": "Chalk board",
+      "text": "Times and seats wherever they fit"
+    },
+    {
+      "title": "Your board",
+      "file": "SlipBoard.java",
+      "mine": true,
+      "gap": "Rows that line up",
+      "tasks": [
+        "Line up a row",
+        "Build the board",
+        "Read a reference"
+      ]
+    },
+    {
+      "title": "Board at the slip",
+      "rows": [
+        [
+          "Linnet",
+          "09:05"
+        ],
+        [
+          "Gannet",
+          "14:30"
+        ]
+      ],
+      "note": "Every column straight."
+    }
+  ],
+  "ticket": {
+    "label": "Linnet",
+    "wrong": "a smudge",
+    "why": "Unreadable",
+    "right": "in its row"
+  },
+  "captions": [
+    "The slip at Lanternquay. Ossian wants the chalk departure board printed instead.",
+    "On the chalk board the Linnet's time and seats are a smudge nobody can read.",
+    "You line up each row, build the whole board, and read the references callers give.",
+    "Now the Linnet sits in its own row, its time and seats in straight columns.",
+    "The board at the slip reads at a glance, and so does every ticket reference."
+  ]
+}

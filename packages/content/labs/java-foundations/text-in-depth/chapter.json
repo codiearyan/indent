@@ -1,0 +1,107 @@
+{
+  "id": "text-in-depth",
+  "title": "Text in depth: build it, line it up, take it apart",
+  "files": [
+    "SlipBoard.java"
+  ],
+  "terminal": {
+    "description": "A shell in your workspace. Print the board here, and try your classes from main.",
+    "suggestedCommand": "java SlipBoard.java"
+  },
+  "tasks": [
+    {
+      "id": "row",
+      "title": "Line up a row of the board",
+      "file": "SlipBoard.java",
+      "description": "Under `// Task 1`, write a class `Board` with one method. `static String row(String boat, int hour, int minute, int seats)` gives back one row of the board: the boat's name on the left of a column 10 characters wide, a space, the time as two digits, a colon and two digits, a space, then the seats on the right of a column 3 characters wide. For the Linnet at 9:05 with 12 seats that is `Linnet     09:05  12`.\n\nCheck calls `row` with boats, times and seats of its own, names of up to 10 characters among them, and reads the text it gives back character by character, spaces included.",
+      "nextSteps": [
+        "Read the part of the lesson about String.format and widths.",
+        "Write one pattern for the whole row: a place for each value, with its width.",
+        "Print a few rows between brackets from main, so you can see the spaces.",
+        "Try a time before 10 o'clock and a boat with a 10-letter name."
+      ],
+      "hints": [
+        "Gluing the values together with + and counting spaces by hand works for one boat and breaks for the next. One method fills a pattern of text with values.",
+        "In a pattern, a number between the % and the letter is the width of that place. Something in front of the width puts the value on the left instead of the right, and a 0 in front fills with zeros instead of spaces.",
+        "`return String.format(\"%-10s %02d:%02d %3d\", boat, hour, minute, seats);`"
+      ],
+      "docs": [
+        {
+          "title": "String.format",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#format(java.lang.String,java.lang.Object...)"
+        },
+        {
+          "title": "Formatter syntax",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Formatter.html#syntax"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Formatting text with printf and String.format",
+          "url": "https://www.youtube.com/watch?v=-ZQFJ0PZ6Qo"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "sheet",
+      "title": "Build the whole board",
+      "file": "SlipBoard.java",
+      "description": "Under `// Task 2`, write a class `Sheet` with two methods. `static void addRows(StringBuilder board, List<String> rows)` adds to the end of `board` each row followed by `\"\\n\"`, then a line of `-` as long as the longest row, followed by `\"\\n\"`; for no rows it adds nothing. `static String board(String title, List<String> rows)` gives back the whole board as text: the title and `\"\\n\"`, then the rows and the line as `addRows` adds them. A `StringBuilder` of its own, handed to `addRows`, makes it short.\n\nCheck hands `addRows` a `StringBuilder` of its own that already holds a line, and reads what it holds afterwards. It calls `board` and reads the text it gives back. Check runs with the line end of a Windows computer, so a line end that follows the computer shows.",
+      "nextSteps": [
+        "Read the part of the lesson about StringBuilder, and the one about repeat.",
+        "Write addRows: append each row and its line end, and keep the length of the longest.",
+        "Write board: make a StringBuilder, add the title, hand it to addRows, and give back its text.",
+        "Print the board from main with print, not println: it already ends with a line end."
+      ],
+      "hints": [
+        "addRows gives nothing back: its work is what it leaves in the StringBuilder it was handed, which belongs to whoever called it.",
+        "A StringBuilder adds to its end with one method, and a text can be repeated a number of times by a method of its own. A StringBuilder is not text: it hands over what it has built when asked.",
+        "In addRows: `board.append(row).append(\"\\n\");` in a loop, then `board.append(\"-\".repeat(longest)).append(\"\\n\");`. In board: `StringBuilder b = new StringBuilder(); b.append(title).append(\"\\n\"); addRows(b, rows); return b.toString();`."
+      ],
+      "docs": [
+        {
+          "title": "StringBuilder",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/StringBuilder.html"
+        },
+        {
+          "title": "String.repeat",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#repeat(int)"
+        }
+      ],
+      "points": 10
+    },
+    {
+      "id": "refs",
+      "title": "Read a ticket reference",
+      "file": "SlipBoard.java",
+      "description": "Under `// Task 3`, write a class `Refs` with three methods. `static List<String> parts(String ref)` gives back the parts of a reference such as `LQ.2031.0457`, split at each point, with any space at either end of `ref` left off first. `static boolean sameRef(String a, String b)` says whether two references are the same, whatever capital letters they use and whatever space is at either end. `static long digits(String ref)` gives back how many digits `ref` holds.\n\nCheck calls each method with references of its own, some with the kind of space text pasted from an email can carry, and hands over texts made while the program runs. It compares a list as a list, in order.",
+      "nextSteps": [
+        "Read the parts of the lesson about strip, split and comparing text.",
+        "Write parts: take the space off the ends, then split.",
+        "Write sameRef, and digits with chars.",
+        "Try each one from main, and try split with a plain point to see what it does."
+      ],
+      "hints": [
+        "Two methods take spaces off the ends of a text, and they do not agree on what a space is. split does not read its text as plain text.",
+        "split takes a pattern, in which a point stands for any character; a backslash in front makes it a plain point, and in Java text the backslash itself is written twice. equals has a cousin that takes no notice of capital letters. chars gives the characters as numbers, and Character can say which are digits.",
+        "`return List.of(ref.strip().split(\"\\\\.\"));`, `return a.strip().equalsIgnoreCase(b.strip());` and `return ref.chars().filter(Character::isDigit).count();`."
+      ],
+      "docs": [
+        {
+          "title": "String.split",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#split(java.lang.String)"
+        },
+        {
+          "title": "String.strip",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#strip()"
+        },
+        {
+          "title": "String.equalsIgnoreCase",
+          "url": "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html#equalsIgnoreCase(java.lang.String)"
+        }
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## What you will be able to do
 
-Until now every fare in this repo was a whole number of pence in an `int`, which was exact but awkward, and part 1 showed that a `double` holds money only nearly. This part gives the hut real money, real dates and real files, and it starts with the money. By the end of this issue you will be able to:
+Until now every fare in this repo was a whole number of pence in an `int`. This part gives the hut real money, real dates and real files, and it starts with the money. By the end of this issue you will be able to:
 
 - say why `0.1 + 0.2` is not `0.3` in a `double`, and why that matters at a till
 - make a `BigDecimal` from text, add, subtract and multiply with it, and compare two amounts
@@ -23,7 +23,7 @@ A `double` stores a number in binary, in a fixed number of bits. Most amounts wi
 System.out.println(0.1 + 0.2);    // 0.30000000000000004
 ```
 
-The error is tiny, and it never goes away. Add a few hundred fares and it shows in the pence; round an amount that should end in exactly half a penny and the `double` may sit just under the half, and round down. A till cannot be nearly right.
+The error is tiny and never goes away. Add a few hundred fares and it shows in the pence; round an amount that should end in exactly half a penny and the `double` may sit just under the half, and round down. A till cannot be nearly right.
 
 ## BigDecimal: an amount made from text
 
