@@ -73,7 +73,8 @@ export function useSideLayout(mounted: boolean, browser: boolean): SideLayout {
     const lesson = (plan.lesson / total) * 100
     const tutor = (plan.chat / total) * 100
     groupRef.current?.setLayout({ lesson, chat: tutor, work: 100 - lesson - tutor })
-  }, [total, plan.lesson, plan.chat, zen, chat, groupRef])
+    // `mounted`: a group that comes back after a notice starts from its default sizes.
+  }, [mounted, total, plan.lesson, plan.chat, zen, chat, groupRef])
 
   const onLayoutChanged = (layout: Layout, meta: LayoutChangedMeta): void => {
     if (!meta.isUserInteraction || !total) return
@@ -88,6 +89,7 @@ export function useSideLayout(mounted: boolean, browser: boolean): SideLayout {
     }
     if (before.lesson === 0 && lesson > 0) settings.setPanel('zen', false)
     if (before.chat > 0 && tutor === 0) settings.setPanel('chat', false)
+    if (before.chat === 0 && tutor > 0) settings.setPanel('chat', true)
     const open = useSettings.getState().panels.chat
     settings.setPanelSizes({
       ...(lesson > 0 && (open ? { lessonWithChat: lesson } : { lesson })),
