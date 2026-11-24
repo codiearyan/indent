@@ -6,6 +6,11 @@
   "language": "html",
   "tags": ["CSS", "Debugging"],
   "kind": "bug-hunt",
+  "prerequisites": [
+    { "title": "The cascade", "lab": "html-css-foundations", "chapter": "cascade" },
+    { "title": "The box model", "lab": "html-css-foundations", "chapter": "box-model" },
+    { "title": "Layouts for phones", "lab": "html-css-foundations", "chapter": "responsive" }
+  ],
   "parts": [
     {
       "title": "Rules that lose",

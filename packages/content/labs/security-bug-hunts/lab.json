@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "Security"],
   "kind": "bug-hunt",
+  "prerequisites": [
+    { "title": "HTTP requests", "lab": "how-the-web-works", "chapter": "requests" },
+    { "title": "Cookies", "lab": "how-the-web-works", "chapter": "cookies" },
+    { "title": "Paths in Node", "lab": "nodejs-foundations", "chapter": "paths" }
+  ],
   "parts": [
     { "title": "Input that changes the code", "chapters": ["search-leak", "notes-as-html"] },
     { "title": "Data that reaches the wrong person", "chapters": ["peeking-orders", "proof-escape", "leaky-log"] }

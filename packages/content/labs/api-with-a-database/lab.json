@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["Node.js", "SQL"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Choosing rows", "lab": "sql-foundations", "chapter": "choosing-rows" },
+    { "title": "Changing rows", "lab": "sql-foundations", "chapter": "changing-rows" },
+    { "title": "A first Express app", "lab": "express-crud-api", "chapter": "first-app" }
+  ],
   "format": 2,
   "parts": [
     {

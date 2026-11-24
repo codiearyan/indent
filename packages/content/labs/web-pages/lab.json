@@ -6,6 +6,11 @@
   "language": "html",
   "tags": ["HTML", "CSS"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "A first page", "lab": "html-css-foundations", "chapter": "first-page" },
+    { "title": "A first stylesheet", "lab": "html-css-foundations", "chapter": "first-stylesheet" },
+    { "title": "Selectors", "lab": "html-css-foundations", "chapter": "selectors" }
+  ],
   "parts": [
     { "title": "A page everyone can read", "chapters": ["page-outline", "signup-form"] },
     {

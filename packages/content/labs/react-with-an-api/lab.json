@@ -6,6 +6,11 @@
   "language": "react",
   "tags": ["React"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Forms in React", "lab": "react-foundations", "chapter": "forms" },
+    { "title": "Fetching data", "lab": "react-foundations", "chapter": "fetching" },
+    { "title": "Status codes", "lab": "how-the-web-works", "chapter": "status-families" }
+  ],
   "parts": [
     {
       "title": "Reading from the API",

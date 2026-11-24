@@ -6,6 +6,11 @@
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Calling a model", "lab": "llm-apps-ts", "chapter": "first-call" },
+    { "title": "New lists from old", "lab": "js-foundations", "chapter": "new-from-old" },
+    { "title": "Sorting", "lab": "js-foundations", "chapter": "sort-and-search" }
+  ],
   "parts": [
     { "title": "Turning the handbook into vectors", "chapters": ["chunking", "embeddings", "vector-store"] },
     { "title": "Answering and measuring", "chapters": ["grounded-answers", "measuring-retrieval"] }

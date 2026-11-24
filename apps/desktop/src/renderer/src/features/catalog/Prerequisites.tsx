@@ -22,7 +22,7 @@ export function Prerequisites({
       <div className="px-5 pt-4 pb-3">
         <h2 className="text-sm font-semibold">Before you start</h2>
         <p className="mt-1 text-[13px] text-muted-foreground">
-          This project assumes you know these. Review them if you like, or start now.
+          This repo assumes you know these. Review them if you like, or start now.
         </p>
       </div>
       <ul>
@@ -32,7 +32,7 @@ export function Prerequisites({
               to={`/learn/${target.id}/${chapter.id}`}
               className="flex h-[52px] items-center gap-4 px-5 text-sm transition-colors outline-none hover:bg-muted/60 focus-visible:bg-muted/60"
             >
-              <span className="w-40 shrink-0 truncate">{title}</span>
+              <span className="w-48 shrink-0 truncate">{title}</span>
               <span className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
                 {chapter.title}
               </span>

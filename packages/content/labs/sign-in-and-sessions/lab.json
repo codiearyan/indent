@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["Node.js", "Security"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "A first Express app", "lab": "express-crud-api", "chapter": "first-app" },
+    { "title": "Forms", "lab": "how-the-web-works", "chapter": "forms" },
+    { "title": "Cookies", "lab": "how-the-web-works", "chapter": "cookies" }
+  ],
   "format": 2,
   "parts": [
     {

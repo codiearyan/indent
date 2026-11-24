@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "Build your own"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Callbacks and timers", "lab": "js-foundations", "chapter": "timers-and-callbacks" },
+    { "title": "Promises", "lab": "js-foundations", "chapter": "promises-and-then" },
+    { "title": "Classes", "lab": "js-foundations", "chapter": "classes" }
+  ],
   "parts": [
     { "title": "Waiting for a value", "chapters": ["a-value-later", "when-it-arrives", "chains"] },
     { "title": "Errors, order and many at once", "chapters": ["when-it-fails", "later-and-together"] }

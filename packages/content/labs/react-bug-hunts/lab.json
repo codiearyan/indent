@@ -6,6 +6,11 @@
   "language": "react",
   "tags": ["React", "Debugging"],
   "kind": "bug-hunt",
+  "prerequisites": [
+    { "title": "Lists and keys", "lab": "react-foundations", "chapter": "lists-and-keys" },
+    { "title": "State", "lab": "react-foundations", "chapter": "state" },
+    { "title": "Effects", "lab": "react-foundations", "chapter": "effects" }
+  ],
   "parts": [
     { "title": "State the screen does not see", "chapters": ["clock-stuck", "names-stay-on", "notes-move-rows"] },
     { "title": "Effects and answers that come later", "chapters": ["card-stays-on-first", "old-search-results"] }

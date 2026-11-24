@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["Node.js", "Project"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "A first server", "lab": "nodejs-foundations", "chapter": "first-server" },
+    { "title": "HTTP requests", "lab": "how-the-web-works", "chapter": "requests" },
+    { "title": "Status codes", "lab": "how-the-web-works", "chapter": "status-families" }
+  ],
   "parts": [
     { "title": "Answering requests", "chapters": ["first-routes", "json-bodies"] },
     { "title": "The fleet behind an API", "chapters": ["boat-crud", "list-queries", "auth-and-errors"] }

@@ -6,6 +6,11 @@
   "language": "react",
   "tags": ["React"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Props", "lab": "react-foundations", "chapter": "props" },
+    { "title": "State", "lab": "react-foundations", "chapter": "state" },
+    { "title": "Effects", "lab": "react-foundations", "chapter": "effects" }
+  ],
   "parts": [
     {
       "title": "A screen made of parts",

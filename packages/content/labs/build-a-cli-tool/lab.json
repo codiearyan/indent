@@ -9,6 +9,11 @@
     "Build your own"
   ],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Paths", "lab": "command-line-foundations", "chapter": "paths" },
+    { "title": "Pipes", "lab": "command-line-foundations", "chapter": "joining-commands" },
+    { "title": "Reading files in Node", "lab": "nodejs-foundations", "chapter": "reading-files" }
+  ],
   "parts": [
     {
       "title": "Words in and out",

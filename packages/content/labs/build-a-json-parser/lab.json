@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "Build your own"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "JSON", "lab": "how-the-web-works", "chapter": "json" },
+    { "title": "Working with text", "lab": "js-foundations", "chapter": "text-and-labels" },
+    { "title": "Throwing errors", "lab": "js-foundations", "chapter": "throwing-errors" }
+  ],
   "parts": [
     { "title": "Reading the text", "chapters": ["cutting-into-tokens", "numbers-and-text", "values-inside-values"] },
     { "title": "Errors and the whole trip", "chapters": ["errors-you-can-act-on", "writing-it-back"] }

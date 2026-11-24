@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "Build your own"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "A first test", "lab": "testing-foundations", "chapter": "first-test" },
+    { "title": "Throwing errors", "lab": "js-foundations", "chapter": "throwing-errors" },
+    { "title": "async and await", "lab": "js-foundations", "chapter": "async-and-await" }
+  ],
   "parts": [
     { "title": "Running tests", "chapters": ["tests-are-functions", "expectations", "a-readable-report"] },
     { "title": "Tests in the real world", "chapters": ["tests-that-wait", "groups-and-setup"] }

@@ -6,6 +6,11 @@
   "language": "sql",
   "tags": ["SQL", "Debugging"],
   "kind": "bug-hunt",
+  "prerequisites": [
+    { "title": "Missing values", "lab": "sql-foundations", "chapter": "missing-values" },
+    { "title": "Totals per group", "lab": "sql-foundations", "chapter": "grouping-rows" },
+    { "title": "Rows with no match", "lab": "sql-foundations", "chapter": "left-joins" }
+  ],
   "parts": [
     { "title": "Rows counted twice or lost", "chapters": ["statements-too-high", "empty-win-back-list", "missing-from-round-up"] },
     { "title": "Numbers that drift", "chapters": ["averages-dont-add-up", "november-comes-up-short"] }

@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "Performance"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Loops", "lab": "js-foundations", "chapter": "doing-it-again" },
+    { "title": "Maps and sets", "lab": "js-foundations", "chapter": "maps-and-sets" },
+    { "title": "Several at once", "lab": "js-foundations", "chapter": "several-at-once" }
+  ],
   "parts": [
     { "title": "Measure, then do less", "chapters": ["measure-first", "loop-inside-a-loop", "work-done-again"] },
     { "title": "Waiting, and knowing when to stop", "chapters": ["waiting-in-line", "knowing-when-to-stop"] }

@@ -9,6 +9,11 @@
     "Build your own"
   ],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Maps", "lab": "js-foundations", "chapter": "maps-and-sets" },
+    { "title": "Reading files in Node", "lab": "nodejs-foundations", "chapter": "reading-files" },
+    { "title": "Writing files in Node", "lab": "nodejs-foundations", "chapter": "writing-files" }
+  ],
   "parts": [
     {
       "title": "Keys, values and a log",

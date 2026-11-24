@@ -9,6 +9,11 @@
     "Debugging"
   ],
   "kind": "bug-hunt",
+  "prerequisites": [
+    { "title": "Numbers and prices", "lab": "js-foundations", "chapter": "numbers-and-prices" },
+    { "title": "Working with text", "lab": "js-foundations", "chapter": "text-and-labels" },
+    { "title": "Sorting", "lab": "js-foundations", "chapter": "sort-and-search" }
+  ],
   "parts": [
     {
       "title": "Money and dates that drift",
