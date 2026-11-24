@@ -1,7 +1,10 @@
-import { Check, ChevronRight, Sparkles, X } from 'lucide-react'
+import { Check, ChevronRight, FileCode, Sparkles, X } from 'lucide-react'
 import type { CheckDetail, CheckResult } from '@shared/types'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { openAtLine } from '@/features/editor/editors'
+import { useWorkspace } from '@/stores/workspace'
+import { findLocation } from './checkLocation'
 
 /** `onAsk` is given only while the tutor is on; it adds "Ask the tutor" to each failed check. */
 export function CheckDetails({
@@ -49,6 +52,7 @@ export function CheckDetails({
                           What your code produced
                         </CollapsibleTrigger>
                       )}
+                      {!detail.passed && detail.output && <OpenAtLine output={detail.output} />}
                       {onAsk && !detail.passed && (
                         <Button
                           variant="ghost"
@@ -74,5 +78,32 @@ export function CheckDetails({
         </ul>
       )}
     </div>
+  )
+}
+
+function OpenAtLine({ output }: { output: string }): React.JSX.Element | null {
+  // A string, so typing re-renders this only when the place it points at changes.
+  const key = useWorkspace((s) => {
+    if (s.companion) return ''
+    const at = findLocation(
+      output,
+      s.files.map((f) => f.path),
+      s.dir
+    )
+    return at ? JSON.stringify(at) : ''
+  })
+  if (!key) return null
+  const { path, line, column } = JSON.parse(key) as { path: string; line: number; column?: number }
+  return (
+    <Button
+      variant="ghost"
+      size="xs"
+      className="-ml-1.5 font-normal text-muted-foreground hover:text-foreground"
+      aria-label={`Open ${path} at line ${line}`}
+      onClick={() => openAtLine(path, line, column)}
+    >
+      <FileCode />
+      Open at line {line}
+    </Button>
   )
 }

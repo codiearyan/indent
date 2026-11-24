@@ -23,3 +23,21 @@ export function focusedEditor(): monaco.editor.IStandaloneCodeEditor | undefined
 export function focusEditorSoon(): void {
   requestAnimationFrame(() => focusedEditor()?.focus())
 }
+
+/** Opens `path` in the focused group, puts the cursor on the line and focuses the editor. */
+export function openAtLine(path: string, line: number, column = 1): void {
+  useWorkspace.getState().openFile(path)
+  let frames = 0
+  const reveal = (): void => {
+    const editor = focusedEditor()
+    // The editor takes the file's model once React has drawn the new tab.
+    if (editor?.getModel()?.uri.path !== `/${path}`) {
+      if (++frames < 10) requestAnimationFrame(reveal)
+      return
+    }
+    editor.setPosition({ lineNumber: line, column })
+    editor.revealPositionInCenter({ lineNumber: line, column })
+    editor.focus()
+  }
+  requestAnimationFrame(reveal)
+}
