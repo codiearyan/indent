@@ -1,18 +1,30 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_PANEL_SIZES, LESSON_MIN, lessonWant, planWidths } from './panelLayout'
 
+const closed = { zen: false, chat: false, browser: false }
+const tutor = { zen: false, chat: true, browser: false }
+
 describe('lessonWant', () => {
   it('asks for the saved width without the tutor', () => {
-    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lesson: 600 }, false)).toBe(600)
+    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lesson: 600 }, closed)).toBe(600)
   })
 
   it('gives the tutor its room from the lesson, down to the lesson minimum', () => {
-    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lesson: 700, chat: 360 }, true)).toBe(340)
-    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lesson: 500, chat: 360 }, true)).toBe(LESSON_MIN)
+    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lesson: 700, chat: 360 }, tutor)).toBe(340)
+    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lesson: 500, chat: 360 }, tutor)).toBe(LESSON_MIN)
   })
 
   it('uses the width set while the tutor was open', () => {
-    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lessonWithChat: 450 }, true)).toBe(450)
+    expect(lessonWant({ ...DEFAULT_PANEL_SIZES, lessonWithChat: 450 }, tutor)).toBe(450)
+  })
+
+  it('steps away in focus mode', () => {
+    expect(lessonWant(DEFAULT_PANEL_SIZES, { ...closed, zen: true })).toBeNull()
+  })
+
+  it('steps away while the tutor is open beside a page, and comes back without it', () => {
+    expect(lessonWant(DEFAULT_PANEL_SIZES, { ...tutor, browser: true })).toBeNull()
+    expect(lessonWant(DEFAULT_PANEL_SIZES, { ...closed, browser: true })).toBe(520)
   })
 })
 

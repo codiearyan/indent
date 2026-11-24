@@ -44,7 +44,7 @@ export function useSideLayout(mounted: boolean, browser: boolean): SideLayout {
   const total = Math.max(0, width - SEPARATORS_PX)
   const plan = planWidths(
     total,
-    { lesson: zen ? null : lessonWant(sizes, chat), chat: chat ? sizes.chat : null },
+    { lesson: lessonWant(sizes, { zen, chat, browser }), chat: chat ? sizes.chat : null },
     CODE_MIN + (browser ? BROWSER_MIN + 1 : 0)
   )
   const planRef = useRef(plan)

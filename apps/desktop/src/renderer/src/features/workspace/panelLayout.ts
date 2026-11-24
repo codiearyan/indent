@@ -28,8 +28,16 @@ export interface SideWidths {
   work: number
 }
 
-/** The width the lesson asks for; opening the tutor takes its room from the lesson first. */
-export function lessonWant(sizes: PanelSizes, chat: boolean): number {
+/**
+ * The width the lesson asks for, or null when it is away: in focus mode, and while the tutor is
+ * open beside an issue's page, which already fills the sheet with three columns. Otherwise the
+ * tutor takes its room from the lesson first.
+ */
+export function lessonWant(
+  sizes: PanelSizes,
+  { zen, chat, browser }: { zen: boolean; chat: boolean; browser: boolean }
+): number | null {
+  if (zen || (chat && browser)) return null
   if (!chat) return sizes.lesson
   return sizes.lessonWithChat ?? Math.max(LESSON_MIN, sizes.lesson - sizes.chat)
 }
