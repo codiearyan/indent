@@ -5,7 +5,8 @@ export interface CodeLocation {
 }
 
 const SCRIPT = /\.[cm]?[jt]sx?$/
-const LINE_COLUMN = /:(\d+)(?::(\d+))?/g
+// `file.js:12:5` from Node and the test runner, `file.ts(12,5)` from the type checker.
+const LINE_COLUMN = /:(\d+)(?::(\d+))?|\((\d+),(\d+)\)/g
 
 const decode = (text: string): string => {
   try {
@@ -41,9 +42,9 @@ export function findLocation(
           (workspace !== '' && head.toLowerCase().endsWith(`${workspace}/`))
         )
       })
-      const line = Number(match[1])
+      const line = Number(match[1] ?? match[3])
       if (!path || line < 1) continue
-      const column = match[2] ? Number(match[2]) : undefined
+      const column = match[2] || match[4] ? Number(match[2] ?? match[4]) : undefined
       // Node names a crash's line without a column, and its stack names it again with one.
       if (!found) found = { path, line, column }
       else if (found.path === path && found.line === line) found.column = column

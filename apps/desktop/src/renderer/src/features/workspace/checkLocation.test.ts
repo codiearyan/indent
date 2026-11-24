@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { findLocation } from './checkLocation'
 
-const paths = ['src/orders.js', 'orders.js', 'src/my file.mjs', 'notes.md', 'README.md']
+const paths = [
+  'src/parse.ts',
+  'src/orders.js',
+  'orders.js',
+  'src/my file.mjs',
+  'notes.md',
+  'README.md'
+]
 const dir = '/Users/sam/work/shop/1'
 
 describe('findLocation', () => {
@@ -65,6 +72,12 @@ describe('findLocation', () => {
       line: 5,
       column: 1
     })
+  })
+
+  it('reads a type error from the type checker', () => {
+    const output =
+      "src/parse.ts(12,7): error TS2322: Type 'string' is not assignable to type 'number'."
+    expect(findLocation(output, paths, dir)).toEqual({ path: 'src/parse.ts', line: 12, column: 7 })
   })
 
   it('reads a relative path from the test runner', () => {
