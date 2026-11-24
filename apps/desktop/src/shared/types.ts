@@ -32,6 +32,8 @@ export interface LabMeta {
   format?: number
   /** Tools it needs on the computer; Node alone when missing. */
   tools?: ToolId[]
+  /** Concepts a project assumes, each linked to the issue that teaches it. */
+  prerequisites?: { title: string; lab: string; chapter: string }[]
   parts: { title: string; chapters: string[] }[]
 }
 

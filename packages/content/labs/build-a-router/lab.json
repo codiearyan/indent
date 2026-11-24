@@ -6,6 +6,10 @@
   "language": "javascript",
   "tags": ["JavaScript", "Build your own"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "URL parts", "lab": "how-the-web-works", "chapter": "addresses" },
+    { "title": "HTTP requests", "lab": "how-the-web-works", "chapter": "requests" }
+  ],
   "parts": [
     { "title": "Finding the handler", "chapters": ["a-table-of-routes", "parts-that-vary", "query-and-body"] },
     { "title": "Around the handler", "chapters": ["middleware-and-errors", "the-order-server"] }

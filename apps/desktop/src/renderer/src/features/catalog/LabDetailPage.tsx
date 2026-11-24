@@ -16,6 +16,7 @@ import { TOUR } from '@/features/tour/anchors'
 import { EmptyState } from './EmptyState'
 import { Figures } from './Figures'
 import { NeedsTools } from './NeedsTools'
+import { Prerequisites } from './Prerequisites'
 import { chapterState, labProgress } from './labStatus'
 
 const ACTION = { 'not-started': 'Start repo', 'in-progress': 'Continue', completed: 'Review' }
@@ -108,6 +109,8 @@ export function LabDetailPage(): React.JSX.Element {
           </div>
         </div>
       </header>
+
+      <Prerequisites lab={lab} labs={labs} />
 
       <Figures
         data-tour={TOUR.repoFigures}

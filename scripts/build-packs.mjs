@@ -111,6 +111,14 @@ for (const lab of labs) {
   if (!Array.isArray(tools) || tools.some((tool) => !TOOL_IDS.includes(tool))) {
     problems.push(`${lab.id}: tools must be a list of ${TOOL_IDS.join(', ')}`)
   }
+  for (const { title, lab: labId, chapter } of lab.prerequisites ?? []) {
+    const target = labs.find((other) => other.id === labId)
+    if (!title || !target?.chapters.some((c) => c.id === chapter)) {
+      problems.push(
+        `${lab.id}: prerequisite "${title}" points at ${labId}/${chapter}, which does not exist`
+      )
+    }
+  }
   checkFlowFile(join(content, 'labs', lab.id), lab.id, null)
   for (const chapter of lab.chapters) {
     const dir = join(content, 'labs', lab.id, chapter.id)
