@@ -18,6 +18,8 @@ export function FocusTasks({ chapter }: { chapter: Chapter }): React.JSX.Element
   const toolsInstalling = useRuntime((s) => !!s.status?.installing)
   const toolsBroken = useRuntime((s) => !!s.status?.error)
   const open = useSettings((s) => s.panels.focusTasks)
+  // Outside focus mode the lesson is away only because the window has no room for it.
+  const zen = useSettings((s) => s.panels.zen)
   const setPanel = useSettings((s) => s.setPanel)
   const tasks = focusTasks(chapter.tasks, progress)
   const passed = tasks.filter((task) => task.status === 'passed').length
@@ -58,14 +60,17 @@ export function FocusTasks({ chapter }: { chapter: Chapter }): React.JSX.Element
         <span className="text-[13px] text-muted-foreground tabular-nums">
           {passed} of {tasks.length}
         </span>
-        <Button
-          variant="ghost"
-          size="xs"
-          className="ml-auto font-normal text-muted-foreground hover:text-foreground"
-          onClick={() => setPanel('zen', false)}
-        >
-          Open lesson
-        </Button>
+        <span className="flex-1" />
+        {zen && (
+          <Button
+            variant="ghost"
+            size="xs"
+            className="font-normal text-muted-foreground hover:text-foreground"
+            onClick={() => setPanel('zen', false)}
+          >
+            Open lesson
+          </Button>
+        )}
         <IconButton
           label="Collapse tasks"
           aria-expanded

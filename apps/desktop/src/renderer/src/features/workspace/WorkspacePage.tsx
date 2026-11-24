@@ -22,6 +22,8 @@ import { RepoNotice } from './RepoNotice'
 import { FocusTasks } from './FocusTasks'
 import { useWorkspaceShortcuts } from './useWorkspaceShortcuts'
 import { useActivePaneTracking, type PaneId } from './activePane'
+import { useSideLayout } from './useSideLayout'
+import { BROWSER_MIN, CHAT_MIN, CODE_MIN, DEFAULT_PANEL_SIZES, LESSON_MIN } from './panelLayout'
 
 /** Height of the terminal's header bar, which stays visible while the terminal is collapsed. */
 export const TERMINAL_HEADER_PX = 41
@@ -37,7 +39,7 @@ export function WorkspacePage(): React.JSX.Element {
   const lessonSide = useSettings((s) => s.lessonSide)
   const setPanel = useSettings((s) => s.setPanel)
   const terminalRef = usePanelRef()
-  const chat = panels.chat && !panels.zen
+  const browserRef = usePanelRef()
   const companion = useWorkspace((s) => s.companion)
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const browserExpanded = useWorkspace((s) => s.browserExpanded) && browser
@@ -48,6 +50,8 @@ export function WorkspacePage(): React.JSX.Element {
   // not open.
   const notice =
     status === 'error' || status === 'elsewhere' || (status === 'loading' && downloading)
+  const side = useSideLayout(!notice && !companion, browser)
+  const lessonShown = side.plan.lesson > 0
   useWorkspaceShortcuts()
   useActivePaneTracking()
   // Here and not in the tasks list, which focus mode hides.
@@ -85,18 +89,33 @@ export function WorkspacePage(): React.JSX.Element {
     if (!panel) return
     if (panels.terminal && panel.isCollapsed()) {
       panel.expand()
-      // A first expand has no earlier size to return to and lands on the minimum.
-      if (panel.getSize().asPercentage < 25) panel.resize('40%')
+      panel.resize(useSettings.getState().panelSizes.terminal ?? '40%')
     }
     if (!panels.terminal && !panel.isCollapsed()) panel.collapse()
   }, [panels.terminal, terminalRef])
 
-  const lesson = !panels.zen && (
-    <Panel id="lesson" defaultSize="38%" minSize="24%">
-      <Pane id="lesson">
-        <LeftPanel />
-      </Pane>
+  const lesson = (
+    <Panel
+      id="lesson"
+      collapsible
+      collapsedSize={0}
+      minSize={LESSON_MIN}
+      defaultSize={DEFAULT_PANEL_SIZES.lesson}
+      groupResizeBehavior="preserve-pixel-size"
+      style={{ overflow: 'hidden' }}
+    >
+      {(lessonShown || side.sliding) && (
+        <Pane
+          id="lesson"
+          style={side.sliding ? { minWidth: side.plan.lesson || undefined } : undefined}
+        >
+          <LeftPanel />
+        </Pane>
+      )}
     </Panel>
+  )
+  const lessonSeparator = (
+    <Separator className={cn('w-px', separator, !lessonShown && 'bg-transparent')} />
   )
 
   return (
@@ -127,19 +146,40 @@ export function WorkspacePage(): React.JSX.Element {
             )}
           </Group>
         ) : (
-          <Group orientation="horizontal">
+          <Group
+            orientation="horizontal"
+            groupRef={side.groupRef}
+            elementRef={side.elementRef}
+            onLayoutChanged={side.onLayoutChanged}
+          >
             {lessonSide === 'left' && lesson}
-            {lessonSide === 'left' && lesson && <Separator className={`w-px ${separator}`} />}
-            <Panel id="work" minSize="30%">
-              <Group orientation="horizontal">
-                <Panel id="code" minSize="30%">
-                  <Group orientation="vertical">
-                    <Panel id="editor" minSize="20%">
+            {lessonSide === 'left' && lessonSeparator}
+            <Panel id="work" minSize={CODE_MIN + (browser ? BROWSER_MIN + 1 : 0)}>
+              <Group
+                orientation="horizontal"
+                onLayoutChanged={(_, meta) => {
+                  const panel = browserRef.current
+                  if (meta.isUserInteraction && panel) {
+                    useSettings.getState().setPanelSizes({ browser: panel.getSize().inPixels })
+                  }
+                }}
+              >
+                <Panel id="code" minSize={CODE_MIN}>
+                  <Group
+                    orientation="vertical"
+                    onLayoutChanged={(_, meta) => {
+                      const panel = terminalRef.current
+                      if (meta.isUserInteraction && panel && !panel.isCollapsed()) {
+                        useSettings.getState().setPanelSizes({ terminal: panel.getSize().inPixels })
+                      }
+                    }}
+                  >
+                    <Panel id="editor" minSize={240}>
                       {/* The task card sits in the editor's bottom corner on the lesson's side, so it
                           stays above the terminal at any height. */}
                       <div className="relative h-full">
                         <EditorPane />
-                        {panels.zen && chapter && status === 'ready' && (
+                        {!lessonShown && chapter && status === 'ready' && (
                           <div
                             className={cn(
                               'absolute bottom-3 z-10 flex max-h-[calc(100%-1.5rem)] flex-col',
@@ -156,11 +196,16 @@ export function WorkspacePage(): React.JSX.Element {
                       id="terminal"
                       panelRef={terminalRef}
                       collapsible
+                      groupResizeBehavior="preserve-pixel-size"
                       collapsedSize={TERMINAL_HEADER_PX}
                       minSize={160}
-                      defaultSize={panels.terminal ? '40%' : TERMINAL_HEADER_PX}
-                      onResize={(size) => {
-                        const collapsed = size.inPixels <= TERMINAL_HEADER_PX + 1
+                      defaultSize={
+                        panels.terminal
+                          ? (useSettings.getState().panelSizes.terminal ?? '40%')
+                          : TERMINAL_HEADER_PX
+                      }
+                      onResize={() => {
+                        const collapsed = terminalRef.current?.isCollapsed() ?? false
                         if (collapsed === useSettings.getState().panels.terminal) {
                           setPanel('terminal', !collapsed)
                         }
@@ -174,7 +219,13 @@ export function WorkspacePage(): React.JSX.Element {
                 </Panel>
                 {browser && <Separator className={`w-px ${separator}`} />}
                 {browser && (
-                  <Panel id="browser" defaultSize="45%" minSize="20%">
+                  <Panel
+                    id="browser"
+                    panelRef={browserRef}
+                    defaultSize={useSettings.getState().panelSizes.browser ?? '45%'}
+                    minSize={BROWSER_MIN}
+                    groupResizeBehavior="preserve-pixel-size"
+                  >
                     {/* Expanded, the pane covers the sheet but stays in place, so the page keeps running. */}
                     <Pane
                       id="browser"
@@ -186,16 +237,29 @@ export function WorkspacePage(): React.JSX.Element {
                 )}
               </Group>
             </Panel>
-            {lessonSide === 'right' && lesson && <Separator className={`w-px ${separator}`} />}
+            {lessonSide === 'right' && lessonSeparator}
             {lessonSide === 'right' && lesson}
-            {chat && <Separator className={`w-px ${separator}`} />}
-            {chat && (
-              <Panel id="chat" defaultSize="26%" minSize="20%">
-                <Pane id="tutor">
+            <Separator
+              className={cn('w-px', separator, side.plan.chat === 0 && 'bg-transparent')}
+            />
+            <Panel
+              id="chat"
+              collapsible
+              collapsedSize={0}
+              minSize={CHAT_MIN}
+              defaultSize={DEFAULT_PANEL_SIZES.chat}
+              groupResizeBehavior="preserve-pixel-size"
+              style={{ overflow: 'hidden' }}
+            >
+              {(side.plan.chat > 0 || side.sliding) && (
+                <Pane
+                  id="tutor"
+                  style={side.sliding ? { minWidth: side.plan.chat || undefined } : undefined}
+                >
                   <ChatPanel />
                 </Pane>
-              </Panel>
-            )}
+              )}
+            </Panel>
           </Group>
         )}
       </div>
@@ -208,14 +272,16 @@ export function WorkspacePage(): React.JSX.Element {
 function Pane({
   id,
   className,
+  style,
   children
 }: {
   id: PaneId
   className?: string
+  style?: React.CSSProperties
   children: React.ReactNode
 }): React.JSX.Element {
   return (
-    <div data-pane={id} className={cn('h-full', className)}>
+    <div data-pane={id} className={cn('h-full', className)} style={style}>
       {children}
     </div>
   )

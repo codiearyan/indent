@@ -208,3 +208,13 @@ html.window-fullscreen {
     transform: none;
   }
 }
+
+/* A workspace panel opening or closing slides; a drag or a window resize follows at once. */
+[data-sliding] > [data-panel] {
+  transition: flex-grow var(--motion-state) var(--ease-in-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-sliding] > [data-panel] {
+    transition: none;
+  }
+}

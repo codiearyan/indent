@@ -6,7 +6,7 @@ let focusBeforeTutor: Element | null = null
 /** Opens the tutor with its composer focused, or closes it and gives focus back to where it was. */
 export function toggleTutor(): void {
   const { panels, setPanel } = useSettings.getState()
-  if (panels.chat && !panels.zen) {
+  if (panels.chat) {
     setPanel('chat', false)
     const previous = focusBeforeTutor
     focusBeforeTutor = null
@@ -22,7 +22,6 @@ export function toggleTutor(): void {
     return
   }
   focusBeforeTutor = document.activeElement
-  if (panels.zen) setPanel('zen', false)
   setPanel('chat', true)
   requestAnimationFrame(() => document.querySelector<HTMLElement>('#tutor-input')?.focus())
 }
