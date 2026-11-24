@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "DOM"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "The parts of a page", "lab": "html-css-foundations", "chapter": "page-structure" },
+    { "title": "Forms", "lab": "html-css-foundations", "chapter": "booking-form" },
+    { "title": "New lists from old", "lab": "js-foundations", "chapter": "new-from-old" }
+  ],
   "parts": [
     { "title": "A board made from data", "chapters": ["route-board", "ticked-routes", "find-a-route"] },
     { "title": "A board that keeps up", "chapters": ["log-a-climb", "board-remembers"] }

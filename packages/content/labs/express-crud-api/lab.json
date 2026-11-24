@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["Node.js", "Express"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "HTTP requests", "lab": "how-the-web-works", "chapter": "requests" },
+    { "title": "Status codes", "lab": "how-the-web-works", "chapter": "status-families" },
+    { "title": "JSON", "lab": "how-the-web-works", "chapter": "json" }
+  ],
   "format": 2,
   "parts": [
     { "title": "Answering with Express", "chapters": ["first-app", "reading-workshops"] },

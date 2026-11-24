@@ -6,6 +6,11 @@
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "async and await", "lab": "js-foundations", "chapter": "async-and-await" },
+    { "title": "Object types", "lab": "typescript-foundations", "chapter": "object-types" },
+    { "title": "JSON", "lab": "how-the-web-works", "chapter": "json" }
+  ],
   "parts": [
     { "title": "Talking to a model", "chapters": ["first-call", "system-prompts", "structured-output"] },
     { "title": "Building for real users", "chapters": ["streaming", "token-budget"] }

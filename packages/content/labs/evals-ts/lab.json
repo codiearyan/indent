@@ -6,6 +6,10 @@
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Calling a model", "lab": "llm-apps-ts", "chapter": "first-call" },
+    { "title": "Structured output", "lab": "llm-apps-ts", "chapter": "structured-output" }
+  ],
   "parts": [
     { "title": "Scoring one version", "chapters": ["exact-match", "graders", "judge"] },
     { "title": "Deciding between versions", "chapters": ["compare", "flaky"] }

@@ -6,6 +6,10 @@
   "language": "typescript",
   "tags": ["TypeScript"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Types for values", "lab": "typescript-foundations", "chapter": "types-for-values" },
+    { "title": "Object types", "lab": "typescript-foundations", "chapter": "object-types" }
+  ],
   "parts": [
     { "title": "Typing what is already there", "chapters": ["narrowing", "modelling-data"] },
     { "title": "Types that do more of the work", "chapters": ["generics", "types-from-types", "unhappy-path"] }

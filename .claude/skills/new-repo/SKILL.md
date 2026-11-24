@@ -42,6 +42,9 @@ commands.
      as needing a newer version instead of failing its checks. `3` for a repo with an issue
      that sets `movesFiles`. `4` for a repo that lists `python`, `java` or `cpp` in `tools`, or
      has an issue that lists a dot file in its `files`.
+   - `prerequisites`: only for a project that assumes concepts taught elsewhere, e.g.
+     `[{ "title": "HTTP requests", "lab": "how-the-web-works", "chapter": "requests" }]`. The
+     repo page lists them under "Before you start", each linked to its issue.
    - `parts`: one or two titled groups that list the issue ids in order.
 4. **Plan the issues.** Five is usual, two is the least. Each is one request from someone at the
    company, and each starts where the last one ended, so the fifth issue's code has grown from the

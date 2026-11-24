@@ -6,6 +6,11 @@
   "language": "javascript",
   "tags": ["JavaScript", "Build your own"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Passing functions", "lab": "js-foundations", "chapter": "passing-functions" },
+    { "title": "Closures", "lab": "js-foundations", "chapter": "loyalty-cards" },
+    { "title": "Copies and originals", "lab": "js-foundations", "chapter": "copies-and-originals" }
+  ],
   "parts": [
     { "title": "Holding the state", "chapters": ["one-place-for-state", "listeners", "selectors"] },
     { "title": "The store at work", "chapters": ["actions", "the-order-screen"] }

@@ -6,6 +6,11 @@
   "language": "typescript",
   "tags": ["TypeScript", "Interview"],
   "kind": "bug-hunt",
+  "prerequisites": [
+    { "title": "Calling a model", "lab": "llm-apps-ts", "chapter": "first-call" },
+    { "title": "Structured output", "lab": "llm-apps-ts", "chapter": "structured-output" },
+    { "title": "Token budgets", "lab": "llm-apps-ts", "chapter": "token-budget" }
+  ],
   "parts": [
     { "title": "Reading what the model sends back", "chapters": ["cut-off-replies", "untrusted-json"] },
     { "title": "Conversations that last", "chapters": ["runaway-history"] }

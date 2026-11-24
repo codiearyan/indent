@@ -6,6 +6,11 @@
   "language": "shell",
   "tags": ["Git"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Reading the history", "lab": "git-foundations", "chapter": "reading-history" },
+    { "title": "Merging", "lab": "git-foundations", "chapter": "merging" },
+    { "title": "Pushing", "lab": "git-foundations", "chapter": "pushing" }
+  ],
   "tools": ["node", "git"],
   "parts": [
     { "title": "Undo and recover", "chapters": ["shared-bad-commit", "lost-work"] },

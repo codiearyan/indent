@@ -6,6 +6,10 @@
   "language": "javascript",
   "tags": ["JavaScript"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Callbacks and timers", "lab": "js-foundations", "chapter": "timers-and-callbacks" },
+    { "title": "Passing functions", "lab": "js-foundations", "chapter": "passing-functions" }
+  ],
   "parts": [
     { "title": "Waiting well", "chapters": ["promises", "async-await", "many-at-once"] },
     { "title": "When services push back", "chapters": ["limiting-concurrency", "retries-and-cancellation"] }

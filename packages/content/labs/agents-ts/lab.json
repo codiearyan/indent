@@ -6,6 +6,11 @@
   "language": "typescript",
   "tags": ["TypeScript", "AI"],
   "kind": "project",
+  "prerequisites": [
+    { "title": "Calling a model", "lab": "llm-apps-ts", "chapter": "first-call" },
+    { "title": "Structured output", "lab": "llm-apps-ts", "chapter": "structured-output" },
+    { "title": "async and await", "lab": "js-foundations", "chapter": "async-and-await" }
+  ],
   "parts": [
     { "title": "Talking to tools", "chapters": ["one-tool-call", "agent-loop"] },
     { "title": "Agents you can trust", "chapters": ["bad-arguments", "parallel-calls", "guardrails"] }
