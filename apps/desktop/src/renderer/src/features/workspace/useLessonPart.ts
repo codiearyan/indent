@@ -47,6 +47,8 @@ export function useLessonPart(
   return useCallback(
     (event: React.UIEvent) => {
       const viewport = event.target as HTMLElement
+      // A code block scrolling sideways reaches this handler too.
+      if (viewport.dataset.slot !== 'scroll-area-viewport') return
       if (!id || pending.current !== undefined) return
       cancelAnimationFrame(frame.current)
       frame.current = requestAnimationFrame(() => {
