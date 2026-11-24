@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Group, Panel, Separator, usePanelRef } from 'react-resizable-panels'
 import { useSettings } from '@/stores/settings'
@@ -40,9 +40,18 @@ export function WorkspacePage(): React.JSX.Element {
   const setPanel = useSettings((s) => s.setPanel)
   const terminalRef = usePanelRef()
   const browserRef = usePanelRef()
+  // Read once: a default size that changes while a separator is dragged ends the drag.
+  const [terminalDefault] = useState(() => {
+    const { panels, panelSizes } = useSettings.getState()
+    return panels.terminal ? (panelSizes.terminal ?? '40%') : TERMINAL_HEADER_PX
+  })
   const companion = useWorkspace((s) => s.companion)
   const browser = useWorkspace((s) => Boolean(s.chapter?.preview)) && panels.browser
   const browserExpanded = useWorkspace((s) => s.browserExpanded) && browser
+  const browserDefault = useMemo(
+    () => (browser ? (useSettings.getState().panelSizes.browser ?? '45%') : '45%'),
+    [browser]
+  )
   const status = useWorkspace((s) => s.status)
   const chapter = useWorkspace((s) => s.chapter)
   const downloading = useCatalog((s) => !!labId && s.downloads[labId]?.state === 'running')
@@ -199,11 +208,7 @@ export function WorkspacePage(): React.JSX.Element {
                       groupResizeBehavior="preserve-pixel-size"
                       collapsedSize={TERMINAL_HEADER_PX}
                       minSize={160}
-                      defaultSize={
-                        panels.terminal
-                          ? (useSettings.getState().panelSizes.terminal ?? '40%')
-                          : TERMINAL_HEADER_PX
-                      }
+                      defaultSize={terminalDefault}
                       onResize={() => {
                         const collapsed = terminalRef.current?.isCollapsed() ?? false
                         if (collapsed === useSettings.getState().panels.terminal) {
@@ -222,7 +227,7 @@ export function WorkspacePage(): React.JSX.Element {
                   <Panel
                     id="browser"
                     panelRef={browserRef}
-                    defaultSize={useSettings.getState().panelSizes.browser ?? '45%'}
+                    defaultSize={browserDefault}
                     minSize={BROWSER_MIN}
                     groupResizeBehavior="preserve-pixel-size"
                   >
