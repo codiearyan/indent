@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CODE_THEMES, codePalette } from '@indent/design/code-palette'
+import { DEFAULT_PANEL_SIZES } from '@/features/workspace/panelLayout'
 import { mergeSettings } from './mergeSettings'
 import type { SettingsState, Typography } from './settings'
 
@@ -19,6 +20,7 @@ const defaults = {
   codeTheme: 'ember',
   editor: { wordWrap: false, lineNumbers: true, minimap: false, vim: false },
   panels: { files: false, terminal: false, chat: false, zen: false, browser: true },
+  panelSizes: DEFAULT_PANEL_SIZES,
   typography,
   shortcuts: {},
   guide: null,

@@ -5,6 +5,8 @@ import { fontStack } from '@/lib/fonts'
 import { setShortcutOverrides, type ShortcutOverrides } from '@/lib/shortcuts'
 import type { GuideStage } from '@/features/tour/guide'
 import { mergeSettings } from './mergeSettings'
+import { withPanel } from './withPanel'
+import { DEFAULT_PANEL_SIZES, type PanelSizes } from '@/features/workspace/panelLayout'
 
 export type Theme = 'dark' | 'light'
 export type Appearance = Theme | 'system'
@@ -54,10 +56,12 @@ export interface SettingsState {
   textScale: Record<TextZone, number>
   typography: Typography
   /**
-   * Which optional panels are showing. `zen` hides everything but the editor; `focusTasks` is the
+   * Which optional panels are showing. `zen` hides the lesson; `focusTasks` is the
    * task card it shows open rather than collapsed to a pill.
    */
   panels: Record<PanelKey, boolean>
+  /** Panel sizes the learner dragged; they belong to this screen, so they stay out of backups. */
+  panelSizes: PanelSizes
   lessonSide: 'left' | 'right'
   leftTab: LeftTab
   /** Chapter keys whose Resources tab the learner uncovered. */
@@ -100,6 +104,7 @@ export interface SettingsState {
   setAllTextScale(value: number): void
   setTypography(change: Partial<Typography>): void
   setPanel(key: PanelKey, open: boolean): void
+  setPanelSizes(change: Partial<PanelSizes>): void
   togglePanel(key: PanelKey): void
   setLessonSide(side: 'left' | 'right'): void
   setLeftTab(tab: LeftTab): void
@@ -151,6 +156,7 @@ export const useSettings = create<SettingsState>()(
       textScale: defaultScale,
       typography: DEFAULT_TYPOGRAPHY,
       panels: defaultPanels,
+      panelSizes: DEFAULT_PANEL_SIZES,
       lessonSide: 'left',
       leftTab: 'insights',
       resourcesShown: [],
@@ -184,8 +190,9 @@ export const useSettings = create<SettingsState>()(
       setAllTextScale: (value) =>
         set({ textScale: { lesson: value, tasks: value, editor: value, terminal: value } }),
       setTypography: (change) => set((s) => ({ typography: { ...s.typography, ...change } })),
-      setPanel: (key, open) => set((s) => ({ panels: { ...s.panels, [key]: open } })),
-      togglePanel: (key) => set((s) => ({ panels: { ...s.panels, [key]: !s.panels[key] } })),
+      setPanel: (key, open) => set((s) => ({ panels: withPanel(s.panels, key, open) })),
+      setPanelSizes: (change) => set((s) => ({ panelSizes: { ...s.panelSizes, ...change } })),
+      togglePanel: (key) => set((s) => ({ panels: withPanel(s.panels, key, !s.panels[key]) })),
       setLessonSide: (lessonSide) => set({ lessonSide }),
       setLeftTab: (leftTab) => set({ leftTab }),
       showResources: (key) =>
@@ -205,7 +212,8 @@ export const useSettings = create<SettingsState>()(
       setLastVersion: (lastVersion) => set({ lastVersion }),
       setGoals: (goals) => set({ goals }),
       setIde: (ide) => set({ ide }),
-      resetLayout: () => set({ panels: defaultPanels, lessonSide: 'left' }),
+      resetLayout: () =>
+        set({ panels: defaultPanels, panelSizes: DEFAULT_PANEL_SIZES, lessonSide: 'left' }),
       setGuide: (guide) => set({ guide })
     }),
     {
