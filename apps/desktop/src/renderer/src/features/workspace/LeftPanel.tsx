@@ -34,7 +34,7 @@ export function LeftPanel(): React.JSX.Element {
   const setPanel = useSettings((s) => s.setPanel)
   // Beside an IDE there is no editor for the card to sit on.
   const companion = useWorkspace((s) => s.companion)
-  useLessonPart(chapter)
+  const onLessonScroll = useLessonPart(chapter, leftTab === 'insights' && status !== 'loading')
 
   return (
     <Tabs
@@ -74,7 +74,7 @@ export function LeftPanel(): React.JSX.Element {
       ) : (
         <>
           <TabsContent value="insights" forceMount className={cn(content, 'flex flex-col')}>
-            <ScrollArea className={cn(scroll, 'min-h-0 flex-1')}>
+            <ScrollArea className={cn(scroll, 'min-h-0 flex-1')} onScrollCapture={onLessonScroll}>
               <div className="zone-lesson space-y-6 px-6 pt-5 pb-10">
                 {chapter.intro ? (
                   <IssueIntro
